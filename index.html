@@ -405,15 +405,23 @@
   </div>
 
   <!-- First-Person Walk Navigation HUD -->
-  <div id="walkHud" class="fixed top-3 left-1/2 -translate-x-1/2 z-50 hidden items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 rounded-full border border-[var(--border-strong)] bg-[var(--glass-bg)] text-[var(--fg)] backdrop-blur-md text-[10px] sm:text-[11px] font-medium shadow-lg select-none max-w-[94vw]">
+  <div id="walkHud"
+    class="fixed top-3 left-1/2 -translate-x-1/2 z-50 hidden items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 rounded-full border border-[var(--border-strong)] bg-[var(--glass-bg)] text-[var(--fg)] backdrop-blur-md text-[10px] sm:text-[11px] font-medium shadow-lg select-none max-w-[94vw]">
     <span class="mono font-bold tracking-wide">WALK MODE</span>
     <span class="opacity-40">|</span>
-    <span class="opacity-80 hidden sm:inline"><kbd class="mono px-1 py-0.5 rounded bg-[var(--surface-mute)]">W</kbd><kbd class="mono px-1 py-0.5 rounded bg-[var(--surface-mute)]">A</kbd><kbd class="mono px-1 py-0.5 rounded bg-[var(--surface-mute)]">S</kbd><kbd class="mono px-1 py-0.5 rounded bg-[var(--surface-mute)]">D</kbd> Walk</span>
-    <span class="opacity-80 hidden sm:inline"><kbd class="mono px-1 py-0.5 rounded bg-[var(--surface-mute)]">Shift</kbd> Sprint</span>
-    <span class="opacity-80 hidden sm:inline"><kbd class="mono px-1 py-0.5 rounded bg-[var(--surface-mute)]">Space</kbd> Jump</span>
+    <span class="opacity-80 hidden sm:inline"><kbd class="mono px-1 py-0.5 rounded bg-[var(--surface-mute)]">W</kbd><kbd
+        class="mono px-1 py-0.5 rounded bg-[var(--surface-mute)]">A</kbd><kbd
+        class="mono px-1 py-0.5 rounded bg-[var(--surface-mute)]">S</kbd><kbd
+        class="mono px-1 py-0.5 rounded bg-[var(--surface-mute)]">D</kbd> Walk</span>
+    <span class="opacity-80 hidden sm:inline"><kbd class="mono px-1 py-0.5 rounded bg-[var(--surface-mute)]">Shift</kbd>
+      Sprint</span>
+    <span class="opacity-80 hidden sm:inline"><kbd class="mono px-1 py-0.5 rounded bg-[var(--surface-mute)]">Space</kbd>
+      Jump</span>
     <span class="opacity-80 hidden md:inline">Click Viewport to Look</span>
     <span class="opacity-40 hidden sm:inline">|</span>
-    <button id="exitWalkBtn" class="mono px-2 py-0.5 rounded text-[10px] bg-[var(--fg)] text-[var(--bg)] font-bold hover:opacity-80">Exit [V]</button>
+    <button id="exitWalkBtn"
+      class="mono px-2 py-0.5 rounded text-[10px] bg-[var(--fg)] text-[var(--bg)] font-bold hover:opacity-80">Exit
+      [V]</button>
   </div>
 
   <!-- ==========================================================================
@@ -762,8 +770,10 @@
 
             <!-- Traffic Rules & Signal Mode -->
             <div class="grid grid-cols-2 gap-1 pt-0.5">
-              <button id="envDriveRuleBtn" class="tool-btn tool-btn-solid active text-[9px] py-1" title="Toggle Driving Lane Rule (LHD / RHD)">Traffic: RHD (Right)</button>
-              <button id="envSignalsBtn" class="tool-btn tool-btn-solid active text-[9px] py-1" title="Toggle 4-Way Traffic Lights">Signals: 4-Way</button>
+              <button id="envDriveRuleBtn" class="tool-btn tool-btn-solid active text-[9px] py-1"
+                title="Toggle Driving Lane Rule (LHD / RHD)">Traffic: RHD (Right)</button>
+              <button id="envSignalsBtn" class="tool-btn tool-btn-solid active text-[9px] py-1"
+                title="Toggle 4-Way Traffic Lights">Signals: 4-Way</button>
             </div>
 
             <div class="space-y-1 pt-1">
@@ -966,7 +976,7 @@
             <p class="text-[9px] opacity-70">Curated architectural finishes with procedural PBR maps (lazy loaded on
               demand).</p>
 
-            <div id="pbrLibraryGrid" class="grid grid-cols-2 gap-1.5 max-h-52 overflow-y-auto pr-0.5">
+            <div id="pbrLibraryGrid" class="grid grid-cols-2 gap-1.5 max-h-64 overflow-y-auto pr-0.5">
               <!-- Dynamically populated via initPbrMaterialLibraryUI() -->
             </div>
 
@@ -1866,8 +1876,8 @@
           }
 
           const cruisingSpeed = (6.0 + (c % 2) * 1.5) * carScale;
-          const stopLineCoord = isEW 
-            ? (crossRoadX - dir * (roadWidth * 0.72)) 
+          const stopLineCoord = isEW
+            ? (crossRoadX - dir * (roadWidth * 0.72))
             : (roadZ - dir * (roadWidth * 0.72));
 
           state.lumionEnvGroup.add(carMesh);
@@ -1890,7 +1900,7 @@
         // 2 Animated Pedestrians Crossing at Zebra Crosswalks
         state.animatedPedestrians = [];
         const pedPalette = [0x2C3A47, 0x576574, 0x8395A7, 0x1E272E];
-        
+
         // Pedestrian 1: Crosses along East zebra crosswalk (North <-> South)
         const ped1Mesh = createStylizedPedestrianMesh(pedPalette[0]);
         ped1Mesh.scale.setScalar(0.95);
@@ -3564,6 +3574,368 @@
             map: tex,
             roughness: 0.96,
             metalness: 0.0
+          });
+        }
+      },
+      {
+        id: 'calacatta_gold',
+        name: 'Calacatta Gold',
+        subtitle: 'Warm Italian Veins',
+        category: 'Marble',
+        swatchHex: '#FAF7F0',
+        create: () => {
+          const c = document.createElement('canvas'); c.width = 512; c.height = 512;
+          const ctx = c.getContext('2d');
+          ctx.fillStyle = '#FAF8F3'; ctx.fillRect(0, 0, 512, 512);
+          for (let i = 0; i < 35; i++) {
+            ctx.fillStyle = `rgba(240, 235, 222, ${0.15 + Math.random() * 0.15})`;
+            ctx.beginPath();
+            ctx.arc(Math.random() * 512, Math.random() * 512, 50 + Math.random() * 100, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          const drawVein = (x, y, len, angle, w) => {
+            ctx.strokeStyle = `rgba(182, 142, 85, ${0.40 + Math.random() * 0.35})`;
+            ctx.lineWidth = w;
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            let curX = x, curY = y;
+            for (let s = 0; s < len; s += 8) {
+              angle += (Math.random() - 0.5) * 0.40;
+              curX += Math.cos(angle) * 8;
+              curY += Math.sin(angle) * 8;
+              ctx.lineTo(curX, curY);
+              if (Math.random() < 0.10 && w > 0.8) {
+                drawVein(curX, curY, len * 0.4, angle + (Math.random() > 0.5 ? 0.55 : -0.55), w * 0.5);
+              }
+            }
+            ctx.stroke();
+          };
+          drawVein(30, 60, 460, 0.72, 2.0);
+          drawVein(440, 20, 380, 2.2, 1.4);
+          drawVein(20, 400, 300, -0.35, 1.1);
+          const tex = new THREE.CanvasTexture(c);
+          tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+          tex.repeat.set(1.5, 1.5);
+          return new THREE.MeshPhysicalMaterial({
+            name: 'PBR_Calacatta_Gold',
+            color: 0xFAF7F2,
+            map: tex,
+            roughness: 0.10,
+            metalness: 0.02,
+            clearcoat: 0.92,
+            clearcoatRoughness: 0.06
+          });
+        }
+      },
+      {
+        id: 'verde_alpi',
+        name: 'Verde Alpi',
+        subtitle: 'Alpine Deep Green',
+        category: 'Marble',
+        swatchHex: '#1A3326',
+        create: () => {
+          const c = document.createElement('canvas'); c.width = 512; c.height = 512;
+          const ctx = c.getContext('2d');
+          ctx.fillStyle = '#12241A'; ctx.fillRect(0, 0, 512, 512);
+          for (let i = 0; i < 40; i++) {
+            ctx.fillStyle = `rgba(26, 56, 40, ${0.12 + Math.random() * 0.18})`;
+            ctx.beginPath();
+            ctx.arc(Math.random() * 512, Math.random() * 512, 40 + Math.random() * 90, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          const drawVein = (x, y, len, angle, w) => {
+            ctx.strokeStyle = `rgba(210, 240, 225, ${0.45 + Math.random() * 0.45})`;
+            ctx.lineWidth = w;
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            let curX = x, curY = y;
+            for (let s = 0; s < len; s += 8) {
+              angle += (Math.random() - 0.5) * 0.50;
+              curX += Math.cos(angle) * 8;
+              curY += Math.sin(angle) * 8;
+              ctx.lineTo(curX, curY);
+              if (Math.random() < 0.14 && w > 0.8) {
+                drawVein(curX, curY, len * 0.45, angle + (Math.random() > 0.5 ? 0.6 : -0.6), w * 0.5);
+              }
+            }
+            ctx.stroke();
+          };
+          drawVein(15, 30, 480, 0.68, 2.0);
+          drawVein(450, 40, 400, 2.4, 1.5);
+          drawVein(30, 380, 320, -0.4, 1.2);
+          const tex = new THREE.CanvasTexture(c);
+          tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+          tex.repeat.set(1.5, 1.5);
+          return new THREE.MeshPhysicalMaterial({
+            name: 'PBR_Verde_Alpi',
+            color: 0x1A3326,
+            map: tex,
+            roughness: 0.14,
+            metalness: 0.03,
+            clearcoat: 0.88,
+            clearcoatRoughness: 0.08
+          });
+        }
+      },
+      {
+        id: 'terracotta_tile',
+        name: 'Terracotta Tile',
+        subtitle: 'Tuscan Clay Earth',
+        category: 'Ceramic',
+        swatchHex: '#B85334',
+        create: () => {
+          const c = document.createElement('canvas'); c.width = 512; c.height = 512;
+          const ctx = c.getContext('2d');
+          ctx.fillStyle = '#A8482A'; ctx.fillRect(0, 0, 512, 512);
+          for (let y = 0; y < 512; y += 64) {
+            for (let x = 0; x < 512; x += 128) {
+              const offsetX = (Math.floor(y / 64) % 2) * 64;
+              const tileX = (x + offsetX) % 512;
+              const tone = 0.88 + Math.random() * 0.24;
+              ctx.fillStyle = `rgb(${Math.floor(184 * tone)}, ${Math.floor(83 * tone)}, ${Math.floor(52 * tone)})`;
+              ctx.fillRect(tileX + 2, y + 2, 124, 60);
+              ctx.fillStyle = 'rgba(70, 25, 12, 0.35)';
+              ctx.fillRect(tileX, y, 128, 2);
+              ctx.fillRect(tileX, y, 2, 64);
+            }
+          }
+          for (let i = 0; i < 900; i++) {
+            ctx.fillStyle = Math.random() > 0.5 ? 'rgba(60, 20, 10, 0.25)' : 'rgba(230, 140, 100, 0.22)';
+            ctx.fillRect(Math.random() * 512, Math.random() * 512, 1 + Math.random() * 3, 1 + Math.random() * 2);
+          }
+          const tex = new THREE.CanvasTexture(c);
+          tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+          tex.repeat.set(2, 2);
+          return new THREE.MeshStandardMaterial({
+            name: 'PBR_Terracotta_Tile',
+            color: 0xBA5536,
+            map: tex,
+            bumpMap: tex,
+            bumpScale: 0.042,
+            roughness: 0.84,
+            metalness: 0.0
+          });
+        }
+      },
+      {
+        id: 'champagne_brass',
+        name: 'Champagne Brass',
+        subtitle: 'Satin Brushed Gold',
+        category: 'Metal',
+        swatchHex: '#C6A664',
+        create: () => {
+          const c = document.createElement('canvas'); c.width = 512; c.height = 512;
+          const ctx = c.getContext('2d');
+          ctx.fillStyle = '#C29F5C'; ctx.fillRect(0, 0, 512, 512);
+          for (let y = 0; y < 512; y++) {
+            const br = (Math.random() - 0.5) * 28;
+            ctx.fillStyle = `rgba(${br > 0 ? 255 : 0}, ${br > 0 ? 230 : 0}, ${br > 0 ? 160 : 0}, ${Math.abs(br) / 255})`;
+            ctx.fillRect(0, y, 512, 1);
+          }
+          const tex = new THREE.CanvasTexture(c);
+          tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+          tex.repeat.set(1, 4);
+          return new THREE.MeshStandardMaterial({
+            name: 'PBR_Champagne_Brass',
+            color: 0xC8A866,
+            map: tex,
+            bumpMap: tex,
+            bumpScale: 0.015,
+            roughness: 0.24,
+            metalness: 0.94
+          });
+        }
+      },
+      {
+        id: 'charcoal_basalt',
+        name: 'Charcoal Basalt',
+        subtitle: 'Flamed Volcanic Stone',
+        category: 'Stone',
+        swatchHex: '#232529',
+        create: () => {
+          const c = document.createElement('canvas'); c.width = 512; c.height = 512;
+          const ctx = c.getContext('2d');
+          ctx.fillStyle = '#202226'; ctx.fillRect(0, 0, 512, 512);
+          for (let i = 0; i < 2800; i++) {
+            const tone = Math.random();
+            ctx.fillStyle = tone > 0.6 ? 'rgba(65, 70, 78, 0.32)' : (tone > 0.3 ? 'rgba(10, 11, 14, 0.45)' : 'rgba(38, 41, 46, 0.25)');
+            ctx.fillRect(Math.random() * 512, Math.random() * 512, 1 + Math.random() * 3, 1 + Math.random() * 3);
+          }
+          const tex = new THREE.CanvasTexture(c);
+          tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+          tex.repeat.set(2, 2);
+          return new THREE.MeshStandardMaterial({
+            name: 'PBR_Charcoal_Basalt',
+            color: 0x25272B,
+            map: tex,
+            bumpMap: tex,
+            bumpScale: 0.048,
+            roughness: 0.74,
+            metalness: 0.04
+          });
+        }
+      },
+      {
+        id: 'smoked_oak',
+        name: 'Smoked Oak',
+        subtitle: 'Deep European Timber',
+        category: 'Wood',
+        swatchHex: '#3C2B1D',
+        create: () => {
+          const c = document.createElement('canvas'); c.width = 512; c.height = 512;
+          const ctx = c.getContext('2d');
+          ctx.fillStyle = '#362417'; ctx.fillRect(0, 0, 512, 512);
+          for (let y = 0; y < 512; y += 2) {
+            const wave = Math.sin(y * 0.038) * 16 + Math.sin(y * 0.10) * 5;
+            const dark = (y + Math.floor(wave)) % 20 < 3;
+            ctx.fillStyle = dark ? 'rgba(20, 12, 6, 0.38)' : 'rgba(84, 58, 38, 0.20)';
+            ctx.fillRect(0, y, 512, 2);
+          }
+          for (let i = 0; i < 500; i++) {
+            ctx.fillStyle = Math.random() > 0.5 ? 'rgba(15, 8, 4, 0.35)' : 'rgba(105, 75, 52, 0.25)';
+            ctx.fillRect(Math.random() * 512, Math.random() * 512, 1 + Math.random() * 7, 1);
+          }
+          const tex = new THREE.CanvasTexture(c);
+          tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+          tex.repeat.set(2, 2);
+          return new THREE.MeshPhysicalMaterial({
+            name: 'PBR_Smoked_Oak',
+            color: 0x3E2D1F,
+            map: tex,
+            bumpMap: tex,
+            bumpScale: 0.035,
+            roughness: 0.35,
+            metalness: 0.0,
+            clearcoat: 0.25,
+            clearcoatRoughness: 0.25
+          });
+        }
+      },
+      {
+        id: 'scandinavian_ash',
+        name: 'Scandinavian Ash',
+        subtitle: 'Nordic Pale Timber',
+        category: 'Wood',
+        swatchHex: '#D8CBB6',
+        create: () => {
+          const c = document.createElement('canvas'); c.width = 512; c.height = 512;
+          const ctx = c.getContext('2d');
+          ctx.fillStyle = '#DCD1BF'; ctx.fillRect(0, 0, 512, 512);
+          for (let y = 0; y < 512; y += 2) {
+            const wave = Math.sin(y * 0.025) * 12 + Math.sin(y * 0.08) * 4;
+            const dark = (y + Math.floor(wave)) % 18 < 2;
+            ctx.fillStyle = dark ? 'rgba(165, 142, 116, 0.25)' : 'rgba(245, 240, 230, 0.30)';
+            ctx.fillRect(0, y, 512, 2);
+          }
+          for (let i = 0; i < 400; i++) {
+            ctx.fillStyle = Math.random() > 0.5 ? 'rgba(150, 128, 102, 0.22)' : 'rgba(255, 252, 245, 0.35)';
+            ctx.fillRect(Math.random() * 512, Math.random() * 512, 1 + Math.random() * 6, 1);
+          }
+          const tex = new THREE.CanvasTexture(c);
+          tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+          tex.repeat.set(2, 2);
+          return new THREE.MeshPhysicalMaterial({
+            name: 'PBR_Scandinavian_Ash',
+            color: 0xDDD2C2,
+            map: tex,
+            bumpMap: tex,
+            bumpScale: 0.025,
+            roughness: 0.42,
+            metalness: 0.0,
+            clearcoat: 0.16,
+            clearcoatRoughness: 0.30
+          });
+        }
+      },
+      {
+        id: 'limewash_plaster',
+        name: 'Limewash Plaster',
+        subtitle: 'Textured Tuscan Stucco',
+        category: 'Plaster',
+        swatchHex: '#E2DACD',
+        create: () => {
+          const c = document.createElement('canvas'); c.width = 512; c.height = 512;
+          const ctx = c.getContext('2d');
+          ctx.fillStyle = '#E4DCCE'; ctx.fillRect(0, 0, 512, 512);
+          for (let i = 0; i < 60; i++) {
+            ctx.fillStyle = `rgba(${195 + Math.random() * 30}, ${185 + Math.random() * 30}, ${170 + Math.random() * 30}, ${0.15 + Math.random() * 0.18})`;
+            ctx.beginPath();
+            ctx.ellipse(Math.random() * 512, Math.random() * 512, 40 + Math.random() * 70, 20 + Math.random() * 40, Math.random() * Math.PI, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          for (let i = 0; i < 1200; i++) {
+            ctx.fillStyle = Math.random() > 0.5 ? 'rgba(165, 150, 135, 0.22)' : 'rgba(250, 248, 242, 0.32)';
+            ctx.fillRect(Math.random() * 512, Math.random() * 512, 1 + Math.random() * 3, 1 + Math.random() * 2);
+          }
+          const tex = new THREE.CanvasTexture(c);
+          tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+          tex.repeat.set(2, 2);
+          return new THREE.MeshStandardMaterial({
+            name: 'PBR_Limewash_Plaster',
+            color: 0xE6DEC9,
+            map: tex,
+            bumpMap: tex,
+            bumpScale: 0.035,
+            roughness: 0.88,
+            metalness: 0.0
+          });
+        }
+      },
+      {
+        id: 'anodized_black',
+        name: 'Anodized Black',
+        subtitle: 'Matte Architectural Metal',
+        category: 'Metal',
+        swatchHex: '#1B1C1E',
+        create: () => {
+          const c = document.createElement('canvas'); c.width = 512; c.height = 512;
+          const ctx = c.getContext('2d');
+          ctx.fillStyle = '#17181A'; ctx.fillRect(0, 0, 512, 512);
+          for (let y = 0; y < 512; y++) {
+            const br = (Math.random() - 0.5) * 20;
+            ctx.fillStyle = `rgba(${br > 0 ? 255 : 0}, ${br > 0 ? 255 : 0}, ${br > 0 ? 255 : 0}, ${Math.abs(br) / 255})`;
+            ctx.fillRect(0, y, 512, 1);
+          }
+          const tex = new THREE.CanvasTexture(c);
+          tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+          tex.repeat.set(1, 4);
+          return new THREE.MeshStandardMaterial({
+            name: 'PBR_Anodized_Black',
+            color: 0x1E1F22,
+            map: tex,
+            bumpMap: tex,
+            bumpScale: 0.012,
+            roughness: 0.36,
+            metalness: 0.86
+          });
+        }
+      },
+      {
+        id: 'solar_bronze_glass',
+        name: 'Solar Bronze Glass',
+        subtitle: 'Amber Architectural Tint',
+        category: 'Glass',
+        swatchHex: '#5C4E3D',
+        create: () => {
+          const c = document.createElement('canvas'); c.width = 512; c.height = 512;
+          const ctx = c.getContext('2d');
+          const grad = ctx.createLinearGradient(0, 0, 512, 512);
+          grad.addColorStop(0, '#5A4A38');
+          grad.addColorStop(1, '#74604A');
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, 512, 512);
+          const tex = new THREE.CanvasTexture(c);
+          return new THREE.MeshPhysicalMaterial({
+            name: 'PBR_Solar_Bronze_Glass',
+            color: 0x6E5842,
+            map: tex,
+            roughness: 0.06,
+            metalness: 0.05,
+            transmission: 0.84,
+            transparent: true,
+            opacity: 0.90,
+            ior: 1.54,
+            thickness: 0.5
           });
         }
       }
@@ -5773,14 +6145,14 @@ body.clean .glass-card,body.clean .glass-pill,body.clean nav,body.clean #dir{opa
           g.setAttribute('position', new THREE.BufferAttribute(a, 3));
           pts = rain ? new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: 0xcfd8e3, transparent: true, opacity: .55, depthWrite: false }))
             : new THREE.Points(g, new THREE.PointsMaterial({
-                map: getSnowflakeTexture(),
-                color: 0xffffff,
-                size: span * .016,
-                transparent: true,
-                opacity: .95,
-                blending: THREE.AdditiveBlending,
-                depthWrite: false
-              }));
+              map: getSnowflakeTexture(),
+              color: 0xffffff,
+              size: span * .016,
+              transparent: true,
+              opacity: .95,
+              blending: THREE.AdditiveBlending,
+              depthWrite: false
+            }));
           pts.frustumCulled = false; scene.add(pts);
         }
         if (!mist && wasMist) { if (state.todEnabled) { const s = $('todAzimuthSlider'); s.dispatchEvent(new Event('input')); } else scene.fog = null; }
