@@ -533,7 +533,8 @@
     </div>
 
     <!-- Focused Part Quick Pill -->
-    <div id="selectedObjHud" class="hidden absolute bottom-28 sm:bottom-36 left-3 z-20 glass-card w-56 p-2.5 space-y-1.5">
+    <div id="selectedObjHud"
+      class="hidden absolute bottom-28 sm:bottom-36 left-3 z-20 glass-card w-56 p-2.5 space-y-1.5">
       <div class="flex items-center justify-between border-b pb-1" style="border-color: var(--border);">
         <span id="selObjName" class="font-bold text-[10px] mono truncate max-w-[125px]">--</span>
         <div class="flex gap-1">
@@ -548,7 +549,8 @@
       </div>
       <div class="flex items-center gap-1 pt-1 border-t" style="border-color: var(--border);">
         <button id="selHudOpenMatsBtn" class="tool-btn tool-btn-solid flex-1 py-0.5 text-[9px]">PBR Finishes</button>
-        <button id="selHudResetMatBtn" class="tool-btn tool-btn-solid flex-1 py-0.5 text-[9px]" title="Reset to original material">Reset Mat</button>
+        <button id="selHudResetMatBtn" class="tool-btn tool-btn-solid flex-1 py-0.5 text-[9px]"
+          title="Reset to original material">Reset Mat</button>
       </div>
     </div>
 
@@ -696,9 +698,12 @@
 
             <!-- Preset Selection Grid -->
             <div class="grid grid-cols-3 gap-1">
-              <button id="hdriPresetDaylight" data-hdri="daylight" class="hdri-preset-btn tool-btn tool-btn-solid text-[10px]">Daylight</button>
-              <button id="hdriPresetOvercast" data-hdri="overcast" class="hdri-preset-btn tool-btn tool-btn-solid text-[10px]">Overcast</button>
-              <button id="hdriPresetSunset" data-hdri="sunset" class="hdri-preset-btn tool-btn tool-btn-solid text-[10px]">Sunset</button>
+              <button id="hdriPresetDaylight" data-hdri="daylight"
+                class="hdri-preset-btn tool-btn tool-btn-solid text-[10px]">Daylight</button>
+              <button id="hdriPresetOvercast" data-hdri="overcast"
+                class="hdri-preset-btn tool-btn tool-btn-solid text-[10px]">Overcast</button>
+              <button id="hdriPresetSunset" data-hdri="sunset"
+                class="hdri-preset-btn tool-btn tool-btn-solid text-[10px]">Sunset</button>
             </div>
 
             <!-- Backdrop Visibility & Custom File Upload -->
@@ -738,7 +743,9 @@
             </div>
 
             <!-- Return to Rayleigh Sky -->
-            <button id="hdriResetProceduralBtn" class="tool-btn tool-btn-solid w-full text-[9px] py-1 opacity-80 hover:opacity-100">Reset to Rayleigh Physical Sky</button>
+            <button id="hdriResetProceduralBtn"
+              class="tool-btn tool-btn-solid w-full text-[9px] py-1 opacity-80 hover:opacity-100">Reset to Rayleigh
+              Physical Sky</button>
           </div>
 
           <!-- Rich World Context Toggles -->
@@ -956,16 +963,19 @@
               <span id="pbrTargetBadge" class="mono text-[9px] px-1.5 py-0.5 rounded font-bold"
                 style="background: var(--surface-mute); color: var(--fg);">NO SELECTION</span>
             </div>
-            <p class="text-[9px] opacity-70">Curated architectural finishes with procedural PBR maps (lazy loaded on demand).</p>
-            
+            <p class="text-[9px] opacity-70">Curated architectural finishes with procedural PBR maps (lazy loaded on
+              demand).</p>
+
             <div id="pbrLibraryGrid" class="grid grid-cols-2 gap-1.5 max-h-52 overflow-y-auto pr-0.5">
               <!-- Dynamically populated via initPbrMaterialLibraryUI() -->
             </div>
 
             <!-- Material Reset Actions -->
             <div class="grid grid-cols-2 gap-1 pt-1.5 border-t" style="border-color: var(--border);">
-              <button id="resetSelectedMatBtn" class="tool-btn tool-btn-solid text-[9px] py-1" title="Reset selected mesh part to its initial loaded material">Reset Part</button>
-              <button id="resetAllMatsBtn" class="tool-btn tool-btn-solid text-[9px] py-1" title="Restore all parts in model to original materials">Reset All</button>
+              <button id="resetSelectedMatBtn" class="tool-btn tool-btn-solid text-[9px] py-1"
+                title="Reset selected mesh part to its initial loaded material">Reset Part</button>
+              <button id="resetAllMatsBtn" class="tool-btn tool-btn-solid text-[9px] py-1"
+                title="Restore all parts in model to original materials">Reset All</button>
             </div>
           </div>
 
@@ -983,7 +993,7 @@
           </div>
 
           <button id="toggleDoubleSideBtn" class="w-full tool-btn tool-btn-solid active py-1">Double-Sided: ON</button>
-          
+
           <div class="text-[9px] font-bold uppercase opacity-65 mono pt-1">Scene SKP Materials</div>
           <div id="materialsList" class="h-32 overflow-y-auto studio-sunken divide-y"
             style="border-color: var(--border);"></div>
@@ -1350,6 +1360,7 @@
         rotation: 0
       },
       animatedCars: [],
+      animatedPedestrians: [],
       trafficSignals: [],
       trafficDriveSide: 'right', // 'right' (RHD default) or 'left' (LHD traffic rule)
       envSignals: true,
@@ -1586,7 +1597,43 @@
         car.add(w);
       });
 
+      car.userData = { tailLightMat, headLightMat };
       return car;
+    }
+
+    // Helper: Build Minimalist Architectural Scale Pedestrian Figure
+    function createStylizedPedestrianMesh(outfitHex = 0x2C333D) {
+      const ped = new THREE.Group();
+      const skinMat = new THREE.MeshStandardMaterial({ color: 0xD8C2AF, roughness: 0.65 });
+      const clothMat = new THREE.MeshStandardMaterial({ color: outfitHex, roughness: 0.8 });
+      const darkMat = new THREE.MeshStandardMaterial({ color: 0x1E2024, roughness: 0.9 });
+
+      // Torso / Jacket
+      const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.20, 0.68, 8), clothMat);
+      torso.position.y = 1.05;
+      torso.castShadow = true;
+      ped.add(torso);
+
+      // Head
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.12, 10, 8), skinMat);
+      head.position.y = 1.50;
+      head.castShadow = true;
+      ped.add(head);
+
+      // Legs
+      const legGeo = new THREE.CylinderGeometry(0.065, 0.06, 0.70, 8);
+      const leftLeg = new THREE.Mesh(legGeo, darkMat);
+      leftLeg.position.set(0.09, 0.35, 0);
+      leftLeg.castShadow = true;
+      ped.add(leftLeg);
+
+      const rightLeg = new THREE.Mesh(legGeo, darkMat);
+      rightLeg.position.set(-0.09, 0.35, 0);
+      rightLeg.castShadow = true;
+      ped.add(rightLeg);
+
+      ped.userData = { leftLeg, rightLeg };
+      return ped;
     }
 
     function buildProceduralLumionEnvironment() {
@@ -1596,6 +1643,7 @@
 
     function buildProceduralLumionEnvironmentCore() {
       state.animatedCars = [];
+      state.animatedPedestrians = [];
       while (state.lumionEnvGroup.children.length > 0) {
         state.lumionEnvGroup.remove(state.lumionEnvGroup.children[0]);
       }
@@ -1817,16 +1865,63 @@
             carMesh.rotation.y = dir > 0 ? -Math.PI / 2 : Math.PI / 2;
           }
 
+          const cruisingSpeed = (6.0 + (c % 2) * 1.5) * carScale;
+          const stopLineCoord = isEW 
+            ? (crossRoadX - dir * (roadWidth * 0.72)) 
+            : (roadZ - dir * (roadWidth * 0.72));
+
           state.lumionEnvGroup.add(carMesh);
           state.animatedCars.push({
             mesh: carMesh,
             axis: isEW ? 'x' : 'z',
             dir,
-            speed: (6.5 + c * 1.4) * carScale,
+            cruisingSpeed,
+            speed: cruisingSpeed,
             limit: roadLen * 0.45,
-            origin: isEW ? center.x : center.z
+            origin: isEW ? center.x : center.z,
+            stopLineCoord,
+            junctionCenter: isEW ? crossRoadX : roadZ,
+            tailLightMat: carMesh.userData.tailLightMat,
+            headLightMat: carMesh.userData.headLightMat,
+            carScale
           });
         }
+
+        // 2 Animated Pedestrians Crossing at Zebra Crosswalks
+        state.animatedPedestrians = [];
+        const pedPalette = [0x2C3A47, 0x576574, 0x8395A7, 0x1E272E];
+        
+        // Pedestrian 1: Crosses along East zebra crosswalk (North <-> South)
+        const ped1Mesh = createStylizedPedestrianMesh(pedPalette[0]);
+        ped1Mesh.scale.setScalar(0.95);
+        ped1Mesh.position.set(crossRoadX + roadWidth * 0.58, floorY + 0.02, roadZ - roadWidth * 0.52);
+        state.lumionEnvGroup.add(ped1Mesh);
+        state.animatedPedestrians.push({
+          mesh: ped1Mesh,
+          axis: 'z',
+          dir: 1,
+          speed: 1.35,
+          minPos: roadZ - roadWidth * 0.52,
+          maxPos: roadZ + roadWidth * 0.52,
+          isEW: false,
+          walkCycle: 0
+        });
+
+        // Pedestrian 2: Crosses along North zebra crosswalk (West <-> East)
+        const ped2Mesh = createStylizedPedestrianMesh(pedPalette[1]);
+        ped2Mesh.scale.setScalar(0.95);
+        ped2Mesh.position.set(crossRoadX - roadWidth * 0.52, floorY + 0.02, roadZ - roadWidth * 0.58);
+        state.lumionEnvGroup.add(ped2Mesh);
+        state.animatedPedestrians.push({
+          mesh: ped2Mesh,
+          axis: 'x',
+          dir: 1,
+          speed: 1.25,
+          minPos: crossRoadX - roadWidth * 0.52,
+          maxPos: crossRoadX + roadWidth * 0.52,
+          isEW: true,
+          walkCycle: 0
+        });
 
         // Parked VIP Car on Driveway Pad
         const parkedCar = createStylizedCarMesh(0x1E2229);
@@ -4233,8 +4328,8 @@
         if (document.pointerLockElement !== canvas) {
           try {
             const p = canvas.requestPointerLock?.();
-            if (p && p.catch) p.catch(() => {});
-          } catch (e) {}
+            if (p && p.catch) p.catch(() => { });
+          } catch (e) { }
         }
       }
     });
@@ -5410,12 +5505,102 @@
         });
       }
 
-      // Animate Moving Traffic on the 4-Way Lumion Road Junction
+      // Animate Pedestrians Crossing at Zebra Crosswalks
+      if (state.todEnabled && state.animatedPedestrians && state.animatedPedestrians.length > 0) {
+        state.animatedPedestrians.forEach((ped) => {
+          ped.walkCycle += dt * 4.2;
+          const stride = Math.sin(ped.walkCycle) * 0.28;
+          if (ped.mesh.userData.leftLeg) ped.mesh.userData.leftLeg.rotation.x = stride;
+          if (ped.mesh.userData.rightLeg) ped.mesh.userData.rightLeg.rotation.x = -stride;
+
+          ped.mesh.position[ped.axis] += ped.dir * ped.speed * dt;
+          if (ped.dir > 0 && ped.mesh.position[ped.axis] >= ped.maxPos) {
+            ped.dir = -1;
+            ped.mesh.rotation.y = ped.axis === 'z' ? Math.PI : -Math.PI / 2;
+          } else if (ped.dir < 0 && ped.mesh.position[ped.axis] <= ped.minPos) {
+            ped.dir = 1;
+            ped.mesh.rotation.y = ped.axis === 'z' ? 0 : Math.PI / 2;
+          }
+        });
+      }
+
+      // Animate Moving Traffic with Intelligent AI (Stop Lines, Signals & Non-Overlap)
       if (state.todEnabled && state.envCars && state.animatedCars.length > 0) {
+        const cycle = (performance.now() * 0.001) % 12.0;
+        const ewGreen = cycle < 4.5;
+        const ewAmber = cycle >= 4.5 && cycle < 6.0;
+        const nsGreen = cycle >= 6.0 && cycle < 10.5;
+        const nsAmber = cycle >= 10.5 && cycle < 12.0;
+
         state.animatedCars.forEach((car) => {
+          const isEW = car.axis === 'x';
+          const isGreen = isEW ? ewGreen : nsGreen;
+          const pos = car.mesh.position[car.axis];
+          const distToStopLine = (car.stopLineCoord - pos) * car.dir;
+
+          let targetSpeed = car.cruisingSpeed;
+
+          // A. Signal stop line logic
+          if (!isGreen) {
+            // Approaching stop line from behind within 14 meters
+            if (distToStopLine > 0 && distToStopLine < 14.0) {
+              targetSpeed = Math.max(0, car.cruisingSpeed * Math.max(0, (distToStopLine - 0.5) / 13.5));
+              if (distToStopLine <= 0.8) targetSpeed = 0;
+            }
+          }
+
+          // B. Crosswalk & Pedestrian Safety Check (NEVER OVERLAP PEDESTRIANS)
+          if (state.animatedPedestrians) {
+            state.animatedPedestrians.forEach((ped) => {
+              const pedDistAlongAxis = (ped.mesh.position[car.axis] - pos) * car.dir;
+              const pedOtherAxisDist = Math.abs(ped.mesh.position[isEW ? 'z' : 'x'] - car.mesh.position[isEW ? 'z' : 'x']);
+              // If pedestrian is ahead within 9m and in or near car's lane corridor (<2.8m lateral)
+              if (pedDistAlongAxis > 0 && pedDistAlongAxis < 9.0 && pedOtherAxisDist < 2.8) {
+                targetSpeed = 0; // Emergency pedestrian safety hold
+              }
+            });
+          }
+
+          // C. First-Person Walk Mode Player Collision Avoidance
+          if (state.walkMode && state.walkMode.active) {
+            const playerPos = activeCamera.position;
+            const playerDistAlongAxis = (playerPos[car.axis] - pos) * car.dir;
+            const playerOtherAxisDist = Math.abs(playerPos[isEW ? 'z' : 'x'] - car.mesh.position[isEW ? 'z' : 'x']);
+            if (playerDistAlongAxis > 0 && playerDistAlongAxis < 10.0 && playerOtherAxisDist < 2.6) {
+              targetSpeed = 0; // Stop for walking player
+            }
+          }
+
+          // D. Inter-Vehicle Anti-Collision Check (Safe queueing in lane)
+          state.animatedCars.forEach((other) => {
+            if (other !== car && other.axis === car.axis && other.dir === car.dir) {
+              const distToLeadCar = (other.mesh.position[car.axis] - pos) * car.dir;
+              if (distToLeadCar > 0 && distToLeadCar < 12.0) {
+                if (distToLeadCar < 4.2) {
+                  targetSpeed = 0; // Bumper stop behind lead car
+                } else {
+                  targetSpeed = Math.min(targetSpeed, other.speed * Math.max(0, (distToLeadCar - 3.8) / 8.0));
+                }
+              }
+            }
+          });
+
+          // E. Smooth Kinematics & Dynamic Brake Lights
+          if (car.speed > targetSpeed) {
+            car.speed = Math.max(targetSpeed, car.speed - 9.0 * dt);
+            if (car.tailLightMat) car.tailLightMat.color.setHex(0xFF1E1E); // Bright red brake light
+          } else if (car.speed < targetSpeed) {
+            car.speed = Math.min(targetSpeed, car.speed + 4.8 * dt);
+            if (car.tailLightMat) car.tailLightMat.color.setHex(0x661010); // Normal running tail light
+          } else if (car.speed === 0) {
+            if (car.tailLightMat) car.tailLightMat.color.setHex(0xFF1E1E); // Holding at standstill
+          }
+
+          // F. Advance Car Position
           car.mesh.position[car.axis] += car.dir * car.speed * dt;
           if (Math.abs(car.mesh.position[car.axis] - car.origin) > car.limit) {
             car.mesh.position[car.axis] = car.origin - car.dir * car.limit;
+            car.speed = car.cruisingSpeed;
           }
         });
       }
