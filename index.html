@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <link rel="manifest" href="manifest.webmanifest" />
+  <!-- PWA Manifest dynamically attached over HTTP/HTTPS to prevent origin 'null' CORS errors on file:/// -->
   <meta name="theme-color" content="#141519" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <link rel="apple-touch-icon" href="icon-192.png" />
@@ -405,15 +405,15 @@
   </div>
 
   <!-- First-Person Walk Navigation HUD -->
-  <div id="walkHud" class="fixed top-3 left-1/2 -translate-x-1/2 z-50 hidden items-center gap-3 px-4 py-1.5 rounded-full border border-[var(--border-strong)] bg-[var(--glass-bg)] text-[var(--fg)] backdrop-blur-md text-[11px] font-medium shadow-lg select-none">
+  <div id="walkHud" class="fixed top-3 left-1/2 -translate-x-1/2 z-50 hidden items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 rounded-full border border-[var(--border-strong)] bg-[var(--glass-bg)] text-[var(--fg)] backdrop-blur-md text-[10px] sm:text-[11px] font-medium shadow-lg select-none max-w-[94vw]">
     <span class="mono font-bold tracking-wide">WALK MODE</span>
     <span class="opacity-40">|</span>
-    <span class="opacity-80"><kbd class="mono px-1 py-0.5 rounded bg-[var(--surface-mute)]">W</kbd><kbd class="mono px-1 py-0.5 rounded bg-[var(--surface-mute)]">A</kbd><kbd class="mono px-1 py-0.5 rounded bg-[var(--surface-mute)]">S</kbd><kbd class="mono px-1 py-0.5 rounded bg-[var(--surface-mute)]">D</kbd> Walk</span>
-    <span class="opacity-80"><kbd class="mono px-1 py-0.5 rounded bg-[var(--surface-mute)]">Shift</kbd> Sprint</span>
-    <span class="opacity-80"><kbd class="mono px-1 py-0.5 rounded bg-[var(--surface-mute)]">Space</kbd> Jump</span>
-    <span class="opacity-80">Click Viewport to Look</span>
-    <span class="opacity-40">|</span>
-    <button id="exitWalkBtn" class="mono px-1.5 py-0.5 rounded text-[10px] bg-[var(--fg)] text-[var(--bg)] font-bold hover:opacity-80">Exit (V / Esc)</button>
+    <span class="opacity-80 hidden sm:inline"><kbd class="mono px-1 py-0.5 rounded bg-[var(--surface-mute)]">W</kbd><kbd class="mono px-1 py-0.5 rounded bg-[var(--surface-mute)]">A</kbd><kbd class="mono px-1 py-0.5 rounded bg-[var(--surface-mute)]">S</kbd><kbd class="mono px-1 py-0.5 rounded bg-[var(--surface-mute)]">D</kbd> Walk</span>
+    <span class="opacity-80 hidden sm:inline"><kbd class="mono px-1 py-0.5 rounded bg-[var(--surface-mute)]">Shift</kbd> Sprint</span>
+    <span class="opacity-80 hidden sm:inline"><kbd class="mono px-1 py-0.5 rounded bg-[var(--surface-mute)]">Space</kbd> Jump</span>
+    <span class="opacity-80 hidden md:inline">Click Viewport to Look</span>
+    <span class="opacity-40 hidden sm:inline">|</span>
+    <button id="exitWalkBtn" class="mono px-2 py-0.5 rounded text-[10px] bg-[var(--fg)] text-[var(--bg)] font-bold hover:opacity-80">Exit [V]</button>
   </div>
 
   <!-- ==========================================================================
@@ -751,6 +751,12 @@
               <button id="envTreesBtn" class="tool-btn tool-btn-solid active text-[10px]">Flora</button>
               <button id="envPoolBtn" class="tool-btn tool-btn-solid active text-[10px]">Pool</button>
               <button id="envLampsBtn" class="tool-btn tool-btn-solid active text-[10px]">Lamps</button>
+            </div>
+
+            <!-- Traffic Rules & Signal Mode -->
+            <div class="grid grid-cols-2 gap-1 pt-0.5">
+              <button id="envDriveRuleBtn" class="tool-btn tool-btn-solid active text-[9px] py-1" title="Toggle Driving Lane Rule (LHD / RHD)">Traffic: RHD (Right)</button>
+              <button id="envSignalsBtn" class="tool-btn tool-btn-solid active text-[9px] py-1" title="Toggle 4-Way Traffic Lights">Signals: 4-Way</button>
             </div>
 
             <div class="space-y-1 pt-1">
@@ -1213,25 +1219,27 @@
     // ==========================================================================
     async function initPwaAndCdnCache() {
       try {
-        // 1. Inject Dynamic Web App Manifest for Installability
-        const manifest = {
-          name: 'RENDRA 3D SKP & Lumion Studio',
-          short_name: 'RENDRA',
-          start_url: window.location.href,
-          display: 'standalone',
-          background_color: '#ECECE6',
-          theme_color: '#141519',
-          icons: [{
-            src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23141519'/%3E%3Cpolygon points='16,4 28,10.5 16,17 4,10.5' fill='%23ECECE6'/%3E%3C/svg%3E",
-            sizes: '192x192',
-            type: 'image/svg+xml'
-          }]
-        };
-        const mBlob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
-        const link = document.createElement('link');
-        link.rel = 'manifest';
-        link.href = URL.createObjectURL(mBlob);
-        if (!document.querySelector('link[rel="manifest"][href$="webmanifest"]')) document.head.appendChild(link);
+        // 1. Inject Dynamic Web App Manifest for Installability (Only on HTTP/HTTPS to prevent origin 'null' CORS errors on file:///)
+        if (window.location.protocol.startsWith('http')) {
+          const manifest = {
+            name: 'RENDRA 3D SKP & Lumion Studio',
+            short_name: 'RENDRA',
+            start_url: window.location.href,
+            display: 'standalone',
+            background_color: '#ECECE6',
+            theme_color: '#141519',
+            icons: [{
+              src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23141519'/%3E%3Cpolygon points='16,4 28,10.5 16,17 4,10.5' fill='%23ECECE6'/%3E%3C/svg%3E",
+              sizes: '192x192',
+              type: 'image/svg+xml'
+            }]
+          };
+          const mBlob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+          const link = document.createElement('link');
+          link.rel = 'manifest';
+          link.href = URL.createObjectURL(mBlob);
+          document.head.appendChild(link);
+        }
 
         // 2. Pre-cache CDN scripts into Browser CacheStorage for instant/offline reuse
         if ('caches' in window) {
@@ -1342,6 +1350,9 @@
         rotation: 0
       },
       animatedCars: [],
+      trafficSignals: [],
+      trafficDriveSide: 'right', // 'right' (RHD default) or 'left' (LHD traffic rule)
+      envSignals: true,
       // 2D Floorplan Slice & Map Interaction
       planCutFraction: 0.22,
       planMapParams: { minX: -10, minZ: -10, maxSpan: 20, pad: 12, drawSpan: 176 },
@@ -1605,31 +1616,31 @@
       const padW = state.modelSize.x * state.sitePadScale;
       const padD = state.modelSize.z * state.sitePadScale;
 
-      // 1. Grass Landscape + Sculpted Distant Rolling Hills & Mountain Horizon Ring
+      // 1. Grass Ground Pad + Travertine Apron (Permanently kept intact as site foundation)
+      const terrainRadius = maxSpan * 11;
+      const terrainGeo = new THREE.CircleGeometry(terrainRadius, 64);
+      terrainGeo.rotateX(-Math.PI / 2);
+      const terrainMat = new THREE.MeshStandardMaterial({
+        map: grassTex,
+        roughness: 0.92,
+        metalness: 0.0
+      });
+      const terrainMesh = new THREE.Mesh(terrainGeo, terrainMat);
+      terrainMesh.position.set(center.x, floorY, center.z);
+      terrainMesh.receiveShadow = true;
+      state.lumionEnvGroup.add(terrainMesh);
+
+      // Travertine Paver Pad + Concrete Perimeter Curb
+      const apron = new THREE.Mesh(
+        new THREE.BoxGeometry(padW, 0.08, padD),
+        new THREE.MeshStandardMaterial({ color: 0xDDDAD0, roughness: 0.72 })
+      );
+      apron.position.set(center.x, floorY + 0.02, center.z);
+      apron.receiveShadow = true;
+      state.lumionEnvGroup.add(apron);
+
+      // Distant Rolling Hills around the Perimeter (Toggled by Hills button)
       if (state.envTerrain) {
-        const terrainRadius = maxSpan * 11;
-        const terrainGeo = new THREE.CircleGeometry(terrainRadius, 64);
-        terrainGeo.rotateX(-Math.PI / 2);
-        const terrainMat = new THREE.MeshStandardMaterial({
-          map: grassTex,
-          roughness: 0.92,
-          metalness: 0.0
-        });
-        const terrainMesh = new THREE.Mesh(terrainGeo, terrainMat);
-        terrainMesh.position.set(center.x, floorY, center.z);
-        terrainMesh.receiveShadow = true;
-        state.lumionEnvGroup.add(terrainMesh);
-
-        // Travertine Paver Pad + Concrete Perimeter Curb
-        const apron = new THREE.Mesh(
-          new THREE.BoxGeometry(padW, 0.08, padD),
-          new THREE.MeshStandardMaterial({ color: 0xDDDAD0, roughness: 0.72 })
-        );
-        apron.position.set(center.x, floorY + 0.02, center.z);
-        apron.receiveShadow = true;
-        state.lumionEnvGroup.add(apron);
-
-        // Distant Rolling Hills & Mountain Range around the Perimeter
         const hillMat1 = new THREE.MeshStandardMaterial({ color: 0x577347, roughness: 0.95 });
         const hillMat2 = new THREE.MeshStandardMaterial({ color: 0x4A633D, roughness: 0.95 });
         const hillCount = 18;
@@ -1718,24 +1729,91 @@
         }
       }
 
-      // 3. Moving Traffic & Parked Cars
+      // 3. 4-Way Traffic Signal Gantries (Signals & Traffic Rules)
+      state.trafficSignals = [];
+      if (state.envRoad && state.envSignals) {
+        const hw = roadWidth * 0.5;
+        const cornerConfigs = [
+          { x: crossRoadX - hw - 0.45, z: roadZ + hw + 0.45, rotY: 0, isEW: true },            // SW: Eastbound EW
+          { x: crossRoadX + hw + 0.45, z: roadZ - hw - 0.45, rotY: Math.PI, isEW: true },      // NE: Westbound EW
+          { x: crossRoadX + hw + 0.45, z: roadZ + hw + 0.45, rotY: -Math.PI / 2, isEW: false }, // SE: Northbound NS
+          { x: crossRoadX - hw - 0.45, z: roadZ - hw - 0.45, rotY: Math.PI / 2, isEW: false }   // NW: Southbound NS
+        ];
+
+        const sigPoleMat = new THREE.MeshStandardMaterial({ color: 0x1E2228, roughness: 0.4, metalness: 0.6 });
+        const housingMat = new THREE.MeshStandardMaterial({ color: 0x121418, roughness: 0.75 });
+
+        cornerConfigs.forEach((cfg) => {
+          const sigGrp = new THREE.Group();
+          sigGrp.position.set(cfg.x, floorY, cfg.z);
+          sigGrp.rotation.y = cfg.rotY;
+
+          // Main Vertical Upright Pole
+          const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.09, 3.8, 8), sigPoleMat);
+          pole.position.y = 1.9;
+          pole.castShadow = true;
+          sigGrp.add(pole);
+
+          // Cantilever Overhead Mast Arm extending towards lane
+          const arm = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 1.8), sigPoleMat);
+          arm.position.set(0, 3.7, 0.85);
+          sigGrp.add(arm);
+
+          // 3-Aspect Traffic Signal Head Housing
+          const housing = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.72, 0.2), housingMat);
+          housing.position.set(0, 3.65, 1.7);
+          sigGrp.add(housing);
+
+          // Three Lenses: Red, Amber, Green
+          const redMat = new THREE.MeshBasicMaterial({ color: 0x331010 });
+          const amberMat = new THREE.MeshBasicMaterial({ color: 0x332000 });
+          const greenMat = new THREE.MeshBasicMaterial({ color: 0x103318 });
+
+          const lensGeo = new THREE.CircleGeometry(0.075, 12);
+          const rLens = new THREE.Mesh(lensGeo, redMat);
+          rLens.position.set(0, 0.22, 0.105);
+          housing.add(rLens);
+
+          const aLens = new THREE.Mesh(lensGeo, amberMat);
+          aLens.position.set(0, 0.0, 0.105);
+          housing.add(aLens);
+
+          const gLens = new THREE.Mesh(lensGeo, greenMat);
+          gLens.position.set(0, -0.22, 0.105);
+          housing.add(gLens);
+
+          state.lumionEnvGroup.add(sigGrp);
+          state.trafficSignals.push({
+            isEW: cfg.isEW,
+            redMat,
+            amberMat,
+            greenMat
+          });
+        });
+      }
+
+      // Moving Traffic & Parked Cars with Left/Right Hand Driving Dual-Lane Rules
       if (state.envCars && state.envRoad) {
         const carScale = Math.max(Math.min(roadWidth / 7.5, 1.35), 0.75);
         const carPalette = [0xD9D9D4, 0x22262C, 0x9E332E, 0x35587A, 0x4E545C];
+        const isLHD = state.trafficDriveSide === 'left';
+        const sideSign = isLHD ? -1 : 1;
 
-        // 4 Animated Cars driving along East-West & North-South lanes
+        // 4 Animated Cars driving along East-West & North-South dual lanes
         for (let c = 0; c < 4; c++) {
           const carMesh = createStylizedCarMesh(carPalette[c % carPalette.length]);
           carMesh.scale.setScalar(carScale);
           const isEW = c < 2;
           const dir = c % 2 === 0 ? 1 : -1;
-          const laneOffset = (roadWidth * 0.23) * dir;
+          const laneOffset = (roadWidth * 0.23) * dir * sideSign;
 
           if (isEW) {
+            // East-West: RHD means Eastbound (dir=+1) is South lane (+z), Westbound is North lane (-z)
             carMesh.position.set(center.x - maxSpan * 2 * dir, floorY + 0.03, roadZ + laneOffset);
             if (dir < 0) carMesh.rotation.y = Math.PI;
           } else {
-            carMesh.position.set(crossRoadX - laneOffset, floorY + 0.03, center.z - maxSpan * 2 * dir);
+            // North-South: RHD means Northbound (dir=+1) is East lane (+x), Southbound is West lane (-x)
+            carMesh.position.set(crossRoadX + laneOffset, floorY + 0.03, center.z - maxSpan * 2 * dir);
             carMesh.rotation.y = dir > 0 ? -Math.PI / 2 : Math.PI / 2;
           }
 
@@ -1788,11 +1866,11 @@
         state.lumionEnvGroup.add(water);
       }
 
-      // 5. Street Bollards & Avenue Pole Lamps
+      // 5. Street Bollards & Avenue Pole Lamps (Tagged for Dynamic Night-Lighting)
       if (state.envLamps) {
         const poleMat = new THREE.MeshStandardMaterial({ color: 0x22252A, roughness: 0.4, metalness: 0.7 });
         const isLowSun = state.todTime < 7.5 || state.todTime > 16.8;
-        const bulbMat = new THREE.MeshBasicMaterial({ color: isLowSun ? 0xFFE29A : 0xFFFFFF });
+        const bulbMat = new THREE.MeshBasicMaterial({ color: isLowSun ? 0xFFE29A : 0xEEEEEE });
 
         const spacing = Math.max(maxSpan * 0.55, 8);
         for (let i = -3; i <= 3; i++) {
@@ -1822,7 +1900,7 @@
           const coneMat = new THREE.MeshBasicMaterial({
             color: 0xFFE29A,
             transparent: true,
-            opacity: isLowSun ? 0.20 : 0.07,
+            opacity: isLowSun ? 0.32 : 0.04,
             blending: THREE.AdditiveBlending,
             side: THREE.DoubleSide,
             depthWrite: false
@@ -1835,7 +1913,7 @@
           const groundPoolMat = new THREE.MeshBasicMaterial({
             color: 0xFFE29A,
             transparent: true,
-            opacity: isLowSun ? 0.24 : 0.09,
+            opacity: isLowSun ? 0.35 : 0.04,
             blending: THREE.AdditiveBlending,
             side: THREE.DoubleSide,
             depthWrite: false
@@ -1845,6 +1923,7 @@
           groundPool.position.set(0, 0.02, 0.6);
           lampGrp.add(groundPool);
 
+          lampGrp.userData = { isLamp: true, bulbMat, coneMat, groundPoolMat };
           state.lumionEnvGroup.add(lampGrp);
         }
       }
@@ -2060,6 +2139,26 @@
       hemiLight.color.copy(skyColor).lerp(new THREE.Color(0xFFFFFF), 0.35);
       hemiLight.groundColor.setHex(0x8C857B);
       hemiLight.intensity = 0.85 + sunFactor * 0.55;
+
+      // Dynamic Luminaire Bulb & Volumetric Street Night-Lighting
+      const isNight = sunFactor < 0.32 || state.todTime < 7.0 || state.todTime > 17.0;
+      const nightFactor = Math.max(0, Math.min(1, (0.35 - sunFactor) / 0.35));
+      if (state.lumionEnvGroup) {
+        state.lumionEnvGroup.traverse((obj) => {
+          if (obj.userData && obj.userData.isLamp) {
+            const { bulbMat, coneMat, groundPoolMat } = obj.userData;
+            if (bulbMat) {
+              bulbMat.color.setHex(isNight ? 0xFFE29A : 0xEEEEEE);
+            }
+            if (coneMat) {
+              coneMat.opacity = 0.02 + 0.33 * nightFactor;
+            }
+            if (groundPoolMat) {
+              groundPoolMat.opacity = 0.03 + 0.34 * nightFactor;
+            }
+          }
+        });
+      }
     }
 
     // ==========================================================================
@@ -2534,6 +2633,8 @@
         targetBadge.style.color = 'var(--fg)';
       }
       document.getElementById('selectedObjHud').classList.add('hidden');
+      const mic = document.getElementById('modelInfoCard');
+      if (mic) mic.style.display = '';
 
       while (modelRoot.children.length > 0) modelRoot.remove(modelRoot.children[0]);
       while (state.edgeLinesGroup.children.length > 0) state.edgeLinesGroup.remove(state.edgeLinesGroup.children[0]);
@@ -3854,6 +3955,10 @@
       document.getElementById('selObjDims').textContent = `${formatLength(size.x)}×${formatLength(size.z)}×${formatLength(size.y)}`;
       document.getElementById('selObjElev').textContent = formatLength(box.min.y - state.modelBounds.min.y);
       document.getElementById('selectedObjHud').classList.remove('hidden');
+      if (window.innerWidth < 700) {
+        const mic = document.getElementById('modelInfoCard');
+        if (mic) mic.style.display = 'none';
+      }
 
       const targetBadge = document.getElementById('pbrTargetBadge');
       if (targetBadge) {
@@ -4787,6 +4892,8 @@
     });
     document.getElementById('closeSelHudBtn').addEventListener('click', () => {
       document.getElementById('selectedObjHud').classList.add('hidden');
+      const mic = document.getElementById('modelInfoCard');
+      if (mic) mic.style.display = '';
       while (state.selectBoxGroup.children.length > 0) state.selectBoxGroup.remove(state.selectBoxGroup.children[0]);
       bboxLabels = bboxLabels.filter((item) => {
         if (item.category === 'select') { item.el.remove(); return false; }
@@ -4868,6 +4975,21 @@
       state.envLamps = !state.envLamps;
       e.currentTarget.classList.toggle('active', state.envLamps);
       buildProceduralLumionEnvironment();
+    });
+
+    document.getElementById('envDriveRuleBtn').addEventListener('click', (e) => {
+      state.trafficDriveSide = state.trafficDriveSide === 'right' ? 'left' : 'right';
+      const isRHD = state.trafficDriveSide === 'right';
+      e.currentTarget.textContent = isRHD ? 'Traffic: RHD (Right)' : 'Traffic: LHD (Left)';
+      e.currentTarget.classList.toggle('active', true);
+      if (state.todEnabled) buildProceduralLumionEnvironment();
+    });
+
+    document.getElementById('envSignalsBtn').addEventListener('click', (e) => {
+      state.envSignals = !state.envSignals;
+      e.currentTarget.classList.toggle('active', state.envSignals);
+      e.currentTarget.textContent = state.envSignals ? 'Signals: 4-Way' : 'Signals: OFF';
+      if (state.todEnabled) buildProceduralLumionEnvironment();
     });
 
     document.getElementById('envShadowsBtn').addEventListener('click', (e) => {
@@ -5267,6 +5389,27 @@
 
       if (mixer) mixer.update(dt * state.animSpeed);
 
+      // 4-Way Traffic Signal Cycling (EW Green -> Amber -> NS Green -> Amber)
+      if (state.todEnabled && state.envSignals && state.trafficSignals && state.trafficSignals.length > 0) {
+        const cycle = (performance.now() * 0.001) % 12.0;
+        const ewGreen = cycle < 4.5;
+        const ewAmber = cycle >= 4.5 && cycle < 6.0;
+        const nsGreen = cycle >= 6.0 && cycle < 10.5;
+        const nsAmber = cycle >= 10.5 && cycle < 12.0;
+
+        state.trafficSignals.forEach((sig) => {
+          if (sig.isEW) {
+            sig.redMat.color.setHex((nsGreen || nsAmber) ? 0xFF2828 : 0x331010);
+            sig.amberMat.color.setHex(ewAmber ? 0xFFAA00 : 0x332000);
+            sig.greenMat.color.setHex(ewGreen ? 0x00FF66 : 0x103318);
+          } else {
+            sig.redMat.color.setHex((ewGreen || ewAmber) ? 0xFF2828 : 0x331010);
+            sig.amberMat.color.setHex(nsAmber ? 0xFFAA00 : 0x332000);
+            sig.greenMat.color.setHex(nsGreen ? 0x00FF66 : 0x103318);
+          }
+        });
+      }
+
       // Animate Moving Traffic on the 4-Way Lumion Road Junction
       if (state.todEnabled && state.envCars && state.animatedCars.length > 0) {
         state.animatedCars.forEach((car) => {
@@ -5340,6 +5483,12 @@
       }
       animate();
       scanHardwareCapabilities();
+      if (window.innerWidth < 700) {
+        const body = document.getElementById('modelInfoBody');
+        if (body) body.classList.add('hidden');
+        const btn = document.getElementById('collapseModelInfoBtn');
+        if (btn) btn.textContent = '▸';
+      }
       await buildDemoArchitecturalVilla();
       if (state.todEnabled) {
         buildProceduralLumionEnvironment();
@@ -5354,13 +5503,18 @@
       const $ = (id) => document.getElementById(id);
       const css = document.createElement('style');
       css.textContent = `
-#dir{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:30;display:flex;align-items:center;gap:4px;padding:5px;max-width:calc(100vw - 20px);overflow-x:auto}
-@media(max-width:700px){#dir{bottom:84px}}
+#dir{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:30;display:flex;align-items:center;gap:4px;padding:5px;max-width:calc(100vw - 20px);overflow-x:auto;-webkit-overflow-scrolling:touch}
+@media(max-width:700px){
+  #dir{bottom:10px;padding:3px 6px;gap:3px;max-width:calc(100vw - 12px)}
+  #dir .tool-btn{font-size:10px;padding:3px 6px}
+  #dirLooks{bottom:52px!important}
+  #selectedObjHud{bottom:54px!important;left:8px!important;max-width:min(280px,calc(100vw - 16px))!important;z-index:45!important}
+  #modelInfoCard{bottom:54px!important;left:8px!important;max-width:min(230px,calc(100vw - 16px))!important;z-index:25!important}
+}
 #dir .sep{width:1px;height:18px;background:var(--border-strong);margin:0 3px;flex:none}
 #dir .tool-btn{flex:none}
 #dirLooks{position:fixed;left:50%;bottom:58px;transform:translateX(-50%);z-index:31;display:none;padding:6px;gap:4px;flex-wrap:wrap;width:min(420px,92vw)}
 #dirLooks.open{display:flex}
-@media(max-width:700px){#dirLooks{bottom:130px}}
 #vig{position:absolute;inset:0;pointer-events:none;z-index:10;opacity:0;transition:opacity .4s;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.5) 100%)}
 #grain{position:absolute;inset:0;pointer-events:none;z-index:10;opacity:0;transition:opacity .4s;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E")}
 body.clean .glass-card,body.clean .glass-pill,body.clean nav,body.clean #dir{opacity:0!important;pointer-events:none!important}
@@ -5402,6 +5556,23 @@ body.clean .glass-card,body.clean .glass-pill,body.clean nav,body.clean #dir{opa
 
       // ---- Weather
       let wx = 'clear', pts = null, N = 4000, span = 40, mist = false;
+      function getSnowflakeTexture() {
+        if (window._snowCanvasTex) return window._snowCanvasTex;
+        const c = document.createElement('canvas');
+        c.width = 64; c.height = 64;
+        const ctx = c.getContext('2d');
+        const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 30);
+        g.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
+        g.addColorStop(0.35, 'rgba(240, 248, 255, 0.85)');
+        g.addColorStop(0.75, 'rgba(220, 240, 255, 0.25)');
+        g.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(32, 32, 30, 0, Math.PI * 2);
+        ctx.fill();
+        window._snowCanvasTex = new THREE.CanvasTexture(c);
+        return window._snowCanvasTex;
+      }
       function setWx(m) {
         wx = m; document.querySelectorAll('[data-wx]').forEach((b) => b.classList.toggle('active', b.dataset.wx === m));
         if (pts) { scene.remove(pts); pts.geometry.dispose(); pts = null; }
@@ -5416,7 +5587,15 @@ body.clean .glass-card,body.clean .glass-pill,body.clean nav,body.clean #dir{opa
           }
           g.setAttribute('position', new THREE.BufferAttribute(a, 3));
           pts = rain ? new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: 0xcfd8e3, transparent: true, opacity: .55, depthWrite: false }))
-            : new THREE.Points(g, new THREE.PointsMaterial({ color: 0xffffff, size: span * .012, transparent: true, opacity: .9, depthWrite: false }));
+            : new THREE.Points(g, new THREE.PointsMaterial({
+                map: getSnowflakeTexture(),
+                color: 0xffffff,
+                size: span * .016,
+                transparent: true,
+                opacity: .95,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false
+              }));
           pts.frustumCulled = false; scene.add(pts);
         }
         if (!mist && wasMist) { if (state.todEnabled) { const s = $('todAzimuthSlider'); s.dispatchEvent(new Event('input')); } else scene.fog = null; }
@@ -5579,31 +5758,33 @@ void main() {
         state.animatedCars = state.animatedCars.filter((c) => { const p = c.mesh.position, ok = c.axis === 'x' ? (p.z < keep.min.z || p.z > keep.max.z) : (p.x < keep.min.x || p.x > keep.max.x); if (!ok) grp.remove(c.mesh); return ok; });
 
         // 2. sculpted mountain ring with road valleys + altitude colouring (grass → forest → rock → snow)
-        const inner = spanVal * 6.5, outer = spanVal * 26, amp = spanVal * 8, g = new THREE.RingGeometry(inner, outer, 180, 56); g.rotateX(-Math.PI / 2);
-        const p = g.attributes.position, col = new Float32Array(p.count * 3), cc = [0x9CBB84, 0x5F8A4C, 0x3F6A3A, 0x8B8C86, 0xF1F3F6].map((x) => new THREE.Color(x)), tmp = new THREE.Color();
-        const sm = THREE.MathUtils.smoothstep;
-        for (let i = 0; i < p.count; i++) {
-          const x = p.getX(i), z = p.getZ(i);
-          const dist = Math.hypot(x, z);
-          const t = Math.max(0, (dist - inner) / Math.max(1, outer - inner));
-          const wx = x + centerX, wz = z + centerZ;
-          const valley = sm(Math.min(Math.abs(wz - roadZ), Math.abs(wx - crossX)), rw * 1.3, rw * 4 + spanVal * 1.8);
-          const h = Math.pow(Math.max(0, t), 1.25) * amp * (.2 + 1.0 * noise(wx / spanVal * .35, wz / spanVal * .35)) * valley;
-          const safeH = isFinite(h) ? Math.max(0, h) : 0;
-          const finalY = isFinite(floorY - 0.05 + safeH) ? (floorY - 0.05 + safeH) : 0;
-          p.setY(i, finalY);
-          const k = Math.min(Math.max(safeH / (amp * .8), 0), .999) * 4;
-          const a = Math.min(Math.max(Math.floor(k), 0), cc.length - 2);
-          if (cc[a] && cc[a + 1]) {
-            tmp.copy(cc[a]).lerp(cc[a + 1], k - a);
-            col.set([tmp.r, tmp.g, tmp.b], i * 3);
+        if (state.envTerrain) {
+          const inner = spanVal * 6.5, outer = spanVal * 26, amp = spanVal * 8, g = new THREE.RingGeometry(inner, outer, 180, 56); g.rotateX(-Math.PI / 2);
+          const p = g.attributes.position, col = new Float32Array(p.count * 3), cc = [0x9CBB84, 0x5F8A4C, 0x3F6A3A, 0x8B8C86, 0xF1F3F6].map((x) => new THREE.Color(x)), tmp = new THREE.Color();
+          const sm = THREE.MathUtils.smoothstep;
+          for (let i = 0; i < p.count; i++) {
+            const x = p.getX(i), z = p.getZ(i);
+            const dist = Math.hypot(x, z);
+            const t = Math.max(0, (dist - inner) / Math.max(1, outer - inner));
+            const wx = x + centerX, wz = z + centerZ;
+            const valley = sm(Math.min(Math.abs(wz - roadZ), Math.abs(wx - crossX)), rw * 1.3, rw * 4 + spanVal * 1.8);
+            const h = Math.pow(Math.max(0, t), 1.25) * amp * (.2 + 1.0 * noise(wx / spanVal * .35, wz / spanVal * .35)) * valley;
+            const safeH = isFinite(h) ? Math.max(0, h) : 0;
+            const finalY = isFinite(floorY - 0.05 + safeH) ? (floorY - 0.05 + safeH) : 0;
+            p.setY(i, finalY);
+            const k = Math.min(Math.max(safeH / (amp * .8), 0), .999) * 4;
+            const a = Math.min(Math.max(Math.floor(k), 0), cc.length - 2);
+            if (cc[a] && cc[a + 1]) {
+              tmp.copy(cc[a]).lerp(cc[a + 1], k - a);
+              col.set([tmp.r, tmp.g, tmp.b], i * 3);
+            }
           }
+          g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+          g.computeVertexNormals();
+          g.computeBoundingBox();
+          g.computeBoundingSphere();
+          const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 1 })); m.position.set(centerX, 0, centerZ); m.receiveShadow = true; env.add(m);
         }
-        g.setAttribute('color', new THREE.BufferAttribute(col, 3));
-        g.computeVertexNormals();
-        g.computeBoundingBox();
-        g.computeBoundingSphere();
-        const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 1 })); m.position.set(centerX, 0, centerZ); m.receiveShadow = true; env.add(m);
 
         // 3. drifting cloud banks
         for (let i = 0; i < 16; i++) {
@@ -5719,7 +5900,7 @@ void main() {
 }
 #dirViews.open { display: flex; }
 @media (max-width: 700px) {
-  #dirFx, #dirViews { bottom: 130px; }
+  #dirFx, #dirViews { bottom: 52px; max-height: min(380px, 65vh); }
 }
 .fx-section {
   padding: 8px;
