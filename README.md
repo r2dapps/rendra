@@ -63,6 +63,30 @@ The existing engine is untouched: SKP→GLB conversion, 180° solar arc, procedu
 | **Measure** | Tape points, line and endpoints are **blue** |
 | **Clean mode** | A **Show UI** pill stays at the top; `Esc` or `Shift+H` also brings everything back |
 
+## ✦ v5 — FX pipeline & polish
+
+| Area | What changed |
+|---|---|
+| **FX panel** | New **FX** button in the dock: a post-processing pipeline with toggles for ambient occlusion (GTAO), bloom, depth of field (auto-focus on the orbit target) and FXAA |
+| **Color grade** | Five looks: Neutral, Warm Arch, Cool Nordic, High Contrast and Film |
+| **Hi-res stills** | Photo can be 1x, 2x or 4x, capped to your GPU's texture limit |
+| **MP4 recording** | Records MP4 (H.264) where the browser supports it, otherwise WebM |
+| **Saved views** | **Views** button: save camera bookmarks (kept in localStorage), click to fly, right-click to delete |
+| **World** | Scale figures (people), an animated normal-mapped pool, and glass with proper reflections (IOR, clearcoat) |
+| **SKP Textures** | Embedded textures are now correctly preserved on import via OpenSKP `{ textures: true }` |
+
+## ✦ v6 — Architectural Demo Villa Estate & Engine Stability
+
+| Area | What changed |
+|---|---|
+| **Demo Villa Estate** | Full 240-mesh luxury modern villa estate with 1.80m concrete perimeter wall, motorized slatted driveway gate, pedestrian wicket door, covered pergola carport, parked sedan, and stepping stone walkway |
+| **Furnished Interiors** | Ground floor living lounge (sectional sofa, coffee table, acoustic media wall, OLED screen), 8-seater dining table with linear chandelier, chef's kitchen with Nero Marquina waterfall island, and powder room. Upper floor master suite (king bed, duvet, nightstands, lamps), dressing wardrobe, en-suite bath (freestanding tub, double vanity, glass shower), and executive study |
+| **PBR Textures** | Procedural canvas textures for Honed Nero Marquina marble, warm woven linen fabric, and granite cobblestone pavers |
+| **Engine Bugfixes** | Fixed sky dome shader directive newline parsing, wireframe blackscreen defect, altitude color array clamp, and drawer FX slider bindings |
+| **2D CAD Plan Slicing** | Planimetric slicing at 1.76m elevation dynamically renders the estate boundary, gate openings, interior walls, and furniture layouts |
+
+Not yet done: HDRI sky, billboard vegetation, geo sun study, first-person walk, self-hosting libraries and instancing.
+
 ## ✦ Quick start
 
 ```bash

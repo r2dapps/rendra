@@ -1,35 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#141519" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="apple-touch-icon" href="icon-192.png" />
   <title>RENDRA — 3D SKP to GLB Studio</title>
-  <meta name="description" content="Free, private in-browser SketchUp (.skp) viewer & GLB converter with Lumion-style procedural 3D environments, real-time solar arc, section cuts, and cinematic director tools. 100% client-side." />
-  <meta name="keywords" content="sketchup, skp viewer, glb converter, threejs, webgl, 3d viewer, architecture, aec, lumion, sun study, offline first, pwa, client side, cad, bim" />
+  <meta name="description"
+    content="Free, private in-browser SketchUp (.skp) viewer & GLB converter with Lumion-style procedural 3D environments, real-time solar arc, section cuts, and cinematic director tools. 100% client-side." />
+  <meta name="keywords"
+    content="sketchup, skp viewer, glb converter, threejs, webgl, 3d viewer, architecture, aec, lumion, sun study, offline first, pwa, client side, cad, bim" />
   <link rel="canonical" href="https://r2dapps.github.io/rendra/" />
-  
+
   <!-- Open Graph / Social Sharing -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://r2dapps.github.io/rendra/" />
   <meta property="og:title" content="RENDRA — 3D SKP to GLB Studio" />
-  <meta property="og:description" content="Open SketchUp (.skp) files, light them like a film set, and export clean GLBs directly in your browser. Zero install, zero uploads, 100% private." />
+  <meta property="og:description"
+    content="Open SketchUp (.skp) files, light them like a film set, and export clean GLBs directly in your browser. Zero install, zero uploads, 100% private." />
   <meta property="og:image" content="icon-512.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="RENDRA — 3D SKP to GLB Studio" />
-  <meta name="twitter:description" content="Open SketchUp (.skp) files, light them like a film set, and export clean GLBs directly in your browser. Zero install, zero uploads, 100% private." />
+  <meta name="twitter:description"
+    content="Open SketchUp (.skp) files, light them like a film set, and export clean GLBs directly in your browser. Zero install, zero uploads, 100% private." />
   <meta name="twitter:image" content="icon-512.png" />
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23141519'/%3E%3Cpolygon points='16,4 28,10.5 16,17 4,10.5' fill='%23ECECE6'/%3E%3Cpolygon points='4,13.5 15,19.5 15,28 4,22' fill='%23ECECE6' opacity='0.85'/%3E%3Cpolygon points='28,13.5 17,19.5 17,28 28,22' fill='%23ECECE6' opacity='0.55'/%3E%3C/svg%3E" />
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23141519'/%3E%3Cpolygon points='16,4 28,10.5 16,17 4,10.5' fill='%23ECECE6'/%3E%3Cpolygon points='4,13.5 15,19.5 15,28 4,22' fill='%23ECECE6' opacity='0.85'/%3E%3Cpolygon points='28,13.5 17,19.5 17,28 28,22' fill='%23ECECE6' opacity='0.55'/%3E%3C/svg%3E" />
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
   <script type="importmap">
     {
       "imports": {
@@ -178,7 +188,7 @@
     .dock-icon-btn.active {
       background: var(--fg);
       color: var(--bg);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
 
     .dock-divider {
@@ -192,6 +202,7 @@
     .menu-dropdown {
       position: relative;
     }
+
     .menu-dropdown-panel {
       display: none;
       position: absolute;
@@ -201,11 +212,13 @@
       padding: 5px;
       z-index: 60;
     }
+
     .menu-dropdown.open .menu-dropdown-panel {
       display: flex;
       flex-direction: column;
       gap: 2px;
     }
+
     .menu-item {
       width: 100%;
       text-align: left;
@@ -220,6 +233,7 @@
       color: var(--fg);
       border: none;
     }
+
     .menu-item:hover {
       background: var(--surface-hover);
     }
@@ -247,9 +261,19 @@
       border: 2px solid var(--bg);
     }
 
-    ::-webkit-scrollbar { width: 4px; height: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 99px; }
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-strong);
+      border-radius: 99px;
+    }
 
     /* Meshy-Style Floating 3D Callout Tags */
     .dim-label {
@@ -277,53 +301,84 @@
 
     /* Animated Construction Crane Spinner */
     @keyframes craneGear {
-      0%   { stroke-dashoffset: 180; transform: rotate(0deg); }
-      50%  { stroke-dashoffset: 40;  transform: rotate(180deg); }
-      100% { stroke-dashoffset: 180; transform: rotate(360deg); }
+      0% {
+        stroke-dashoffset: 180;
+        transform: rotate(0deg);
+      }
+
+      50% {
+        stroke-dashoffset: 40;
+        transform: rotate(180deg);
+      }
+
+      100% {
+        stroke-dashoffset: 180;
+        transform: rotate(360deg);
+      }
     }
+
     @keyframes hoistLift {
-      0%, 100% { transform: translateY(-7px); }
-      50%      { transform: translateY(5px); }
+
+      0%,
+      100% {
+        transform: translateY(-7px);
+      }
+
+      50% {
+        transform: translateY(5px);
+      }
     }
+
     .spinner-gear {
       stroke-dasharray: 180;
       animation: craneGear 2s infinite linear;
       transform-origin: center;
     }
+
     .spinner-hoist {
       animation: hoistLift 0.9s infinite ease-in-out;
     }
   </style>
 </head>
+
 <body class="h-screen w-screen overflow-hidden select-none relative">
 
   <!-- ==========================================================================
        0. RENDRA STARTUP LAUNCHPAD & DRAG-DROP WELCOME GATE
        ========================================================================== -->
-  <div id="startupModal" class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background: rgba(20, 21, 25, 0.45); backdrop-filter: blur(8px);">
+  <div id="startupModal" class="fixed inset-0 z-50 flex items-center justify-center p-4"
+    style="background: rgba(20, 21, 25, 0.45); backdrop-filter: blur(8px);">
     <div class="glass-card max-w-md w-full p-5 space-y-4">
       <div class="flex items-center justify-between border-b pb-3" style="border-color: var(--border);">
         <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold mono text-sm" style="background: var(--fg); color: var(--bg);">R</div>
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold mono text-sm"
+            style="background: var(--fg); color: var(--bg);">R</div>
           <div>
             <div class="font-bold text-sm tracking-tight mono">RENDRA</div>
             <div class="text-[10px] opacity-65">3D SKP → GLB & Lumion Studio</div>
           </div>
         </div>
-        <span id="pwaReadyBadge" class="mono text-[9px] px-2 py-0.5 rounded studio-sunken font-semibold">PWA READY</span>
+        <span id="pwaReadyBadge" class="mono text-[9px] px-2 py-0.5 rounded studio-sunken font-semibold">PWA
+          READY</span>
       </div>
 
-      <div id="startupDropZone" class="studio-sunken border-2 border-dashed p-6 text-center space-y-2 cursor-pointer transition-all hover:opacity-80" style="border-color: var(--border-strong);">
-        <svg class="w-8 h-8 mx-auto opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-          <polyline points="17 8 12 3 7 8"/>
-          <line x1="12" y1="3" x2="12" y2="15"/>
+      <div id="startupDropZone"
+        class="studio-sunken border-2 border-dashed p-6 text-center space-y-2 cursor-pointer transition-all hover:opacity-80"
+        style="border-color: var(--border-strong);">
+        <svg class="w-8 h-8 mx-auto opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="1.8">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="17 8 12 3 7 8" />
+          <line x1="12" y1="3" x2="12" y2="15" />
         </svg>
         <div class="font-bold text-xs">Drop 3D Model or Tap to Browse</div>
         <div class="flex items-center justify-center gap-1.5 pt-1">
-          <span class="mono text-[9px] px-1.5 py-0.5 rounded font-bold" style="background: var(--fg); color: var(--bg);">.SKP</span>
-          <span class="mono text-[9px] px-1.5 py-0.5 rounded font-bold" style="background: var(--fg); color: var(--bg);">.GLB</span>
-          <span class="mono text-[9px] px-1.5 py-0.5 rounded font-bold" style="background: var(--fg); color: var(--bg);">.GLTF</span>
+          <span class="mono text-[9px] px-1.5 py-0.5 rounded font-bold"
+            style="background: var(--fg); color: var(--bg);">.SKP</span>
+          <span class="mono text-[9px] px-1.5 py-0.5 rounded font-bold"
+            style="background: var(--fg); color: var(--bg);">.GLB</span>
+          <span class="mono text-[9px] px-1.5 py-0.5 rounded font-bold"
+            style="background: var(--fg); color: var(--bg);">.GLTF</span>
         </div>
       </div>
 
@@ -352,14 +407,15 @@
   <!-- ==========================================================================
        1. CONSTRUCTION SPINNER (SHOWN ON EVERY LOAD / GEN ACTION)
        ========================================================================== -->
-  <div id="loadingOverlay" class="hidden fixed inset-0 z-50 flex items-center justify-center" style="background: rgba(20, 21, 25, 0.55); backdrop-filter: blur(6px);">
+  <div id="loadingOverlay" class="hidden fixed inset-0 z-50 flex items-center justify-center"
+    style="background: rgba(20, 21, 25, 0.55); backdrop-filter: blur(6px);">
     <div class="glass-card w-72 p-4 flex flex-col items-center text-center space-y-2.5">
       <div class="relative w-16 h-16 flex items-center justify-center">
         <svg class="w-16 h-16" viewBox="0 0 80 80" fill="none" stroke="currentColor">
           <circle class="spinner-gear" cx="40" cy="40" r="35" stroke-width="2" opacity="0.7" />
-          <path d="M22 62 V18 H58 M22 25 L32 18 M16 62 H64" stroke-width="2" stroke-linecap="round"/>
+          <path d="M22 62 V18 H58 M22 25 L32 18 M16 62 H64" stroke-width="2" stroke-linecap="round" />
           <g class="spinner-hoist">
-            <line x1="46" y1="18" x2="46" y2="33" stroke-width="1.5" stroke-dasharray="2 2"/>
+            <line x1="46" y1="18" x2="46" y2="33" stroke-width="1.5" stroke-dasharray="2 2" />
             <polygon points="46,31 56,36 46,41 36,36" fill="currentColor" />
             <polygon points="36,36 46,41 46,51 36,46" stroke-width="1.5" />
             <polygon points="56,36 46,41 46,51 56,46" stroke-width="1.5" />
@@ -369,7 +425,8 @@
       <div id="spinnerStageText" class="mono font-bold text-[11px] tracking-wider uppercase">PROCESSING...</div>
       <div id="spinnerSubText" class="text-[10px] opacity-75">Building geometry & textures</div>
       <div class="w-full studio-sunken h-1.5 overflow-hidden p-0">
-        <div id="spinnerBar" class="h-full transition-all duration-150" style="width: 50%; background: var(--fg);"></div>
+        <div id="spinnerBar" class="h-full transition-all duration-150" style="width: 50%; background: var(--fg);">
+        </div>
       </div>
     </div>
   </div>
@@ -377,7 +434,8 @@
   <!-- ==========================================================================
        2. DRAG & DROP FILE OVERLAY
        ========================================================================== -->
-  <div id="dropOverlay" class="hidden fixed inset-3 z-40 glass-card flex flex-col items-center justify-center pointer-events-none">
+  <div id="dropOverlay"
+    class="hidden fixed inset-3 z-40 glass-card flex flex-col items-center justify-center pointer-events-none">
     <p class="text-sm font-bold tracking-wide mono">DROP .SKP, .GLB OR .GLTF TO LOAD</p>
     <p class="text-[11px] opacity-75 mt-1">Instant Client-Side Conversion & Lumion Context</p>
   </div>
@@ -396,10 +454,13 @@
       <input type="file" id="fileInput" accept=".skp,.glb,.gltf" class="hidden" />
 
       <div class="menu-dropdown" id="fileMenuDropdown">
-        <button id="fileMenuTrigger" class="glass-pill px-2.5 py-1.5 flex items-center gap-2 cursor-pointer hover:opacity-90">
-          <span class="w-5 h-5 rounded flex items-center justify-center font-bold mono text-[10px]" style="background: var(--fg); color: var(--bg);">R</span>
+        <button id="fileMenuTrigger"
+          class="glass-pill px-2.5 py-1.5 flex items-center gap-2 cursor-pointer hover:opacity-90">
+          <span class="w-5 h-5 rounded flex items-center justify-center font-bold mono text-[10px]"
+            style="background: var(--fg); color: var(--bg);">R</span>
           <span class="font-bold mono text-xs tracking-tight">RENDRA</span>
-          <span id="fileBadge" class="hidden sm:inline mono text-[10px] opacity-65 truncate max-w-[95px]">DEMO.SKP</span>
+          <span id="fileBadge"
+            class="hidden sm:inline mono text-[10px] opacity-65 truncate max-w-[95px]">DEMO.SKP</span>
           <span class="text-[9px] opacity-60">▾</span>
         </button>
 
@@ -427,7 +488,9 @@
       </div>
 
       <!-- Compact 2D Floor Plan Toggle Pill -->
-      <button id="toggle2dPlanBtn" class="glass-pill px-2.5 py-1.5 text-[10px] font-semibold mono flex items-center gap-1.5 cursor-pointer hover:opacity-90" title="Toggle 2D Floor Plan Radar">
+      <button id="toggle2dPlanBtn"
+        class="glass-pill px-2.5 py-1.5 text-[10px] font-semibold mono flex items-center gap-1.5 cursor-pointer hover:opacity-90"
+        title="Toggle 2D Floor Plan Radar">
         <span>2D Plan</span>
       </button>
     </div>
@@ -444,9 +507,11 @@
           <button id="close2dPlanBtn" class="tool-btn px-1 py-0.5 text-[9px]">✕</button>
         </div>
       </div>
-      <div class="relative w-full aspect-square studio-sunken overflow-hidden cursor-pointer" title="Tap anywhere on map to glide 3D camera">
+      <div class="relative w-full aspect-square studio-sunken overflow-hidden cursor-pointer"
+        title="Tap anywhere on map to glide 3D camera">
         <canvas id="floorplanCanvas" width="200" height="200" class="w-full h-full block"></canvas>
-        <div class="absolute top-1 right-1 mono text-[8px] px-1 rounded font-bold pointer-events-none" style="background: var(--fg); color: var(--bg);">N↑</div>
+        <div class="absolute top-1 right-1 mono text-[8px] px-1 rounded font-bold pointer-events-none"
+          style="background: var(--fg); color: var(--bg);">N↑</div>
       </div>
       <div class="flex items-center gap-1.5">
         <span class="text-[9px] mono opacity-65 shrink-0">Cut</span>
@@ -472,16 +537,19 @@
     </div>
 
     <!-- Bottom-Left: Meshy-Style Collapsible MODEL INFO Card -->
-    <div id="modelInfoCard" class="absolute bottom-3 left-3 z-20 glass-card w-48 sm:w-56 p-2.5 space-y-1.5 transition-all">
+    <div id="modelInfoCard"
+      class="absolute bottom-3 left-3 z-20 glass-card w-48 sm:w-56 p-2.5 space-y-1.5 transition-all">
       <div class="flex items-center justify-between">
         <span class="mono text-[10px] font-bold tracking-wider uppercase opacity-75">MODEL INFO</span>
         <div class="flex items-center gap-1">
-          <select id="quickUnitSelect" class="studio-sunken text-[9px] mono px-1.5 py-0.5 bg-transparent outline-none cursor-pointer">
+          <select id="quickUnitSelect"
+            class="studio-sunken text-[9px] mono px-1.5 py-0.5 bg-transparent outline-none cursor-pointer">
             <option value="m">m</option>
             <option value="mm">mm</option>
             <option value="ft">ft</option>
           </select>
-          <button id="collapseModelInfoBtn" class="tool-btn px-1 py-0.5 text-[9px]" title="Collapse/Expand Info">▾</button>
+          <button id="collapseModelInfoBtn" class="tool-btn px-1 py-0.5 text-[9px]"
+            title="Collapse/Expand Info">▾</button>
         </div>
       </div>
 
@@ -508,7 +576,8 @@
     <!-- ========================================================================
          RIGHT-SIDE COLLAPSIBLE FLOATING GLASS CARD (OPENS NEXT TO DOCK)
          ======================================================================== -->
-    <aside id="inspectorDrawer" class="fixed right-14 top-3 z-30 glass-card w-60 sm:w-64 max-h-[calc(100vh-95px)] flex flex-col transition-all duration-150">
+    <aside id="inspectorDrawer"
+      class="fixed right-14 top-3 z-30 glass-card w-60 sm:w-64 max-h-[calc(100vh-95px)] flex flex-col transition-all duration-150">
       <!-- Card Header with Collapse (✕) Button -->
       <div class="flex items-center justify-between px-3 py-2 border-b" style="border-color: var(--border);">
         <span id="drawerTitle" class="font-bold text-xs tracking-wide">Lumion World</span>
@@ -532,13 +601,15 @@
           </div>
 
           <!-- Numbered Multi-Line Measurements List (Like Meshy Reference) -->
-          <div id="measureHistoryList" class="max-h-32 overflow-y-auto space-y-1 mono text-[10px] divide-y" style="border-color: var(--border);"></div>
+          <div id="measureHistoryList" class="max-h-32 overflow-y-auto space-y-1 mono text-[10px] divide-y"
+            style="border-color: var(--border);"></div>
 
           <div class="studio-sunken p-2 space-y-1 mono text-[10px]">
             <div class="flex justify-between"><span class="opacity-60">X × Z × Y</span> <b id="dimX">--</b></div>
             <div class="hidden"><b id="dimZ"></b><b id="dimY"></b></div>
             <div class="flex justify-between"><span class="opacity-60">Footprint</span> <b id="dimArea">--</b></div>
-            <div class="flex justify-between"><span class="opacity-60">Last Tape</span> <b id="lastMeasureReadout">--</b></div>
+            <div class="flex justify-between"><span class="opacity-60">Last Tape</span> <b
+                id="lastMeasureReadout">--</b></div>
           </div>
 
           <button id="clearMeasureBtn" class="w-full tool-btn tool-btn-solid py-1.5 font-semibold">Clear all</button>
@@ -568,7 +639,8 @@
                 <span class="opacity-70">Time (E → W)</span>
                 <span id="todTimeLabel" class="mono font-bold">14:30</span>
               </div>
-              <input type="range" id="todTimeSlider" min="6.0" max="18.0" step="0.1" value="14.5" class="studio-slider" />
+              <input type="range" id="todTimeSlider" min="6.0" max="18.0" step="0.1" value="14.5"
+                class="studio-slider" />
               <div class="flex justify-between text-[8px] mono opacity-50 mt-0.5">
                 <span>06:00 East (0°)</span>
                 <span>12:00 (90°)</span>
@@ -635,18 +707,135 @@
         </div>
 
         <!-- ==================================================================
+             PANEL: POST-PROCESSING (FX) SLIDERS
+             ================================================================== -->
+        <div data-tab-panel="fx" class="hidden space-y-2.5">
+          <div class="studio-sunken p-2 flex items-center justify-between">
+            <div>
+              <span class="font-bold text-[11px] block">Post-Processing (FX)</span>
+              <span class="text-[9px] opacity-60">Bloom, AO, DOF & Color Grade</span>
+            </div>
+            <button id="drawerFxMasterBtn" class="tool-btn tool-btn-primary px-2 py-0.5 text-[9px]">Pipeline:
+              ON</button>
+          </div>
+
+          <!-- Bloom -->
+          <div class="studio-sunken p-2.5 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-[10px]">Bloom Glow</span>
+              <button id="drawerFxBloomBtn" class="tool-btn tool-btn-solid text-[9px] px-2 py-0.5 active">ON</button>
+            </div>
+            <div class="space-y-1">
+              <div class="flex justify-between text-[10px]">
+                <span class="opacity-70">Intensity</span>
+                <span id="drawerBloomStrVal" class="mono font-bold">0.25</span>
+              </div>
+              <input type="range" id="drawerBloomStr" min="0" max="150" value="25" class="studio-slider" />
+            </div>
+            <div class="space-y-1">
+              <div class="flex justify-between text-[10px]">
+                <span class="opacity-70">Radius</span>
+                <span id="drawerBloomRadVal" class="mono font-bold">0.45</span>
+              </div>
+              <input type="range" id="drawerBloomRad" min="5" max="100" value="45" class="studio-slider" />
+            </div>
+            <div class="space-y-1">
+              <div class="flex justify-between text-[10px]">
+                <span class="opacity-70">Threshold</span>
+                <span id="drawerBloomThreshVal" class="mono font-bold">0.90</span>
+              </div>
+              <input type="range" id="drawerBloomThresh" min="50" max="100" value="90" class="studio-slider" />
+            </div>
+          </div>
+
+          <!-- Ambient Occlusion (GTAO) -->
+          <div class="studio-sunken p-2.5 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-[10px]">Ambient Occlusion (GTAO)</span>
+              <button id="drawerFxAoBtn" class="tool-btn tool-btn-solid text-[9px] px-2 py-0.5">OFF</button>
+            </div>
+            <div class="space-y-1">
+              <div class="flex justify-between text-[10px]">
+                <span class="opacity-70">Radius</span>
+                <span id="drawerAoRadiusVal" class="mono font-bold">0.35m</span>
+              </div>
+              <input type="range" id="drawerAoRadius" min="10" max="200" value="35" class="studio-slider" />
+            </div>
+            <div class="space-y-1">
+              <div class="flex justify-between text-[10px]">
+                <span class="opacity-70">Scale / Intensity</span>
+                <span id="drawerAoScaleVal" class="mono font-bold">1.1x</span>
+              </div>
+              <input type="range" id="drawerAoScale" min="5" max="30" value="11" class="studio-slider" />
+            </div>
+          </div>
+
+          <!-- Depth of Field -->
+          <div class="studio-sunken p-2.5 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-[10px]">Depth of Field (Bokeh)</span>
+              <button id="drawerFxDofBtn" class="tool-btn tool-btn-solid text-[9px] px-2 py-0.5">OFF</button>
+            </div>
+            <div class="space-y-1">
+              <div class="flex justify-between text-[10px]">
+                <span class="opacity-70">Aperture</span>
+                <span id="drawerDofApertureVal" class="mono font-bold">0.004</span>
+              </div>
+              <input type="range" id="drawerDofAperture" min="1" max="25" value="4" class="studio-slider" />
+            </div>
+            <div class="space-y-1">
+              <div class="flex justify-between text-[10px]">
+                <span class="opacity-70">Max Blur</span>
+                <span id="drawerDofBlurVal" class="mono font-bold">0.008</span>
+              </div>
+              <input type="range" id="drawerDofBlur" min="2" max="25" value="8" class="studio-slider" />
+            </div>
+          </div>
+
+          <!-- Live Color Grade -->
+          <div class="studio-sunken p-2.5 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-[10px]">Color Grading</span>
+              <button id="drawerFxGradeBtn" class="tool-btn tool-btn-solid text-[9px] px-2 py-0.5">Neutral</button>
+            </div>
+            <div class="space-y-1">
+              <div class="flex justify-between text-[10px]">
+                <span class="opacity-70">Contrast</span>
+                <span id="drawerContrastVal" class="mono font-bold">1.00x</span>
+              </div>
+              <input type="range" id="drawerContrast" min="70" max="150" value="100" class="studio-slider" />
+            </div>
+            <div class="space-y-1">
+              <div class="flex justify-between text-[10px]">
+                <span class="opacity-70">Saturation</span>
+                <span id="drawerSatVal" class="mono font-bold">1.00x</span>
+              </div>
+              <input type="range" id="drawerSat" min="0" max="200" value="100" class="studio-slider" />
+            </div>
+          </div>
+
+          <!-- Environment & Quality Quick Grid -->
+          <div class="grid grid-cols-2 gap-1 pt-0.5">
+            <button id="drawerFxHdriBtn" class="tool-btn tool-btn-solid text-[10px] py-1">HDRI: OFF</button>
+            <button id="drawerFxAaBtn" class="tool-btn tool-btn-solid active text-[10px] py-1">FXAA: ON</button>
+          </div>
+        </div>
+
+        <!-- ==================================================================
              PANEL 3: OUTLINER TREE
              ================================================================== -->
         <div data-tab-panel="outliner" class="hidden space-y-2">
           <div class="flex gap-1">
-            <input id="meshSearchInput" type="text" placeholder="Filter parts..." class="studio-sunken px-2 py-1 flex-1 text-[11px] bg-transparent outline-none" />
+            <input id="meshSearchInput" type="text" placeholder="Filter parts..."
+              class="studio-sunken px-2 py-1 flex-1 text-[11px] bg-transparent outline-none" />
             <button id="showAllNodesBtn" class="tool-btn tool-btn-solid text-[10px]">All</button>
           </div>
           <div class="flex justify-between text-[9px] opacity-60 mono px-0.5">
             <span id="meshTreeCountLabel">0 ITEMS</span>
             <span>TAP = FOCUS</span>
           </div>
-          <div id="meshTreeList" class="h-64 overflow-y-auto studio-sunken divide-y" style="border-color: var(--border);"></div>
+          <div id="meshTreeList" class="h-64 overflow-y-auto studio-sunken divide-y"
+            style="border-color: var(--border);"></div>
         </div>
 
         <!-- ==================================================================
@@ -678,7 +867,7 @@
         <div data-tab-panel="materials" class="hidden space-y-2">
           <!-- Viewport Shading Quick Grid -->
           <div class="grid grid-cols-2 gap-1">
-            <button id="shadeEdgesBtn" class="tool-btn tool-btn-solid active">Edges: ON</button>
+            <button id="shadeEdgesBtn" class="tool-btn tool-btn-solid">Edges: OFF</button>
             <button id="shadeClayBtn" class="tool-btn tool-btn-solid">Clay: OFF</button>
             <button id="shadeWireBtn" class="tool-btn tool-btn-solid">Wire: OFF</button>
             <button id="shadeXrayBtn" class="tool-btn tool-btn-solid">X-Ray: OFF</button>
@@ -687,7 +876,8 @@
           <div class="studio-sunken p-2 space-y-1.5">
             <div class="flex items-center justify-between">
               <span class="font-bold text-[10px]">SKP Doctor</span>
-              <span id="orangeCountBadge" class="mono text-[9px] px-1.5 py-0.5 rounded font-bold" style="background: var(--fg); color: var(--bg);">OK</span>
+              <span id="orangeCountBadge" class="mono text-[9px] px-1.5 py-0.5 rounded font-bold"
+                style="background: var(--fg); color: var(--bg);">OK</span>
             </div>
             <p id="orangeDiagText" class="text-[9px] opacity-70">Heals unpainted orange back-faces.</p>
             <div class="grid grid-cols-2 gap-1">
@@ -697,7 +887,8 @@
           </div>
 
           <button id="toggleDoubleSideBtn" class="w-full tool-btn tool-btn-solid active py-1">Double-Sided: ON</button>
-          <div id="materialsList" class="h-44 overflow-y-auto studio-sunken divide-y" style="border-color: var(--border);"></div>
+          <div id="materialsList" class="h-44 overflow-y-auto studio-sunken divide-y"
+            style="border-color: var(--border);"></div>
         </div>
 
         <!-- ==================================================================
@@ -767,48 +958,109 @@
     <nav class="fixed right-2.5 top-3 z-30 glass-pill p-1 flex flex-col items-center gap-1">
       <!-- Zoom In / Out / Fit -->
       <button id="dockZoomInBtn" class="dock-icon-btn" title="Zoom In">
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          <line x1="11" y1="8" x2="11" y2="14" />
+          <line x1="8" y1="11" x2="14" y2="11" />
+        </svg>
       </button>
       <button id="dockZoomOutBtn" class="dock-icon-btn" title="Zoom Out">
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          <line x1="8" y1="11" x2="14" y2="11" />
+        </svg>
       </button>
       <button id="quickFrameBtn" class="dock-icon-btn" title="Fit to View (F)">
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+        </svg>
       </button>
 
       <div class="dock-divider"></div>
 
       <!-- Tool Tabs (Clicking active tab collapses/expands the card!) -->
       <button data-tab="lumion" class="workspace-tab dock-icon-btn active" title="Lumion World & 180° Sun">
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5" />
+          <line x1="12" y1="1" x2="12" y2="3" />
+          <line x1="12" y1="21" x2="12" y2="23" />
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+          <line x1="1" y1="12" x2="3" y2="12" />
+          <line x1="21" y1="12" x2="23" y2="12" />
+        </svg>
+      </button>
+      <button data-tab="fx" class="workspace-tab dock-icon-btn" title="Post-Processing & FX Sliders">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M14.31 8 20.05 17.94" />
+          <path d="M9.69 8h11.48" />
+          <path d="m7.38 12 5.74-9.94" />
+          <path d="M9.69 16 3.95 6.06" />
+          <path d="M14.31 16H2.83" />
+          <path d="m16.62 12-5.74 9.94" />
+        </svg>
       </button>
       <button data-tab="dimensions" class="workspace-tab dock-icon-btn" title="Measure Distance & BBox">
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/></svg>
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path
+            d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
+          <path d="m14.5 12.5 2-2" />
+          <path d="m11.5 9.5 2-2" />
+          <path d="m8.5 6.5 2-2" />
+        </svg>
       </button>
       <button data-tab="outliner" class="workspace-tab dock-icon-btn" title="Outliner Mesh Tree">
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="8" y1="6" x2="21" y2="6" />
+          <line x1="8" y1="12" x2="21" y2="12" />
+          <line x1="8" y1="18" x2="21" y2="18" />
+          <line x1="3" y1="6" x2="3.01" y2="6" />
+          <line x1="3" y1="12" x2="3.01" y2="12" />
+          <line x1="3" y1="18" x2="3.01" y2="18" />
+        </svg>
       </button>
       <button data-tab="section" class="workspace-tab dock-icon-btn" title="Section Cut">
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="12" x2="21" y2="12"/></svg>
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+        </svg>
       </button>
       <button data-tab="materials" class="workspace-tab dock-icon-btn" title="Materials & Shading">
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a7 7 0 1 0 10 10"/></svg>
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 2a7 7 0 1 0 10 10" />
+        </svg>
       </button>
       <button data-tab="animation" class="workspace-tab dock-icon-btn" title="Explode & Turntable">
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="5 3 19 12 5 21 5 3" />
+        </svg>
       </button>
       <button data-tab="camera" class="workspace-tab dock-icon-btn" title="Camera Views">
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
+          <circle cx="12" cy="13" r="3" />
+        </svg>
       </button>
 
       <div class="dock-divider"></div>
 
       <!-- Theme & Fullscreen -->
       <button id="quickThemeIconBtn" class="dock-icon-btn" title="Toggle Day / Dark Theme">
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
       </button>
       <button id="fullscreenBtn" class="dock-icon-btn" title="Toggle Fullscreen">
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 3 21 3 21 9" />
+          <polyline points="9 21 3 21 3 15" />
+          <line x1="21" y1="3" x2="14" y2="10" />
+          <line x1="3" y1="21" x2="10" y2="14" />
+        </svg>
       </button>
     </nav>
 
@@ -816,7 +1068,8 @@
          BOTTOM-RIGHT: INTERACTIVE XYZ ORIENTATION GIZMO (LIKE MESHY SCREENSHOT)
          ======================================================================== -->
     <div class="fixed bottom-3 right-3 z-20 flex flex-col items-center">
-      <canvas id="axisGizmoCanvas" width="76" height="76" class="cursor-pointer" title="Click X, Y, Z axis to snap view"></canvas>
+      <canvas id="axisGizmoCanvas" width="76" height="76" class="cursor-pointer"
+        title="Click X, Y, Z axis to snap view"></canvas>
     </div>
 
   </div>
@@ -824,21 +1077,31 @@
   <!-- ==========================================================================
        6. MODAL: HARDWARE SPECS, PWA ARCHITECTURE & CDN CACHE
        ========================================================================== -->
-  <div id="limitsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background: rgba(20, 21, 25, 0.72); backdrop-filter: blur(4px);">
+  <div id="limitsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4"
+    style="background: rgba(20, 21, 25, 0.72); backdrop-filter: blur(4px);">
     <div class="glass-card max-w-2xl w-full p-5 space-y-4">
       <div class="flex items-center justify-between border-b pb-2.5" style="border-color: var(--border);">
         <span class="font-bold text-sm uppercase tracking-wider">Hardware Telemetry & PWA Offline Cache</span>
         <button id="closeLimitsModalBtn" class="tool-btn tool-btn-solid px-2 py-0.5">✕</button>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mono text-xs">
-        <div class="studio-sunken p-2.5"><span class="opacity-60 block text-[10px]">WEBGL GPU</span><b id="hwGpuName" class="truncate block mt-0.5">--</b></div>
-        <div class="studio-sunken p-2.5"><span class="opacity-60 block text-[10px]">CPU THREADS</span><b id="hwCpuRam" class="block mt-0.5">--</b></div>
-        <div class="studio-sunken p-2.5"><span class="opacity-60 block text-[10px]">CDN CACHE</span><b id="hwMaxTex" class="block mt-0.5">--</b></div>
+        <div class="studio-sunken p-2.5"><span class="opacity-60 block text-[10px]">WEBGL GPU</span><b id="hwGpuName"
+            class="truncate block mt-0.5">--</b></div>
+        <div class="studio-sunken p-2.5"><span class="opacity-60 block text-[10px]">CPU THREADS</span><b id="hwCpuRam"
+            class="block mt-0.5">--</b></div>
+        <div class="studio-sunken p-2.5"><span class="opacity-60 block text-[10px]">CDN CACHE</span><b id="hwMaxTex"
+            class="block mt-0.5">--</b></div>
       </div>
       <div class="studio-sunken p-3.5 space-y-2 text-xs leading-relaxed opacity-90">
-        <p><b>• Can a Single HTML File with CDN JS be a PWA?</b> Yes! RENDRA dynamically injects a Web App Manifest and uses the browser's <code>CacheStorage</code> API (<code>caches.open('rendra-cdn-v1')</code>) to cache <code>three.js</code> and <code>openskp</code> CDN modules locally. When served over HTTPS with a standard Service Worker, those cached CDN modules load 100% offline.</p>
-        <p><b>• Optimal SketchUp File Size:</b> 1 MB – 120 MB <code>.skp</code> files parse in 0.5–10 seconds locally in RAM (~300 MB browser tab ceiling).</p>
-        <p><b>• V-Ray & Lumion 180° Sun Engine:</b> Full 180° East-to-West solar trajectory, PMREM physical reflections, 4-way road intersection, animated traffic, rolling hills, and multi-species vegetation.</p>
+        <p><b>• Can a Single HTML File with CDN JS be a PWA?</b> Yes! RENDRA dynamically injects a Web App Manifest and
+          uses the browser's <code>CacheStorage</code> API (<code>caches.open('rendra-cdn-v1')</code>) to cache
+          <code>three.js</code> and <code>openskp</code> CDN modules locally. When served over HTTPS with a standard
+          Service Worker, those cached CDN modules load 100% offline.
+        </p>
+        <p><b>• Optimal SketchUp File Size:</b> 1 MB – 120 MB <code>.skp</code> files parse in 0.5–10 seconds locally in
+          RAM (~300 MB browser tab ceiling).</p>
+        <p><b>• V-Ray & Lumion 180° Sun Engine:</b> Full 180° East-to-West solar trajectory, PMREM physical reflections,
+          4-way road intersection, animated traffic, rolling hills, and multi-species vegetation.</p>
       </div>
     </div>
   </div>
@@ -889,7 +1152,7 @@
           const badge = document.getElementById('cacheStateText');
           if (badge) badge.textContent = 'PWA Cached ✓';
         }
-      } catch (e) {}
+      } catch (e) { }
     }
     initPwaAndCdnCache();
 
@@ -907,7 +1170,7 @@
             try {
               const mod = await import(url);
               if (mod && (mod.buildScene || mod.buildInstancedScene)) return mod;
-            } catch (e) {}
+            } catch (e) { }
           }
           openskpModulePromise = null;
           throw new Error('Failed to load OpenSKP engine from CDN.');
@@ -940,7 +1203,7 @@
       sectionPercent: 100,
       sectionFlipped: false,
       showSectionHelper: true,
-      showEdges: true,
+      showEdges: false,
       wireframe: false,
       xray: false,
       clayMode: false,
@@ -1002,7 +1265,7 @@
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(getBgHex());
 
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance', preserveDrawingBuffer: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.localClippingEnabled = true;
     renderer.shadowMap.enabled = true;
@@ -1649,22 +1912,224 @@
     // ==========================================================================
     // 5. CORE SCENE HELPERS, FILE LOADER, GLB EXPORTER & 2D FLOOR PLAN
     // ==========================================================================
-    function createCheckerboardTexture(hexA = '#E2E2DC', hexB = '#CECEC6') {
+    // Architectural PBR Procedural Textures
+    function createArchitecturalConcreteTexture() {
       const c = document.createElement('canvas');
-      c.width = 128;
-      c.height = 128;
+      c.width = 256; c.height = 256;
       const ctx = c.getContext('2d');
-      ctx.fillStyle = hexA;
-      ctx.fillRect(0, 0, 128, 128);
-      ctx.fillStyle = hexB;
-      ctx.fillRect(0, 0, 64, 64);
-      ctx.fillRect(64, 64, 64, 64);
+      ctx.fillStyle = '#D9D7D0';
+      ctx.fillRect(0, 0, 256, 256);
+      // Subtle architectural formwork panel joints
+      ctx.strokeStyle = 'rgba(120, 118, 112, 0.45)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(1, 1, 254, 126);
+      ctx.strokeRect(1, 129, 254, 126);
+      // Formwork tie-rod holes
+      ctx.fillStyle = 'rgba(90, 88, 82, 0.65)';
+      [[24, 24], [232, 24], [24, 104], [232, 104], [24, 152], [232, 152], [24, 232], [232, 232]].forEach(([x, y]) => {
+        ctx.beginPath(); ctx.arc(x, y, 3.5, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)'; ctx.stroke();
+      });
+      // Micro-aggregate concrete noise
+      const img = ctx.getImageData(0, 0, 256, 256);
+      for (let i = 0; i < img.data.length; i += 4) {
+        const noise = (Math.random() - 0.5) * 16;
+        img.data[i] = Math.min(255, Math.max(0, img.data[i] + noise));
+        img.data[i + 1] = Math.min(255, Math.max(0, img.data[i + 1] + noise));
+        img.data[i + 2] = Math.min(255, Math.max(0, img.data[i + 2] + noise));
+      }
+      ctx.putImageData(img, 0, 0);
       const tex = new THREE.CanvasTexture(c);
-      tex.wrapS = THREE.RepeatWrapping;
-      tex.wrapT = THREE.RepeatWrapping;
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(3, 2);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+
+    function createNeroMarquinaTexture() {
+      const c = document.createElement('canvas');
+      c.width = 512; c.height = 512;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#181A1D';
+      ctx.fillRect(0, 0, 512, 512);
+
+      // Organic white and silver marble veining
+      ctx.strokeStyle = 'rgba(235, 238, 242, 0.65)';
+      for (let i = 0; i < 18; i++) {
+        ctx.beginPath();
+        let x = Math.random() * 512, y = Math.random() * 512;
+        ctx.moveTo(x, y);
+        for (let j = 0; j < 8; j++) {
+          x += (Math.random() - 0.4) * 65;
+          y += (Math.random() - 0.4) * 65;
+          ctx.lineTo(x, y);
+        }
+        ctx.lineWidth = Math.random() * 2.2 + 0.6;
+        ctx.stroke();
+      }
+
+      // Fine secondary hairline veins
+      ctx.strokeStyle = 'rgba(200, 205, 210, 0.25)';
+      for (let i = 0; i < 30; i++) {
+        ctx.beginPath();
+        let x = Math.random() * 512, y = Math.random() * 512;
+        ctx.moveTo(x, y);
+        for (let j = 0; j < 5; j++) {
+          x += (Math.random() - 0.5) * 45;
+          y += (Math.random() - 0.5) * 45;
+          ctx.lineTo(x, y);
+        }
+        ctx.lineWidth = 0.75;
+        ctx.stroke();
+      }
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(2, 2);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+
+    function createFabricTexture() {
+      const c = document.createElement('canvas');
+      c.width = 256; c.height = 256;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#EAE7E1';
+      ctx.fillRect(0, 0, 256, 256);
+
+      // Fine woven linen crosshatch
+      ctx.strokeStyle = 'rgba(175, 170, 160, 0.22)';
+      ctx.lineWidth = 1.0;
+      for (let i = 0; i < 256; i += 6) {
+        ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 256); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(256, i); ctx.stroke();
+      }
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
       tex.repeat.set(8, 8);
       tex.colorSpace = THREE.SRGBColorSpace;
       return tex;
+    }
+
+    function createCobblestoneTexture() {
+      const c = document.createElement('canvas');
+      c.width = 512; c.height = 512;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#5A5E65';
+      ctx.fillRect(0, 0, 512, 512);
+
+      // Staggered architectural granite paver bond
+      ctx.strokeStyle = '#2B2D31';
+      ctx.lineWidth = 3.0;
+      const rowH = 32, colW = 64;
+      for (let y = 0; y <= 512; y += rowH) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(512, y); ctx.stroke();
+        const offset = ((y / rowH) % 2) * (colW / 2);
+        for (let x = offset; x <= 512; x += colW) {
+          ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + rowH); ctx.stroke();
+        }
+      }
+
+      // Noise speckles for granite texture
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+      for (let i = 0; i < 600; i++) {
+        ctx.fillRect(Math.random() * 512, Math.random() * 512, 2, 2);
+      }
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(4, 4);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+
+    function createWoodPlankTexture() {
+      const c = document.createElement('canvas');
+      c.width = 256; c.height = 256;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#9C7A54';
+      ctx.fillRect(0, 0, 256, 256);
+      // Horizontal cedar slat grooves
+      for (let y = 0; y < 256; y += 16) {
+        ctx.fillStyle = (y / 16) % 2 === 0 ? '#A6845D' : '#92704B';
+        ctx.fillRect(0, y, 256, 15);
+        ctx.fillStyle = 'rgba(40, 28, 18, 0.45)';
+        ctx.fillRect(0, y + 15, 256, 1);
+      }
+      // Grain strands
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+      for (let i = 0; i < 400; i++) {
+        ctx.fillRect(Math.random() * 256, Math.random() * 256, Math.random() * 24 + 4, 1);
+      }
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(2, 4);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+
+    function createTravertineTexture() {
+      const c = document.createElement('canvas');
+      c.width = 512; c.height = 512;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#DDD8CE';
+      ctx.fillRect(0, 0, 512, 512);
+
+      // Subtle limestone natural veining
+      ctx.strokeStyle = 'rgba(180, 172, 160, 0.35)';
+      for (let i = 0; i < 28; i++) {
+        ctx.beginPath();
+        let x = Math.random() * 512, y = Math.random() * 512;
+        ctx.moveTo(x, y);
+        for (let j = 0; j < 6; j++) {
+          x += (Math.random() - 0.5) * 55;
+          y += Math.random() * 45;
+          ctx.lineTo(x, y);
+        }
+        ctx.lineWidth = Math.random() * 2 + 0.5;
+        ctx.stroke();
+      }
+
+      // Architectural Paver Joint Grid (600x1200mm layout)
+      ctx.strokeStyle = 'rgba(95, 90, 80, 0.45)';
+      ctx.lineWidth = 2.5;
+      for (let x = 0; x <= 512; x += 128) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 512); ctx.stroke();
+      }
+      for (let y = 0; y <= 512; y += 256) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(512, y); ctx.stroke();
+      }
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(4, 3);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+
+    function createWaterRippleTexture() {
+      const c = document.createElement('canvas');
+      c.width = 256; c.height = 256;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#1D7874';
+      ctx.fillRect(0, 0, 256, 256);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.28)';
+      ctx.lineWidth = 1.8;
+      for (let i = 0; i < 45; i++) {
+        ctx.beginPath();
+        ctx.arc(Math.random() * 256, Math.random() * 256, Math.random() * 28 + 6, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(3, 2);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+
+    function createCheckerboardTexture(hexA = '#E2E2DC', hexB = '#CECEC6') {
+      return createArchitecturalConcreteTexture();
     }
 
     const sharedClayMaterial = new THREE.MeshStandardMaterial({
@@ -1724,13 +2189,23 @@
         }
 
         const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+        const maxAniso = renderer.capabilities.getMaxAnisotropy ? renderer.capabilities.getMaxAnisotropy() : 4;
         mats.forEach((m) => {
           if (!m) return;
           m.side = state.doubleSided ? THREE.DoubleSide : THREE.FrontSide;
+          m.shadowSide = THREE.DoubleSide;
+          if (m.map) {
+            m.map.anisotropy = maxAniso;
+            m.map.colorSpace = THREE.SRGBColorSpace;
+            m.map.needsUpdate = true;
+          }
           if (!m.userData) m.userData = {};
           if (m.userData.origOpacity === undefined) {
             m.userData.origOpacity = m.opacity ?? 1;
             m.userData.origTransparent = m.transparent ?? false;
+          }
+          if (m.transparent && m.opacity < 0.95) {
+            m.depthWrite = false;
           }
           state.uniqueMaterials.set(m.uuid, m);
 
@@ -1819,14 +2294,14 @@
           if (typeof openskp.buildScene === 'function' && typeof openskp.toGLB === 'function') {
             try {
               const builtScene = openskp.buildScene(arrayBuffer);
-              glbBytes = openskp.toGLB(builtScene);
+              glbBytes = openskp.toGLB(builtScene, { textures: true });
             } catch (err) {
               console.warn('buildScene fallback to buildInstancedScene:', err);
             }
           }
           if (!glbBytes && typeof openskp.buildInstancedScene === 'function') {
             const instScene = openskp.buildInstancedScene(arrayBuffer);
-            glbBytes = openskp.toInstancedGLB(instScene);
+            glbBytes = openskp.toInstancedGLB(instScene, { textures: true });
           }
           if (!glbBytes) throw new Error('OpenSKP could not convert this .skp file.');
 
@@ -2063,7 +2538,7 @@
 
       filtered.forEach((rec, idx) => {
         const row = document.createElement('div');
-        row.className = 'flex items-center justify-between px-2 py-1.5 text-[10px] hover:bg-black/5 cursor-pointer';
+        row.className = 'outliner-node flex items-center justify-between px-2 py-1.5 text-[10px] hover:bg-black/5 cursor-pointer';
 
         const nameSpan = document.createElement('span');
         nameSpan.className = 'mono truncate flex-1 pr-2';
@@ -2121,7 +2596,7 @@
         left.appendChild(label);
 
         const isoBtn = document.createElement('button');
-        isoBtn.className = `tool-btn px-1.5 py-0.5 text-[9px] tool-btn-solid ${state.isolatedMaterialUuid === mat.uuid ? 'active' : ''}`;
+        isoBtn.className = `solo-mat-btn tool-btn px-1.5 py-0.5 text-[9px] tool-btn-solid ${state.isolatedMaterialUuid === mat.uuid ? 'active' : ''}`;
         isoBtn.textContent = state.isolatedMaterialUuid === mat.uuid ? 'All' : 'Solo';
         isoBtn.addEventListener('click', () => {
           state.isolatedMaterialUuid = state.isolatedMaterialUuid === mat.uuid ? null : mat.uuid;
@@ -2300,7 +2775,7 @@
         const ram = navigator.deviceMemory ? `${navigator.deviceMemory} GB` : '8+ GB';
         document.getElementById('hwCpuRam').textContent = `${cores} Cores / ${ram}`;
         document.getElementById('hwMaxTex').textContent = `${gl.getParameter(gl.MAX_TEXTURE_SIZE)}px + PWA`;
-      } catch (e) {}
+      } catch (e) { }
     }
 
     // ==========================================================================
@@ -2590,41 +3065,134 @@
     }
 
     async function buildDemoArchitecturalVilla() {
-      await showSpinner('BUILDING DEMO VILLA...', 'Generating architectural slabs, walls & glazing', 40);
+      await showSpinner('BUILDING ARCHITECTURAL VILLA...', 'Constructing perimeter estate, interior rooms & cantilever slabs', 35);
       clearCurrentModel();
 
       const villa = new THREE.Group();
-      villa.name = 'Modernist_Pavilion_SKP';
+      villa.name = 'Luxury_Modern_Villa_Estate_SKP';
 
-      const tileTex = createCheckerboardTexture('#E2E2DC', '#CECEC6');
+      const concreteTex = createArchitecturalConcreteTexture();
+      const timberTex = createWoodPlankTexture();
+      const travertineTex = createTravertineTexture();
+      const waterTex = createWaterRippleTexture();
+      const neroTex = createNeroMarquinaTexture();
+      const fabricTex = createFabricTexture();
+      const cobbleTex = createCobblestoneTexture();
+
       const matConcrete = new THREE.MeshStandardMaterial({
         name: 'Architectural_Concrete',
-        color: 0xE2E2DC,
-        map: tileTex,
-        roughness: 0.75,
-        metalness: 0.05,
+        color: 0xE5E3DC,
+        map: concreteTex,
+        bumpMap: concreteTex,
+        bumpScale: 0.02,
+        roughness: 0.72,
+        metalness: 0.04,
         side: THREE.DoubleSide
       });
-      const matDarkSteel = new THREE.MeshStandardMaterial({
-        name: 'Anodized_Dark_Steel',
-        color: 0x242730,
-        roughness: 0.35,
-        metalness: 0.6,
+
+      const matTravertine = new THREE.MeshStandardMaterial({
+        name: 'Travertine_Limestone',
+        color: 0xF0ECE4,
+        map: travertineTex,
+        bumpMap: travertineTex,
+        bumpScale: 0.015,
+        roughness: 0.65,
+        metalness: 0.02,
         side: THREE.DoubleSide
       });
+
+      const matDarkBronze = new THREE.MeshStandardMaterial({
+        name: 'Anodized_Dark_Bronze',
+        color: 0x1E2024,
+        roughness: 0.32,
+        metalness: 0.85,
+        side: THREE.DoubleSide
+      });
+
       const matTimber = new THREE.MeshStandardMaterial({
-        name: 'Warm_Cedar_Timber',
-        color: 0xA88256,
-        roughness: 0.6,
+        name: 'Warm_Teak_Cedar',
+        color: 0xEAD8C2,
+        map: timberTex,
+        bumpMap: timberTex,
+        bumpScale: 0.025,
+        roughness: 0.52,
         metalness: 0.05,
         side: THREE.DoubleSide
       });
+
+      const matNero = new THREE.MeshStandardMaterial({
+        name: 'Honed_Nero_Marquina',
+        color: 0x222428,
+        map: neroTex,
+        bumpMap: neroTex,
+        bumpScale: 0.012,
+        roughness: 0.32,
+        metalness: 0.15,
+        side: THREE.DoubleSide
+      });
+
+      const matFabric = new THREE.MeshStandardMaterial({
+        name: 'Warm_Linen_Fabric',
+        color: 0xF2EFEB,
+        map: fabricTex,
+        roughness: 0.88,
+        metalness: 0.0,
+        side: THREE.DoubleSide
+      });
+
+      const matCobble = new THREE.MeshStandardMaterial({
+        name: 'Granite_Driveway_Pavers',
+        color: 0x686C72,
+        map: cobbleTex,
+        bumpMap: cobbleTex,
+        bumpScale: 0.03,
+        roughness: 0.82,
+        metalness: 0.05,
+        side: THREE.DoubleSide
+      });
+
       const matGlass = new THREE.MeshPhysicalMaterial({
         name: 'Curtain_Wall_Glazing',
-        color: 0xD8ECF8,
+        color: 0xD0EAF5,
         transparent: true,
-        opacity: 0.32,
+        opacity: 0.25,
+        transmission: 0.78,
+        roughness: 0.03,
+        metalness: 0.05,
+        ior: 1.52,
+        clearcoat: 1.0,
+        clearcoatRoughness: 0.02,
+        envMapIntensity: 2.2,
+        depthWrite: false,
+        side: THREE.DoubleSide
+      });
+
+      const matPoolWater = new THREE.MeshPhysicalMaterial({
+        name: 'Infinity_Pool_Water',
+        color: 0x2A9D8F,
+        transparent: true,
+        opacity: 0.68,
+        transmission: 0.8,
         roughness: 0.08,
+        metalness: 0.02,
+        ior: 1.333,
+        clearcoat: 1.0,
+        side: THREE.DoubleSide
+      });
+
+      const matCarGloss = new THREE.MeshStandardMaterial({
+        name: 'Automotive_Gloss_Obsidian',
+        color: 0x181A20,
+        roughness: 0.12,
+        metalness: 0.92,
+        side: THREE.DoubleSide
+      });
+
+      const matHedge = new THREE.MeshStandardMaterial({
+        name: 'Landscape_Boxwood_Hedge',
+        color: 0x3F6A3A,
+        roughness: 0.85,
+        metalness: 0.0,
         side: THREE.DoubleSide
       });
 
@@ -2638,50 +3206,262 @@
         return mesh;
       };
 
-      const grpFoundation = new THREE.Group();
-      grpFoundation.name = '01_Foundation';
-      addPart('Main_Floor_Slab', new THREE.BoxGeometry(14, 0.45, 10), matConcrete, 0, 0.225, 0, grpFoundation);
-      addPart('Entry_Steps', new THREE.BoxGeometry(4, 0.25, 1.4), matConcrete, 2, 0.125, 5.7, grpFoundation);
-      addPart('Reflecting_Pool', new THREE.BoxGeometry(5.2, 0.35, 3.8), matDarkSteel, -4.2, 0.18, 2.8, grpFoundation);
-      villa.add(grpFoundation);
+      // 01_Site_Perimeter
+      const grpPerimeter = new THREE.Group();
+      grpPerimeter.name = '01_Site_Perimeter';
+      addPart('Boundary_Wall_Front_West', new THREE.BoxGeometry(9.0, 2.0, 0.30), matConcrete, -8.5, 1.0, 10.5, grpPerimeter);
+      addPart('Boundary_Wall_Front_West_Coping', new THREE.BoxGeometry(9.1, 0.08, 0.38), matDarkBronze, -8.5, 2.04, 10.5, grpPerimeter);
+      addPart('Gate_Pillar_Driveway_W', new THREE.BoxGeometry(0.70, 2.25, 0.70), matTravertine, -3.65, 1.125, 10.5, grpPerimeter);
 
-      const grpGround = new THREE.Group();
-      grpGround.name = '02_Ground_Walls';
-      addPart('North_Shear_Wall', new THREE.BoxGeometry(13.2, 3.2, 0.35), matConcrete, 0, 2.05, -4.4, grpGround);
-      addPart('West_Core_Wall', new THREE.BoxGeometry(0.35, 3.2, 8.8), matConcrete, -6.4, 2.05, 0, grpGround);
-      addPart('East_Living_Wall', new THREE.BoxGeometry(0.35, 3.2, 6.2), matConcrete, 6.2, 2.05, -1.2, grpGround);
-      addPart('Interior_Timber_Wall', new THREE.BoxGeometry(0.25, 3.2, 5.5), matTimber, -1.2, 2.05, -1.5, grpGround);
-      addPart('Kitchen_Island', new THREE.BoxGeometry(3.4, 0.95, 1.1), matDarkSteel, -3.6, 0.92, -1.2, grpGround);
-      [[6.2, 4.2], [0.5, 4.2], [-6.2, 4.2]].forEach(([cx, cz], i) => {
-        addPart(`Steel_Column_0${i + 1}`, new THREE.BoxGeometry(0.26, 3.2, 0.26), matDarkSteel, cx, 2.05, cz, grpGround);
-      });
-      villa.add(grpGround);
-
-      const grpStairs = new THREE.Group();
-      grpStairs.name = '03_Staircase';
-      for (let i = 0; i < 10; i++) {
-        addPart(`Stair_Tread_${i + 1}`, new THREE.BoxGeometry(1.3, 0.08, 0.32), matTimber, 0.2, 0.65 + i * 0.31, -3.2 + i * 0.32, grpStairs);
+      // Motorized Slatted Driveway Gate
+      addPart('Driveway_Gate_TopRail', new THREE.BoxGeometry(4.2, 0.08, 0.08), matDarkBronze, -1.35, 1.90, 10.5, grpPerimeter);
+      addPart('Driveway_Gate_BotRail', new THREE.BoxGeometry(4.2, 0.08, 0.08), matDarkBronze, -1.35, 0.15, 10.5, grpPerimeter);
+      for (let gy = 0.25; gy <= 1.85; gy += 0.14) {
+        addPart(`Driveway_Gate_Slat_${Math.round(gy * 100)}`, new THREE.BoxGeometry(4.1, 0.05, 0.03), matDarkBronze, -1.35, gy, 10.5, grpPerimeter);
       }
+
+      addPart('Gate_Pillar_Driveway_E', new THREE.BoxGeometry(0.60, 2.25, 0.60), matTravertine, 0.95, 1.125, 10.5, grpPerimeter);
+      // Pedestrian Wicket Gate
+      addPart('Pedestrian_Gate_Frame', new THREE.BoxGeometry(1.20, 2.0, 0.06), matDarkBronze, 1.85, 1.0, 10.5, grpPerimeter);
+      for (let py = 0.20; py <= 1.90; py += 0.14) {
+        addPart(`Pedestrian_Gate_Slat_${Math.round(py * 100)}`, new THREE.BoxGeometry(1.1, 0.05, 0.02), matDarkBronze, 1.85, py, 10.5, grpPerimeter);
+      }
+      addPart('Gate_Pillar_Pedestrian_E', new THREE.BoxGeometry(0.60, 2.25, 0.60), matTravertine, 2.75, 1.125, 10.5, grpPerimeter);
+
+      addPart('Boundary_Wall_Front_East', new THREE.BoxGeometry(9.6, 2.0, 0.30), matConcrete, 7.85, 1.0, 10.5, grpPerimeter);
+      addPart('Boundary_Wall_Front_East_Coping', new THREE.BoxGeometry(9.7, 0.08, 0.38), matDarkBronze, 7.85, 2.04, 10.5, grpPerimeter);
+      addPart('Boundary_Wall_West', new THREE.BoxGeometry(0.30, 2.0, 22.0), matConcrete, -13.0, 1.0, -0.5, grpPerimeter);
+      addPart('Boundary_Wall_East', new THREE.BoxGeometry(0.30, 2.0, 22.0), matConcrete, 13.0, 1.0, -0.5, grpPerimeter);
+      addPart('Boundary_Wall_North_Rear', new THREE.BoxGeometry(26.3, 2.0, 0.30), matConcrete, 0, 1.0, -11.5, grpPerimeter);
+
+      // Driveway Approach & Covered Carport
+      addPart('Driveway_Paver_Approach', new THREE.BoxGeometry(4.8, 0.08, 5.0), matCobble, -1.4, 0.04, 8.0, grpPerimeter);
+      addPart('Carport_Cobble_Slab', new THREE.BoxGeometry(6.2, 0.10, 5.5), matCobble, -7.0, 0.05, 7.5, grpPerimeter);
+      [[-9.8, 5.0], [-4.2, 5.0], [-9.8, 9.8], [-4.2, 9.8]].forEach(([cx, cz], i) => {
+        addPart(`Carport_Steel_Column_0${i + 1}`, new THREE.BoxGeometry(0.20, 2.8, 0.20), matDarkBronze, cx, 1.4, cz, grpPerimeter);
+      });
+      addPart('Carport_Header_Beam_South', new THREE.BoxGeometry(6.0, 0.22, 0.12), matDarkBronze, -7.0, 2.85, 9.8, grpPerimeter);
+      addPart('Carport_Header_Beam_North', new THREE.BoxGeometry(6.0, 0.22, 0.12), matDarkBronze, -7.0, 2.85, 5.0, grpPerimeter);
+      for (let cs = 5.2; cs <= 9.6; cs += 0.50) {
+        addPart(`Carport_Pergola_Slat_${Math.round(cs * 10)}`, new THREE.BoxGeometry(0.08, 0.08, 5.8), matTimber, -7.0, 2.96, cs, grpPerimeter);
+      }
+      // Executive Sedan in Carport
+      addPart('Carport_Executive_Sedan_Body', new THREE.BoxGeometry(4.4, 0.72, 1.95), matCarGloss, -7.0, 0.52, 7.4, grpPerimeter);
+      addPart('Carport_Executive_Sedan_Cabin', new THREE.BoxGeometry(2.3, 0.62, 1.65), matGlass, -7.2, 1.15, 7.4, grpPerimeter);
+
+      // Entrance Stepping Pavers & Landscaping
+      for (let z = 9.2, idx = 1; z >= 5.0; z -= 1.05, idx++) {
+        addPart(`Entry_Walkway_Paver_0${idx}`, new THREE.BoxGeometry(1.6, 0.10, 0.85), matTravertine, 2.0, 0.05, z, grpPerimeter);
+      }
+      addPart('Front_Lawn_Turf_Bed', new THREE.BoxGeometry(4.2, 0.05, 5.0), matHedge, 0.2, 0.025, 7.8, grpPerimeter);
+      addPart('Hedge_Front_West_Border', new THREE.BoxGeometry(8.5, 0.65, 0.45), matHedge, -8.5, 0.325, 10.0, grpPerimeter);
+      addPart('Hedge_Front_East_Border', new THREE.BoxGeometry(9.0, 0.65, 0.45), matHedge, 8.0, 0.325, 10.0, grpPerimeter);
+      villa.add(grpPerimeter);
+
+      // 02_Ground_Terrace_Pool
+      const grpTerrace = new THREE.Group();
+      grpTerrace.name = '02_Ground_Terrace_Pool';
+      addPart('Plinth_Travertine_Deck', new THREE.BoxGeometry(21.0, 0.45, 16.0), matTravertine, 0, 0.225, 0.5, grpTerrace);
+      addPart('Terrace_Steps_Approach', new THREE.BoxGeometry(5.2, 0.15, 1.4), matTravertine, 2.0, 0.075, 8.8, grpTerrace);
+      addPart('Terrace_Steps_Upper', new THREE.BoxGeometry(4.4, 0.15, 1.0), matTravertine, 2.0, 0.225, 7.8, grpTerrace);
+
+      // Infinity Lap Pool & Submerged Steps
+      addPart('Pool_Coping_Granite', new THREE.BoxGeometry(8.2, 0.46, 4.2), matNero, -6.2, 0.23, 4.8, grpTerrace);
+      addPart('Pool_Basin_Structure', new THREE.BoxGeometry(7.6, 0.44, 3.6), matNero, -6.2, 0.20, 4.8, grpTerrace);
+      addPart('Infinity_Pool_Water', new THREE.BoxGeometry(7.5, 0.05, 3.5), matPoolWater, -6.2, 0.40, 4.8, grpTerrace);
+      addPart('Pool_Submerged_Step_1', new THREE.BoxGeometry(2.2, 0.12, 0.6), matTravertine, -2.8, 0.34, 3.8, grpTerrace);
+      addPart('Pool_Submerged_Step_2', new THREE.BoxGeometry(2.2, 0.12, 0.6), matTravertine, -2.8, 0.22, 4.4, grpTerrace);
+
+      // Poolside Sun Loungers & Drinks Table
+      addPart('Pool_Lounger_01_Frame', new THREE.BoxGeometry(0.75, 0.25, 2.0), matTimber, -1.8, 0.35, 5.5, grpTerrace);
+      addPart('Pool_Lounger_01_Cushion', new THREE.BoxGeometry(0.70, 0.08, 1.95), matFabric, -1.8, 0.48, 5.5, grpTerrace);
+      addPart('Pool_Lounger_02_Frame', new THREE.BoxGeometry(0.75, 0.25, 2.0), matTimber, -0.8, 0.35, 5.5, grpTerrace);
+      addPart('Pool_Lounger_02_Cushion', new THREE.BoxGeometry(0.70, 0.08, 1.95), matFabric, -0.8, 0.48, 5.5, grpTerrace);
+      addPart('Pool_Drinks_Table', new THREE.BoxGeometry(0.45, 0.35, 0.45), matTimber, -1.3, 0.40, 6.7, grpTerrace);
+      addPart('Pool_Parasol_Pole', new THREE.BoxGeometry(0.06, 2.5, 0.06), matDarkBronze, -1.3, 1.6, 6.7, grpTerrace);
+      addPart('Pool_Parasol_Canopy', new THREE.BoxGeometry(2.2, 0.08, 2.2), matFabric, -1.3, 2.85, 6.7, grpTerrace);
+
+      // Sunken Conversation Lounge
+      addPart('Sunken_Lounge_Floor', new THREE.BoxGeometry(4.4, 0.20, 4.4), matTravertine, 6.8, 0.10, 4.8, grpTerrace);
+      addPart('Sunken_Lounge_Bench_N', new THREE.BoxGeometry(4.0, 0.35, 0.65), matTimber, 6.8, 0.35, 3.1, grpTerrace);
+      addPart('Sunken_Lounge_Cushion_N', new THREE.BoxGeometry(3.9, 0.08, 0.58), matFabric, 6.8, 0.54, 3.1, grpTerrace);
+      addPart('Sunken_Lounge_Bench_E', new THREE.BoxGeometry(0.65, 0.35, 3.4), matTimber, 8.5, 0.35, 4.8, grpTerrace);
+      addPart('Sunken_Lounge_Cushion_E', new THREE.BoxGeometry(0.58, 0.08, 3.3), matFabric, 8.5, 0.54, 4.8, grpTerrace);
+      addPart('Sunken_Lounge_Bench_S', new THREE.BoxGeometry(4.0, 0.35, 0.65), matTimber, 6.8, 0.35, 6.5, grpTerrace);
+      addPart('Sunken_Lounge_Cushion_S', new THREE.BoxGeometry(3.9, 0.08, 0.58), matFabric, 6.8, 0.54, 6.5, grpTerrace);
+      addPart('Central_FireTable_Nero', new THREE.BoxGeometry(1.6, 0.35, 1.6), matNero, 6.8, 0.35, 4.8, grpTerrace);
+      villa.add(grpTerrace);
+
+      // 03_Ground_Structure
+      const grpGroundStruct = new THREE.Group();
+      grpGroundStruct.name = '03_Ground_Structure';
+      addPart('Ground_Interior_Slab', new THREE.BoxGeometry(15.8, 0.14, 10.4), matConcrete, 0.2, 0.52, -1.8, grpGroundStruct);
+      addPart('ShearWall_North_Concrete', new THREE.BoxGeometry(15.4, 3.3, 0.35), matConcrete, 0.2, 2.15, -6.8, grpGroundStruct);
+      addPart('ShearWall_West_Concrete', new THREE.BoxGeometry(0.35, 3.3, 7.8), matConcrete, -7.5, 2.15, -3.0, grpGroundStruct);
+      addPart('CoreWall_Elevator_Shaft', new THREE.BoxGeometry(2.4, 3.3, 2.2), matConcrete, -4.5, 2.15, -4.5, grpGroundStruct);
+      addPart('Entrance_Foyer_FeatureWall', new THREE.BoxGeometry(3.6, 3.3, 0.28), matTravertine, 5.5, 2.15, 2.0, grpGroundStruct);
+      addPart('Entrance_Pivot_Door', new THREE.BoxGeometry(1.3, 2.8, 0.08), matTimber, 3.2, 1.90, 2.0, grpGroundStruct);
+      addPart('Entrance_Pivot_Door_Handle', new THREE.BoxGeometry(0.04, 1.6, 0.06), matDarkBronze, 2.7, 1.90, 2.06, grpGroundStruct);
+
+      // Columns
+      [[6.8, 2.8], [1.5, 2.8], [-4.2, 2.8], [6.8, -2.0], [1.5, -2.0], [-4.2, -2.0]].forEach(([cx, cz], i) => {
+        addPart(`Column_Ground_0${i + 1}`, new THREE.BoxGeometry(0.24, 3.3, 0.24), matDarkBronze, cx, 2.15, cz, grpGroundStruct);
+      });
+      villa.add(grpGroundStruct);
+
+      // 04_Ground_Interiors (FURNISHED LIVING, DINING, KITCHEN & POWDER ROOM)
+      const grpGroundInteriors = new THREE.Group();
+      grpGroundInteriors.name = '04_Ground_Interiors';
+
+      // Living Room
+      addPart('Living_Area_Rug', new THREE.BoxGeometry(4.4, 0.02, 3.4), matFabric, -1.8, 0.53, 0.6, grpGroundInteriors);
+      addPart('Living_Sofa_Base_Timber', new THREE.BoxGeometry(3.4, 0.22, 1.1), matTimber, -1.8, 0.64, 0.2, grpGroundInteriors);
+      addPart('Living_Sofa_Seat_Cushions', new THREE.BoxGeometry(3.3, 0.24, 1.0), matFabric, -1.8, 0.85, 0.2, grpGroundInteriors);
+      addPart('Living_Sofa_Backrest', new THREE.BoxGeometry(3.3, 0.42, 0.28), matFabric, -1.8, 1.15, -0.2, grpGroundInteriors);
+      addPart('Living_Sofa_Chaise_Seat', new THREE.BoxGeometry(1.1, 0.24, 1.8), matFabric, -3.2, 0.85, 1.2, grpGroundInteriors);
+      addPart('Living_Sofa_Chaise_Arm', new THREE.BoxGeometry(0.24, 0.35, 1.8), matFabric, -3.7, 0.95, 1.2, grpGroundInteriors);
+      addPart('Living_Throw_Pillow_1', new THREE.BoxGeometry(0.42, 0.42, 0.16), matNero, -0.6, 1.05, 0.1, grpGroundInteriors);
+      addPart('Living_Throw_Pillow_2', new THREE.BoxGeometry(0.42, 0.42, 0.16), matNero, -1.8, 1.05, 0.1, grpGroundInteriors);
+      addPart('Living_Throw_Pillow_3', new THREE.BoxGeometry(0.42, 0.42, 0.16), matNero, -3.0, 1.05, 0.8, grpGroundInteriors);
+      addPart('Living_Coffee_Table_Nero', new THREE.BoxGeometry(1.5, 0.32, 0.85), matNero, -1.4, 0.69, 1.2, grpGroundInteriors);
+      addPart('Living_Media_Acoustic_Wall', new THREE.BoxGeometry(0.12, 3.2, 3.6), matTimber, 0.2, 2.15, -1.8, grpGroundInteriors);
+      addPart('Living_Media_Credenza_Floating', new THREE.BoxGeometry(0.42, 0.45, 3.2), matNero, 0.45, 0.95, -1.8, grpGroundInteriors);
+      addPart('Living_OLED_Display_Screen', new THREE.BoxGeometry(0.04, 1.1, 2.0), matDarkBronze, 0.35, 2.1, -1.8, grpGroundInteriors);
+
+      // Dining Room
+      addPart('Dining_Table_Teak_Top', new THREE.BoxGeometry(2.5, 0.08, 1.1), matTimber, -4.2, 1.15, -1.8, grpGroundInteriors);
+      addPart('Dining_Table_Bronze_Leg_W', new THREE.BoxGeometry(0.10, 0.65, 0.95), matDarkBronze, -5.2, 0.84, -1.8, grpGroundInteriors);
+      addPart('Dining_Table_Bronze_Leg_E', new THREE.BoxGeometry(0.10, 0.65, 0.95), matDarkBronze, -3.2, 0.84, -1.8, grpGroundInteriors);
+      [-5.1, -4.5, -3.9, -3.3].forEach((cx, idx) => {
+        addPart(`Dining_Chair_North_0${idx + 1}`, new THREE.BoxGeometry(0.46, 0.78, 0.46), matFabric, cx, 0.90, -2.5, grpGroundInteriors);
+        addPart(`Dining_Chair_South_0${idx + 1}`, new THREE.BoxGeometry(0.46, 0.78, 0.46), matFabric, cx, 0.90, -1.1, grpGroundInteriors);
+      });
+      addPart('Dining_Chandelier_Linear', new THREE.BoxGeometry(2.2, 0.06, 0.14), matDarkBronze, -4.2, 2.85, -1.8, grpGroundInteriors);
+
+      // Chef's Kitchen
+      addPart('Kitchen_Tall_Cabinet_Wall', new THREE.BoxGeometry(4.8, 2.9, 0.65), matTimber, 3.5, 2.0, -6.4, grpGroundInteriors);
+      addPart('Kitchen_Oven_Tower_Unit', new THREE.BoxGeometry(1.2, 2.9, 0.66), matNero, 5.5, 2.0, -6.4, grpGroundInteriors);
+      addPart('Kitchen_Island_Nero_Block', new THREE.BoxGeometry(3.6, 0.92, 1.2), matNero, 3.2, 1.0, -4.2, grpGroundInteriors);
+      addPart('Kitchen_Island_Sink_Basin', new THREE.BoxGeometry(0.70, 0.02, 0.45), matDarkBronze, 2.2, 1.46, -4.2, grpGroundInteriors);
+      addPart('Kitchen_Island_Faucet', new THREE.BoxGeometry(0.06, 0.38, 0.18), matDarkBronze, 2.2, 1.65, -4.4, grpGroundInteriors);
+      [2.4, 3.2, 4.0].forEach((bx, idx) => {
+        addPart(`Kitchen_Barstool_0${idx + 1}`, new THREE.BoxGeometry(0.40, 0.72, 0.40), matTimber, bx, 0.88, -3.3, grpGroundInteriors);
+      });
+
+      // Powder Room Enclosure & Vanity
+      addPart('Powder_Room_Wall_West', new THREE.BoxGeometry(0.15, 3.3, 2.4), matConcrete, 5.8, 2.15, -4.2, grpGroundInteriors);
+      addPart('Powder_Room_Wall_South', new THREE.BoxGeometry(1.8, 3.3, 0.15), matConcrete, 6.6, 2.15, -3.0, grpGroundInteriors);
+      addPart('Powder_Room_Floating_Vanity', new THREE.BoxGeometry(1.2, 0.35, 0.55), matNero, 6.8, 1.15, -4.2, grpGroundInteriors);
+      addPart('Powder_Room_Mirror', new THREE.BoxGeometry(0.9, 1.2, 0.04), matGlass, 6.8, 2.15, -4.45, grpGroundInteriors);
+      villa.add(grpGroundInteriors);
+
+      // 05_Ground_CurtainWall
+      const grpCurtain = new THREE.Group();
+      grpCurtain.name = '05_Ground_CurtainWall';
+      addPart('Mullion_Sill_South', new THREE.BoxGeometry(11.8, 0.08, 0.12), matDarkBronze, 1.2, 0.56, 2.8, grpCurtain);
+      addPart('Mullion_Header_South', new THREE.BoxGeometry(11.8, 0.08, 0.12), matDarkBronze, 1.2, 3.76, 2.8, grpCurtain);
+      addPart('Mullion_Transom_South', new THREE.BoxGeometry(11.8, 0.06, 0.10), matDarkBronze, 1.2, 2.30, 2.8, grpCurtain);
+      for (let x = -4.2; x <= 6.8; x += 2.2) {
+        addPart(`Mullion_Vertical_S_${Math.round(x * 10)}`, new THREE.BoxGeometry(0.08, 3.25, 0.12), matDarkBronze, x, 2.15, 2.8, grpCurtain);
+      }
+      addPart('Glazing_South_Ground', new THREE.BoxGeometry(11.7, 3.15, 0.04), matGlass, 1.2, 2.15, 2.8, grpCurtain);
+      addPart('Glazing_East_Ground', new THREE.BoxGeometry(0.04, 3.15, 4.8), matGlass, 7.1, 2.15, 0.4, grpCurtain);
+      addPart('Mullion_Corner_SE', new THREE.BoxGeometry(0.12, 3.25, 0.12), matDarkBronze, 7.1, 2.15, 2.8, grpCurtain);
+      villa.add(grpCurtain);
+
+      // 06_Vertical_Circulation
+      const grpStairs = new THREE.Group();
+      grpStairs.name = '06_Vertical_Circulation';
+      const stringer = addPart('Stair_MonoStringer_Spine', new THREE.BoxGeometry(0.24, 0.15, 4.5), matDarkBronze, -0.8, 2.15, -4.5, grpStairs);
+      stringer.rotation.x = 0.58;
+      for (let i = 0; i < 12; i++) {
+        addPart(`Stair_Tread_${String(i + 1).padStart(2, '0')}`, new THREE.BoxGeometry(1.25, 0.07, 0.32), matTimber, -0.8, 0.75 + i * 0.28, -2.8 - i * 0.32, grpStairs);
+      }
+      const balustrade = addPart('Stair_Glass_Balustrade', new THREE.BoxGeometry(0.03, 1.0, 4.4), matGlass, -0.15, 2.55, -4.4, grpStairs);
+      balustrade.rotation.x = 0.58;
+      const handrail = addPart('Stair_Handrail_Cap', new THREE.BoxGeometry(0.06, 0.06, 4.4), matDarkBronze, -0.15, 3.05, -4.4, grpStairs);
+      handrail.rotation.x = 0.58;
       villa.add(grpStairs);
 
-      const grpUpper = new THREE.Group();
-      grpUpper.name = '04_Upper_Level';
-      addPart('Second_Floor_Slab', new THREE.BoxGeometry(14.8, 0.38, 10.4), matConcrete, 0.4, 3.84, 0, grpUpper);
-      addPart('Upper_North_Wall', new THREE.BoxGeometry(9.5, 2.9, 0.32), matConcrete, 2.5, 5.48, -4.4, grpUpper);
-      addPart('Upper_East_Wall', new THREE.BoxGeometry(0.32, 2.9, 9.6), matConcrete, 7.2, 5.48, 0, grpUpper);
-      addPart('Upper_Timber_Soffit', new THREE.BoxGeometry(0.24, 2.9, 6.0), matTimber, 2.2, 5.48, -1.2, grpUpper);
-      addPart('Louvre_Screen', new THREE.BoxGeometry(4.8, 2.8, 0.18), matDarkSteel, -3.8, 5.4, 4.9, grpUpper);
-      villa.add(grpUpper);
+      // 07_Upper_Structure
+      const grpUpperStruct = new THREE.Group();
+      grpUpperStruct.name = '07_Upper_Structure';
+      addPart('Slab_Upper_Cantilever', new THREE.BoxGeometry(17.8, 0.44, 12.2), matConcrete, 0.2, 4.02, -1.2, grpUpperStruct);
+      addPart('Slab_Upper_Soffit_Teak', new THREE.BoxGeometry(17.6, 0.04, 4.2), matTimber, 0.2, 3.78, 2.8, grpUpperStruct);
+      addPart('Upper_North_Wall_Concrete', new THREE.BoxGeometry(11.5, 3.0, 0.32), matConcrete, 2.5, 5.72, -6.8, grpUpperStruct);
+      addPart('Upper_East_Wall_Concrete', new THREE.BoxGeometry(0.32, 3.0, 9.2), matConcrete, 8.0, 5.72, -2.0, grpUpperStruct);
+      addPart('Upper_Master_Divider_Wall', new THREE.BoxGeometry(0.18, 3.0, 5.5), matTimber, 1.5, 5.72, -3.2, grpUpperStruct);
 
-      const grpGlazing = new THREE.Group();
-      grpGlazing.name = '05_Glazing';
-      addPart('Ground_South_Glass', new THREE.BoxGeometry(12.2, 3.15, 0.08), matGlass, 0, 2.02, 4.2, grpGlazing);
-      addPart('Upper_South_Glass', new THREE.BoxGeometry(9.2, 2.85, 0.08), matGlass, 2.5, 5.45, 3.8, grpGlazing);
-      villa.add(grpGlazing);
+      [[7.6, 2.2], [1.5, 2.2], [-4.2, 2.2]].forEach(([cx, cz], i) => {
+        addPart(`Column_Upper_0${i + 1}`, new THREE.BoxGeometry(0.20, 3.0, 0.20), matDarkBronze, cx, 5.72, cz, grpUpperStruct);
+      });
 
+      addPart('Cantilever_Balcony_Deck', new THREE.BoxGeometry(17.4, 0.05, 2.4), matTravertine, 0.2, 4.25, 3.7, grpUpperStruct);
+      addPart('Cantilever_Balcony_Glass_Rail', new THREE.BoxGeometry(17.4, 1.02, 0.04), matGlass, 0.2, 4.74, 4.8, grpUpperStruct);
+      addPart('Cantilever_Balcony_Bronze_TopCap', new THREE.BoxGeometry(17.5, 0.05, 0.08), matDarkBronze, 0.2, 5.24, 4.8, grpUpperStruct);
+
+      // Brise-Soleil Timber Louvers
+      const grpLouvers = new THREE.Group();
+      grpLouvers.name = 'Brise_Soleil_Louvers';
+      for (let x = -7.8; x <= -2.0; x += 0.34) {
+        const louver = addPart(`Louver_Blade_${Math.round(x * 10)}`, new THREE.BoxGeometry(0.04, 2.95, 0.38), matTimber, x, 5.72, 2.4, grpLouvers);
+        louver.rotation.y = 0.45;
+      }
+      grpUpperStruct.add(grpLouvers);
+
+      addPart('Upper_Glazing_South', new THREE.BoxGeometry(9.8, 2.95, 0.04), matGlass, 2.8, 5.72, 2.2, grpUpperStruct);
+      addPart('Upper_Mullions_Bronze', new THREE.BoxGeometry(9.9, 3.0, 0.10), matDarkBronze, 2.8, 5.72, 2.2, grpUpperStruct);
+      villa.add(grpUpperStruct);
+
+      // 08_Upper_Interiors (FURNISHED MASTER SUITE, DRESSING, LUXURY BATH & STUDY)
+      const grpUpperInteriors = new THREE.Group();
+      grpUpperInteriors.name = '08_Upper_Interiors';
+
+      // Master Bedroom Suite
+      addPart('Master_Bedroom_Rug', new THREE.BoxGeometry(3.6, 0.02, 3.2), matFabric, -2.5, 4.25, 0.5, grpUpperInteriors);
+      addPart('Master_King_Bed_Platform', new THREE.BoxGeometry(2.3, 0.28, 2.3), matTimber, -2.5, 4.38, 0.5, grpUpperInteriors);
+      addPart('Master_King_Mattress', new THREE.BoxGeometry(2.1, 0.26, 2.1), matFabric, -2.5, 4.65, 0.5, grpUpperInteriors);
+      addPart('Master_Duvet_Blanket', new THREE.BoxGeometry(2.15, 0.08, 1.5), matFabric, -2.5, 4.80, 0.8, grpUpperInteriors);
+      addPart('Master_Pillow_W1', new THREE.BoxGeometry(0.65, 0.16, 0.42), matFabric, -3.1, 4.85, -0.25, grpUpperInteriors);
+      addPart('Master_Pillow_E1', new THREE.BoxGeometry(0.65, 0.16, 0.42), matFabric, -1.9, 4.85, -0.25, grpUpperInteriors);
+      addPart('Master_Headboard_Wall_Panel', new THREE.BoxGeometry(4.2, 2.5, 0.10), matTimber, -2.5, 5.48, -0.6, grpUpperInteriors);
+      addPart('Master_Nightstand_West', new THREE.BoxGeometry(0.65, 0.42, 0.50), matNero, -4.2, 4.45, -0.2, grpUpperInteriors);
+      addPart('Master_Nightstand_East', new THREE.BoxGeometry(0.65, 0.42, 0.50), matNero, -0.8, 4.45, -0.2, grpUpperInteriors);
+      addPart('Master_Lamp_West', new THREE.BoxGeometry(0.18, 0.45, 0.18), matDarkBronze, -4.2, 4.88, -0.2, grpUpperInteriors);
+      addPart('Master_Lamp_East', new THREE.BoxGeometry(0.18, 0.45, 0.18), matDarkBronze, -0.8, 4.88, -0.2, grpUpperInteriors);
+
+      // Walk-in Dressing Area
+      addPart('Wardrobe_Cabinet_Run_W', new THREE.BoxGeometry(0.65, 2.8, 4.2), matTimber, -6.8, 5.64, -3.5, grpUpperInteriors);
+      addPart('Wardrobe_Island_Bench', new THREE.BoxGeometry(1.2, 0.45, 0.6), matFabric, -5.0, 4.46, -3.5, grpUpperInteriors);
+
+      // Master Luxury En-Suite Bathroom
+      addPart('Ensuite_Marble_Floor', new THREE.BoxGeometry(4.2, 0.02, 4.2), matNero, -2.5, 4.25, -4.5, grpUpperInteriors);
+      addPart('Ensuite_Freestanding_Soaking_Tub', new THREE.BoxGeometry(1.8, 0.62, 0.90), matTravertine, -2.5, 4.56, -3.5, grpUpperInteriors);
+      addPart('Ensuite_Tub_Filler_Faucet', new THREE.BoxGeometry(0.08, 0.85, 0.18), matDarkBronze, -2.5, 4.67, -4.1, grpUpperInteriors);
+      addPart('Ensuite_Vanity_Floating', new THREE.BoxGeometry(2.4, 0.38, 0.60), matNero, -2.5, 5.10, -6.2, grpUpperInteriors);
+      addPart('Ensuite_Twin_Mirrors', new THREE.BoxGeometry(2.2, 1.2, 0.04), matGlass, -2.5, 6.0, -6.45, grpUpperInteriors);
+      addPart('Ensuite_Walkin_Shower_Glass', new THREE.BoxGeometry(0.04, 2.7, 1.8), matGlass, -0.4, 5.60, -5.2, grpUpperInteriors);
+
+      // Executive Study / Library
+      addPart('Study_Executive_Desk', new THREE.BoxGeometry(1.9, 0.76, 0.90), matTimber, 4.5, 4.62, -0.5, grpUpperInteriors);
+      addPart('Study_Desk_Legs_Bronze', new THREE.BoxGeometry(1.8, 0.72, 0.85), matDarkBronze, 4.5, 4.60, -0.5, grpUpperInteriors);
+      addPart('Study_Armchair_Leather', new THREE.BoxGeometry(0.72, 0.88, 0.72), matDarkBronze, 4.5, 4.68, -1.2, grpUpperInteriors);
+      addPart('Study_Bookshelf_Unit', new THREE.BoxGeometry(0.38, 2.6, 2.8), matTimber, 7.5, 5.54, -1.5, grpUpperInteriors);
+      villa.add(grpUpperInteriors);
+
+      // 09_Roof_Pavilion
       const grpRoof = new THREE.Group();
-      grpRoof.name = '06_Roof';
-      addPart('Main_Roof_Canopy', new THREE.BoxGeometry(16.2, 0.42, 11.6), matConcrete, 0.4, 7.1, 0, grpRoof);
+      grpRoof.name = '09_Roof_Pavilion';
+      addPart('Main_Roof_Floating_Slab', new THREE.BoxGeometry(19.2, 0.38, 13.8), matConcrete, 0.2, 7.35, -1.2, grpRoof);
+      const pergolaZ = [-4.5, -2.5, -0.5, 1.5, 3.5];
+      pergolaZ.forEach((pz, idx) => {
+        addPart(`Pergola_Steel_Beam_0${idx + 1}`, new THREE.BoxGeometry(8.2, 0.22, 0.12), matDarkBronze, -4.5, 7.66, pz, grpRoof);
+      });
+      for (let px = -8.5; px <= -0.5; px += 0.55) {
+        addPart(`Pergola_Timber_Slat_${Math.round(px * 10)}`, new THREE.BoxGeometry(0.08, 0.08, 9.2), matTimber, px, 7.80, -0.5, grpRoof);
+      }
+      addPart('Roof_Skylight_Frame', new THREE.BoxGeometry(3.8, 0.18, 3.8), matDarkBronze, 2.5, 7.46, -3.2, grpRoof);
+      addPart('Roof_Skylight_Glazing', new THREE.BoxGeometry(3.6, 0.04, 3.6), matGlass, 2.5, 7.50, -3.2, grpRoof);
       villa.add(grpRoof);
 
       modelRoot.add(villa);
@@ -2698,6 +3478,7 @@
     // ==========================================================================
     const tabTitles = {
       lumion: 'Lumion World',
+      fx: 'Post-Processing FX',
       dimensions: 'Measure',
       outliner: 'Outliner Tree',
       section: 'Section Cut',
@@ -3197,7 +3978,7 @@
       const invRot = activeCamera.quaternion.clone().invert();
       const axes = [
         { label: 'X', view: 'right', dir: new THREE.Vector3(1, 0, 0).applyQuaternion(invRot), filled: true },
-        { label: 'Y', view: 'top',   dir: new THREE.Vector3(0, 1, 0).applyQuaternion(invRot), filled: true },
+        { label: 'Y', view: 'top', dir: new THREE.Vector3(0, 1, 0).applyQuaternion(invRot), filled: true },
         { label: 'Z', view: 'front', dir: new THREE.Vector3(0, 0, 1).applyQuaternion(invRot), filled: false }
       ];
 
@@ -3333,7 +4114,7 @@
       controls.update();
       updateFloatingLabelsScreenPos();
       renderAxisGizmo();
-      renderer.render(scene, activeCamera);
+      if (window.RENDRA.render) window.RENDRA.render(scene, activeCamera); else renderer.render(scene, activeCamera);
       for (const fn of window.RENDRA.post) fn();
     }
 
@@ -3349,13 +4130,13 @@
       await buildDemoArchitecturalVilla();
     };
   </script>
-<script type="module">
-/* RENDRA DIRECTOR — cinematic layer: looks, weather, photo, video, tour, install */
-const R = window.RENDRA; if (R) {
-const { THREE, scene, renderer, state, controls, canvas } = R;
-const $ = (id) => document.getElementById(id);
-const css = document.createElement('style');
-css.textContent = `
+  <script type="module">
+    /* RENDRA DIRECTOR — cinematic layer: looks, weather, photo, video, tour, install */
+    const R = window.RENDRA; if (R) {
+      const { THREE, scene, renderer, state, controls, canvas } = R;
+      const $ = (id) => document.getElementById(id);
+      const css = document.createElement('style');
+      css.textContent = `
 #dir{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:30;display:flex;align-items:center;gap:4px;padding:5px;max-width:calc(100vw - 20px);overflow-x:auto}
 @media(max-width:700px){#dir{bottom:84px}}
 #dir .sep{width:1px;height:18px;background:var(--border-strong);margin:0 3px;flex:none}
@@ -3368,9 +4149,9 @@ css.textContent = `
 body.clean .glass-card,body.clean .glass-pill,body.clean nav,body.clean #dir{opacity:0!important;pointer-events:none!important}
 #recDot{display:none;width:7px;height:7px;border-radius:50%;background:#e03c31;animation:bl 1s infinite}
 @keyframes bl{50%{opacity:.2}}`;
-document.head.appendChild(css);
-const vc = $('viewportContainer');
-vc.insertAdjacentHTML('beforeend', `<div id="vig"></div><div id="grain"></div>
+      document.head.appendChild(css);
+      const vc = $('viewportContainer');
+      vc.insertAdjacentHTML('beforeend', `<div id="vig"></div><div id="grain"></div>
 <div id="dirLooks" class="glass-card"></div>
 <div id="dir" class="glass-pill">
  <button class="tool-btn tool-btn-solid" id="dLooks">Looks</button><span class="sep"></span>
@@ -3382,195 +4163,831 @@ vc.insertAdjacentHTML('beforeend', `<div id="vig"></div><div id="grain"></div>
  <button class="tool-btn" id="dRec"><i id="recDot"></i><span id="recTxt">Record</span></button>
  <button class="tool-btn" id="dClean" title="Shift+H">Clean</button><button class="tool-btn tool-btn-primary" id="dInstall" style="display:none">Install</button></div>`);
 
-// ---- Looks (time slider drives the existing 180° solar engine)
-const LOOKS = [
- ['Noon', 12, 1.1, 'clear', 0, 0], ['Golden Hour', 17.2, 1.0, 'clear', 1, 1],
- ['Blue Hour', 6.0, 0.7, 'clear', 1, 1], ['Overcast', 13, 0.95, 'mist', 0, 1],
- ['Rain Storm', 11, 0.8, 'rain', 1, 1], ['Snowfall', 15, 1.05, 'snow', 1, 0]];
-const lk = $('dirLooks');
-LOOKS.forEach(([n, t, e, w, v, g]) => { const b = document.createElement('button'); b.className = 'tool-btn tool-btn-solid'; b.textContent = n;
-  b.onclick = () => { const s = $('todTimeSlider'); s.value = t; s.dispatchEvent(new Event('input'));
-    setExp(e); setWx(w); setFx('vig', !!v); setFx('grain', !!g); lk.classList.remove('open'); }; lk.appendChild(b); });
-$('dLooks').onclick = () => lk.classList.toggle('open');
-function setExp(e) { renderer.toneMappingExposure = e; $('dExp').value = e * 10; }
-$('dExp').oninput = (ev) => { renderer.toneMappingExposure = ev.target.value / 10; };
-function setFx(id, on) { $(id).style.opacity = on ? 1 : 0; $(id === 'vig' ? 'dVig' : 'dGrain').classList.toggle('active', on); }
-$('dVig').onclick = () => setFx('vig', $('vig').style.opacity != 1);
-$('dGrain').onclick = () => setFx('grain', $('grain').style.opacity != 1);
+      // ---- Looks (time slider drives the existing 180° solar engine)
+      const LOOKS = [
+        ['Noon', 12, 1.1, 'clear', 0, 0], ['Golden Hour', 17.2, 1.0, 'clear', 1, 1],
+        ['Blue Hour', 6.0, 0.7, 'clear', 1, 1], ['Overcast', 13, 0.95, 'mist', 0, 1],
+        ['Rain Storm', 11, 0.8, 'rain', 1, 1], ['Snowfall', 15, 1.05, 'snow', 1, 0]];
+      const lk = $('dirLooks');
+      LOOKS.forEach(([n, t, e, w, v, g]) => {
+        const b = document.createElement('button'); b.className = 'tool-btn tool-btn-solid'; b.textContent = n;
+        b.onclick = () => {
+          const s = $('todTimeSlider'); s.value = t; s.dispatchEvent(new Event('input'));
+          setExp(e); setWx(w); setFx('vig', !!v); setFx('grain', !!g); lk.classList.remove('open');
+        }; lk.appendChild(b);
+      });
+      $('dLooks').onclick = () => lk.classList.toggle('open');
+      function setExp(e) { renderer.toneMappingExposure = e; $('dExp').value = e * 10; }
+      $('dExp').oninput = (ev) => { renderer.toneMappingExposure = ev.target.value / 10; };
+      function setFx(id, on) { $(id).style.opacity = on ? 1 : 0; $(id === 'vig' ? 'dVig' : 'dGrain').classList.toggle('active', on); }
+      $('dVig').onclick = () => setFx('vig', $('vig').style.opacity != 1);
+      $('dGrain').onclick = () => setFx('grain', $('grain').style.opacity != 1);
 
-// ---- Weather
-let wx = 'clear', pts = null, N = 4000, span = 40, mist = false;
-function setWx(m) {
-  wx = m; document.querySelectorAll('[data-wx]').forEach((b) => b.classList.toggle('active', b.dataset.wx === m));
-  if (pts) { scene.remove(pts); pts.geometry.dispose(); pts = null; }
-  const wasMist = mist; mist = m !== 'clear';
-  span = Math.max(30, state.modelSize.length() * 2.2);
-  if (m === 'rain' || m === 'snow') {
-    const g = new THREE.BufferGeometry(), rain = m === 'rain', n = rain ? N : N / 2;
-    const a = new Float32Array(n * (rain ? 6 : 3));
-    for (let i = 0; i < n; i++) { const x = (Math.random() - .5) * span, y = Math.random() * span * .7, z = (Math.random() - .5) * span;
-      if (rain) a.set([x, y, z, x, y - span * .02, z], i * 6); else a.set([x, y, z], i * 3); }
-    g.setAttribute('position', new THREE.BufferAttribute(a, 3));
-    pts = rain ? new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: 0xcfd8e3, transparent: true, opacity: .55, depthWrite: false }))
-               : new THREE.Points(g, new THREE.PointsMaterial({ color: 0xffffff, size: span * .012, transparent: true, opacity: .9, depthWrite: false }));
-    pts.frustumCulled = false; scene.add(pts);
-  }
-  if (!mist && wasMist) { if (state.todEnabled) { const s = $('todAzimuthSlider'); s.dispatchEvent(new Event('input')); } else scene.fog = null; }
-}
-document.querySelectorAll('[data-wx]').forEach((b) => b.onclick = () => setWx(b.dataset.wx));
+      // ---- Weather
+      let wx = 'clear', pts = null, N = 4000, span = 40, mist = false;
+      function setWx(m) {
+        wx = m; document.querySelectorAll('[data-wx]').forEach((b) => b.classList.toggle('active', b.dataset.wx === m));
+        if (pts) { scene.remove(pts); pts.geometry.dispose(); pts = null; }
+        const wasMist = mist; mist = m !== 'clear';
+        span = Math.max(30, state.modelSize.length() * 2.2);
+        if (m === 'rain' || m === 'snow') {
+          const g = new THREE.BufferGeometry(), rain = m === 'rain', n = rain ? N : N / 2;
+          const a = new Float32Array(n * (rain ? 6 : 3));
+          for (let i = 0; i < n; i++) {
+            const x = (Math.random() - .5) * span, y = Math.random() * span * .7, z = (Math.random() - .5) * span;
+            if (rain) a.set([x, y, z, x, y - span * .02, z], i * 6); else a.set([x, y, z], i * 3);
+          }
+          g.setAttribute('position', new THREE.BufferAttribute(a, 3));
+          pts = rain ? new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: 0xcfd8e3, transparent: true, opacity: .55, depthWrite: false }))
+            : new THREE.Points(g, new THREE.PointsMaterial({ color: 0xffffff, size: span * .012, transparent: true, opacity: .9, depthWrite: false }));
+          pts.frustumCulled = false; scene.add(pts);
+        }
+        if (!mist && wasMist) { if (state.todEnabled) { const s = $('todAzimuthSlider'); s.dispatchEvent(new Event('input')); } else scene.fog = null; }
+      }
+      document.querySelectorAll('[data-wx]').forEach((b) => b.onclick = () => setWx(b.dataset.wx));
 
-// ---- Cinematic tour (orbit + dolly + crane)
-let tour = null;
-function tourToggle(on = !tour) {
-  $('dTour').classList.toggle('active', !!on);
-  if (!on) { tour = null; controls.enabled = true; return; }
-  const cam = R.getCamera(), t = controls.target.clone(), off = cam.position.clone().sub(t);
-  tour = { c: t, r: Math.max(off.length(), 6), a: Math.atan2(off.x, off.z), h: Math.max(off.y, 2), t: 0 };
-  canvas.addEventListener('pointerdown', () => tourToggle(false), { once: true });
-}
-$('dTour').onclick = () => tourToggle();
+      // ---- Cinematic tour (orbit + dolly + crane)
+      let tour = null;
+      function tourToggle(on = !tour) {
+        $('dTour').classList.toggle('active', !!on);
+        if (!on) { tour = null; controls.enabled = true; return; }
+        const cam = R.getCamera(), t = controls.target.clone(), off = cam.position.clone().sub(t);
+        tour = { c: t, r: Math.max(off.length(), 6), a: Math.atan2(off.x, off.z), h: Math.max(off.y, 2), t: 0 };
+        canvas.addEventListener('pointerdown', () => tourToggle(false), { once: true });
+      }
+      $('dTour').onclick = () => tourToggle();
 
-// ---- Photo & Video
-let shot = false; const dl = (blob, name) => { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4e3); };
-$('dShot').onclick = () => { shot = true; };
-let rec = null, chunks = [];
-$('dRec').onclick = () => {
-  if (rec) { rec.stop(); return; }
-  try {
-    rec = new MediaRecorder(canvas.captureStream(30), { mimeType: MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm', videoBitsPerSecond: 12e6 });
-    chunks = []; rec.ondataavailable = (e) => chunks.push(e.data);
-    rec.onstop = () => { dl(new Blob(chunks, { type: 'video/webm' }), `rendra-film-${Date.now()}.webm`); rec = null; $('recDot').style.display = 'none'; $('recTxt').textContent = 'Record'; };
-    rec.start(); $('recDot').style.display = 'inline-block'; $('recTxt').textContent = 'Stop'; if (!tour) tourToggle(true);
-  } catch (e) { alert('Recording is not supported in this browser.'); }
-};
-const clean = () => document.body.classList.toggle('clean');
-$('dClean').onclick = clean;
-addEventListener('keydown', (e) => { if (!e.shiftKey || /INPUT|TEXTAREA/.test(e.target.tagName)) return;
-  ({ KeyP: () => (shot = true), KeyT: () => tourToggle(), KeyR: () => $('dRec').click(), KeyH: clean })[e.code]?.(); });
+      // ---- Photo & Video
+      let shot = false; const dl = (blob, name) => { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4e3); };
+      $('dShot').onclick = () => { shot = true; };
+      let rec = null, chunks = [], mime = '';
+      $('dRec').onclick = () => {
+        if (rec) { rec.stop(); return; }
+        try {
+          rec = new MediaRecorder(canvas.captureStream(30), { mimeType: (mime = ['video/mp4;codecs=avc1', 'video/webm;codecs=vp9', 'video/webm'].find((m) => MediaRecorder.isTypeSupported(m))), videoBitsPerSecond: 12e6 });
+          chunks = []; rec.ondataavailable = (e) => chunks.push(e.data);
+          rec.onstop = () => { dl(new Blob(chunks, { type: mime.split(';')[0] }), `rendra-film-${Date.now()}.${mime.startsWith('video/mp4') ? 'mp4' : 'webm'}`); rec = null; $('recDot').style.display = 'none'; $('recTxt').textContent = 'Record'; };
+          rec.start(); $('recDot').style.display = 'inline-block'; $('recTxt').textContent = 'Stop'; if (!tour) tourToggle(true);
+        } catch (e) { alert('Recording is not supported in this browser.'); }
+      };
+      const clean = () => document.body.classList.toggle('clean');
+      $('dClean').onclick = clean;
+      addEventListener('keydown', (e) => {
+        if (!e.shiftKey || /INPUT|TEXTAREA/.test(e.target.tagName)) return;
+        ({ KeyP: () => (shot = true), KeyT: () => tourToggle(), KeyR: () => $('dRec').click(), KeyH: clean })[e.code]?.();
+      });
 
-// ---- PWA install + service worker
-let ip; addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); ip = e; $('dInstall').style.display = ''; });
-$('dInstall').onclick = async () => { if (ip) { ip.prompt(); await ip.userChoice; ip = null; $('dInstall').style.display = 'none'; } };
-if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
+      // ---- PWA install + service worker
+      let ip; addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); ip = e; $('dInstall').style.display = ''; });
+      $('dInstall').onclick = async () => { if (ip) { ip.prompt(); await ip.userChoice; ip = null; $('dInstall').style.display = 'none'; } };
+      if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => { });
 
-// ---- frame hooks
-R.tick.push((dt, time) => {
-  if (tour) { tour.t += dt; tour.a += dt * .14; const k = 1 + .16 * Math.sin(tour.t * .35), cam = R.getCamera();
-    cam.position.set(tour.c.x + Math.sin(tour.a) * tour.r * k, tour.c.y + tour.h * (1 + .35 * Math.sin(tour.t * .22)), tour.c.z + Math.cos(tour.a) * tour.r * k);
-    controls.target.copy(tour.c); }
-  if (mist && scene.background?.isColor) { const f = wx === 'mist' ? .012 : .008; scene.fog = new THREE.FogExp2(scene.background.getHex(), f / Math.max(span / 40, .6)); }
-  if (pts) { const p = pts.geometry.attributes.position, a = p.array, rain = wx === 'rain', st = rain ? 6 : 3, c = controls.target;
-    pts.position.set(c.x, 0, c.z);
-    for (let i = 0; i < a.length; i += st) { const v = (rain ? span * 1.1 : span * .09) * dt;
-      a[i + 1] -= v; if (rain) a[i + 4] -= v; else a[i] += Math.sin(time + i) * dt * .6;
-      if (a[i + 1] < 0) { const d = span * .7; a[i + 1] += d; if (rain) a[i + 4] += d; } }
-    p.needsUpdate = true; }
-});
-R.post.push(() => { if (shot) { shot = false; canvas.toBlob((b) => dl(b, `rendra-shot-${Date.now()}.png`)); } });
-}
-</script>
+      // ---- frame hooks
+      R.tick.push((dt, time) => {
+        if (tour) {
+          tour.t += dt; tour.a += dt * .14; const k = 1 + .16 * Math.sin(tour.t * .35), cam = R.getCamera();
+          cam.position.set(tour.c.x + Math.sin(tour.a) * tour.r * k, tour.c.y + tour.h * (1 + .35 * Math.sin(tour.t * .22)), tour.c.z + Math.cos(tour.a) * tour.r * k);
+          controls.target.copy(tour.c);
+        }
+        if (mist && scene.background?.isColor) { const f = wx === 'mist' ? .012 : .008; scene.fog = new THREE.FogExp2(scene.background.getHex(), f / Math.max(span / 40, .6)); }
+        if (pts) {
+          const p = pts.geometry.attributes.position, a = p.array, rain = wx === 'rain', st = rain ? 6 : 3, c = controls.target;
+          pts.position.set(c.x, 0, c.z);
+          for (let i = 0; i < a.length; i += st) {
+            const v = (rain ? span * 1.1 : span * .09) * dt;
+            a[i + 1] -= v; if (rain) a[i + 4] -= v; else a[i] += Math.sin(time + i) * dt * .6;
+            if (a[i + 1] < 0) { const d = span * .7; a[i + 1] += d; if (rain) a[i + 4] += d; }
+          }
+          p.needsUpdate = true;
+        }
+      });
+      R.post.push(() => { if (shot) { shot = false; (R.capture || ((cb) => canvas.toBlob(cb)))((b) => dl(b, `rendra-shot-${Date.now()}.png`)); } });
+    }
+  </script>
 
-<script type="module">
-/* RENDRA WORLD+ — richer Lumion space, collision-free props, focus tools, selection UX */
-const R = window.RENDRA; if (R) {
-const { THREE, scene, state, controls, canvas, sunLight } = R, $ = (id) => document.getElementById(id);
-const ACC = 0x2F7BFF;
+  <script type="module">
+    /* RENDRA WORLD+ — richer Lumion space, collision-free props, focus tools, selection UX */
+    const R = window.RENDRA; if (R) {
+      const { THREE, scene, state, controls, canvas, sunLight } = R, $ = (id) => document.getElementById(id);
+      const ACC = 0x2F7BFF;
 
-// ---------- UI: Focus buttons + Show-UI escape hatch
-const st = document.createElement('style');
-st.textContent = `#showUi{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:60;display:none;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;border:1px solid var(--border-strong);background:var(--glass-bg);color:var(--fg);backdrop-filter:blur(14px);font:600 11px Inter,sans-serif;cursor:pointer;opacity:.4;transition:opacity .2s}
+      // ---------- UI: Focus buttons + Show-UI escape hatch
+      const st = document.createElement('style');
+      st.textContent = `#showUi{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:60;display:none;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;border:1px solid var(--border-strong);background:var(--glass-bg);color:var(--fg);backdrop-filter:blur(14px);font:600 11px Inter,sans-serif;cursor:pointer;opacity:.4;transition:opacity .2s}
 #showUi:hover{opacity:1}body.clean #showUi{display:inline-flex}`;
-document.head.appendChild(st);
-document.body.insertAdjacentHTML('beforeend', '<button id="showUi">Show UI <span class="mono" style="opacity:.6">Esc</span></button>');
-$('dTour').insertAdjacentHTML('beforebegin', '<button class="tool-btn tool-btn-solid" id="dFocus" title="F — focus selection / frame all">Focus</button><button class="tool-btn" id="dFrame" title="Home — frame everything">Frame</button>');
-const focus = () => state.selectedMesh ? R.focusMesh(state.selectedMesh) : R.frameModel('iso');
-$('dFocus').onclick = focus; $('dFrame').onclick = () => R.frameModel('iso');
-$('showUi').onclick = () => document.body.classList.remove('clean');
-addEventListener('keydown', (e) => { if (/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
-  if (e.key === 'Escape') { if (document.body.classList.contains('clean')) document.body.classList.remove('clean'); else $('closeSelHudBtn')?.click(); }
-  if (e.key === 'Home') R.frameModel('iso'); if (e.key === '.') focus(); });
+      document.head.appendChild(st);
+      document.body.insertAdjacentHTML('beforeend', '<button id="showUi">Show UI <span class="mono" style="opacity:.6">Esc</span></button>');
+      $('dTour').insertAdjacentHTML('beforebegin', '<button class="tool-btn tool-btn-solid" id="dFocus" title="F — focus selection / frame all">Focus</button><button class="tool-btn" id="dFrame" title="Home — frame everything">Frame</button>');
+      const focus = () => state.selectedMesh ? R.focusMesh(state.selectedMesh) : R.frameModel('iso');
+      $('dFocus').onclick = focus; $('dFrame').onclick = () => R.frameModel('iso');
+      $('showUi').onclick = () => document.body.classList.remove('clean');
+      addEventListener('keydown', (e) => {
+        if (/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
+        if (e.key === 'Escape') { if (document.body.classList.contains('clean')) document.body.classList.remove('clean'); else $('closeSelHudBtn')?.click(); }
+        if (e.key === 'Home') R.frameModel('iso'); if (e.key === '.') focus();
+      });
 
-// ---------- Click = select (blue box), dbl-click = focus, empty click = deselect
-const rc = new THREE.Raycaster(), pv = new THREE.Vector2(); let down = null;
-canvas.addEventListener('pointerdown', (e) => { down = [e.clientX, e.clientY]; });
-canvas.addEventListener('pointerup', (e) => {
-  if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 5) return;
-  if (state.tapeActive && state.activeTab === 'dimensions') return;
-  const r = canvas.getBoundingClientRect(); pv.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
-  rc.setFromCamera(pv, R.getCamera()); const h = rc.intersectObjects(R.modelRoot.children, true).find((x) => x.object.isMesh && x.object.visible);
-  if (h) R.selectMesh(h.object, false); else $('closeSelHudBtn')?.click();
-});
+      // ---------- Click = select (blue box), dbl-click = focus, empty click = deselect
+      const rc = new THREE.Raycaster(), pv = new THREE.Vector2(); let down = null;
+      canvas.addEventListener('pointerdown', (e) => { down = [e.clientX, e.clientY]; });
+      canvas.addEventListener('pointerup', (e) => {
+        if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 5) return;
+        if (state.tapeActive && state.activeTab === 'dimensions') return;
+        const r = canvas.getBoundingClientRect(); pv.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+        rc.setFromCamera(pv, R.getCamera()); const h = rc.intersectObjects(R.modelRoot.children, true).find((x) => x.object.isMesh && x.object.visible);
+        if (h) R.selectMesh(h.object, false); else $('closeSelHudBtn')?.click();
+      });
 
-// ---------- Lumion space+: sky dome, clouds, mountain ring, prop collision
-const noise = (() => { const H = (x, y) => { const s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453; return s - Math.floor(s); };
-  const V = (x, y) => { const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi, u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
-    return H(xi, yi) * (1 - u) * (1 - v) + H(xi + 1, yi) * u * (1 - v) + H(xi, yi + 1) * (1 - u) * v + H(xi + 1, yi + 1) * u * v; };
-  return (x, y) => { let a = .5, f = 1, s = 0; for (let i = 0; i < 5; i++) { s += a * (1 - Math.abs(2 * V(x * f, y * f) - 1)); f *= 2; a *= .5; } return s; }; })();
-const dome = new THREE.Mesh(new THREE.SphereGeometry(3400, 32, 18), new THREE.ShaderMaterial({ side: THREE.BackSide, depthWrite: false, fog: false,
-  uniforms: { top: { value: new THREE.Color() }, mid: { value: new THREE.Color() }, bot: { value: new THREE.Color() }, sunDir: { value: new THREE.Vector3(0, 1, 0) }, sunCol: { value: new THREE.Color() } },
-  vertexShader: 'varying vec3 vP;void main(){vP=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-  fragmentShader: `uniform vec3 top,mid,bot,sunDir,sunCol;varying vec3 vP;void main(){vec3 d=normalize(vP);float h=d.y;
-  vec3 c=h>0.?mix(mid,top,pow(h,.5)):mix(mid,bot,pow(-h,.5));float s=max(dot(d,normalize(sunDir)),0.);
-  c+=sunCol*(pow(s,900.)*4.+pow(s,30.)*.35+pow(s,5.)*.14);gl_FragColor=vec4(c,1.);#include <tonemapping_fragment>
-  #include <colorspace_fragment>}` }));
-dome.renderOrder = -10; dome.frustumCulled = false; scene.add(dome);
-const env = new THREE.Group(); scene.add(env);
-const ctex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'), gr = g.createRadialGradient(64, 64, 4, 64, 64, 62);
-  gr.addColorStop(0, 'rgba(255,255,255,.95)'); gr.addColorStop(.5, 'rgba(255,255,255,.5)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
-let clouds = [], span = 20;
-const weather = () => document.querySelector('[data-wx].active')?.dataset.wx || 'clear';
+      // ---------- Lumion space+: sky dome, clouds, mountain ring, prop collision
+      const noise = (() => {
+        const H = (x, y) => { const s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453; return s - Math.floor(s); };
+        const V = (x, y) => {
+          const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi, u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
+          return H(xi, yi) * (1 - u) * (1 - v) + H(xi + 1, yi) * u * (1 - v) + H(xi, yi + 1) * (1 - u) * v + H(xi + 1, yi + 1) * u * v;
+        };
+        return (x, y) => { let a = .5, f = 1, s = 0; for (let i = 0; i < 5; i++) { s += a * (1 - Math.abs(2 * V(x * f, y * f) - 1)); f *= 2; a *= .5; } return s; };
+      })();
+      const dome = new THREE.Mesh(new THREE.SphereGeometry(3400, 32, 18), new THREE.ShaderMaterial({
+        side: THREE.BackSide, depthWrite: false, fog: false,
+        uniforms: { top: { value: new THREE.Color() }, mid: { value: new THREE.Color() }, bot: { value: new THREE.Color() }, sunDir: { value: new THREE.Vector3(0, 1, 0) }, sunCol: { value: new THREE.Color() } },
+        vertexShader: `varying vec3 vP;
+void main() {
+  vP = position;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}`,
+        fragmentShader: `uniform vec3 top, mid, bot, sunDir, sunCol;
+varying vec3 vP;
+void main() {
+  vec3 d = normalize(vP);
+  float h = d.y;
+  vec3 c = h > 0.0 ? mix(mid, top, pow(h, 0.5)) : mix(mid, bot, pow(-h, 0.5));
+  float s = max(dot(d, normalize(sunDir)), 0.0);
+  c += sunCol * (pow(s, 900.0) * 4.0 + pow(s, 30.0) * 0.35 + pow(s, 5.0) * 0.14);
+  gl_FragColor = vec4(c, 1.0);
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
+}` }));
+      dome.renderOrder = -10; dome.frustumCulled = false; scene.add(dome);
+      const env = new THREE.Group(); scene.add(env);
+      const ctex = (() => {
+        const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'), gr = g.createRadialGradient(64, 64, 4, 64, 64, 62);
+        gr.addColorStop(0, 'rgba(255,255,255,.95)'); gr.addColorStop(.5, 'rgba(255,255,255,.5)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c);
+      })();
+      let clouds = [], span = 20;
+      const weather = () => document.querySelector('[data-wx].active')?.dataset.wx || 'clear';
 
-function buildWorld() {
-  while (env.children.length) { const o = env.children.pop(); o.traverse((m) => { m.geometry?.dispose?.(); }); }
-  clouds = []; env.visible = dome.visible = !!state.todEnabled; if (!state.todEnabled) return;
-  const B = state.modelBounds, C = state.modelCenter, S = state.modelSize; span = Math.max(S.x, S.z, 12);
-  const floorY = B.min.y - 0.02, rw = Math.max(span * .42, 7.2), padW = S.x * state.sitePadScale, padD = S.z * state.sitePadScale;
-  const roadZ = B.max.z + Math.max(padD * .32, 5) + rw * .5, crossX = C.x + padW * .65 + rw * .75;
+      function buildWorld() {
+        while (env.children.length) { const o = env.children.pop(); o.traverse((m) => { m.geometry?.dispose?.(); }); }
+        clouds = []; env.visible = dome.visible = !!state.todEnabled; if (!state.todEnabled) return;
+        const B = state.modelBounds, C = state.modelCenter, S = state.modelSize; span = Math.max(S.x, S.z, 12);
+        const floorY = B.min.y - 0.02, rw = Math.max(span * .42, 7.2), padW = S.x * state.sitePadScale, padD = S.z * state.sitePadScale;
+        const roadZ = B.max.z + Math.max(padD * .32, 5) + rw * .5, crossX = C.x + padW * .65 + rw * .75;
 
-  // 1. remove prop collisions with the loaded model (cars, lamps, trees) + old blob hills
-  const keep = B.clone().expandByScalar(Math.max(.8, span * .03)), bx = new THREE.Box3(), grp = state.lumionEnvGroup;
-  for (const o of [...grp.children]) {
-    if (o.isMesh && o.geometry.type === 'SphereGeometry') { grp.remove(o); continue; }
-    if (o.isGroup && bx.setFromObject(o).intersectsBox(keep)) grp.remove(o);
-  }
-  state.animatedCars = state.animatedCars.filter((c) => { const p = c.mesh.position, ok = c.axis === 'x' ? (p.z < keep.min.z || p.z > keep.max.z) : (p.x < keep.min.x || p.x > keep.max.x); if (!ok) grp.remove(c.mesh); return ok; });
+        // 1. remove prop collisions with the loaded model (cars, lamps, trees) + old blob hills
+        const keep = B.clone().expandByScalar(Math.max(.8, span * .03)), bx = new THREE.Box3(), grp = state.lumionEnvGroup;
+        for (const o of [...grp.children]) {
+          if (o.isMesh && o.geometry.type === 'SphereGeometry') { grp.remove(o); continue; }
+          if (o.isGroup && bx.setFromObject(o).intersectsBox(keep)) grp.remove(o);
+        }
+        state.animatedCars = state.animatedCars.filter((c) => { const p = c.mesh.position, ok = c.axis === 'x' ? (p.z < keep.min.z || p.z > keep.max.z) : (p.x < keep.min.x || p.x > keep.max.x); if (!ok) grp.remove(c.mesh); return ok; });
 
-  // 2. sculpted mountain ring with road valleys + altitude colouring (grass → forest → rock → snow)
-  const inner = span * 6.5, outer = span * 26, amp = span * 8, g = new THREE.RingGeometry(inner, outer, 180, 56); g.rotateX(-Math.PI / 2);
-  const p = g.attributes.position, col = new Float32Array(p.count * 3), cc = [0x9CBB84, 0x5F8A4C, 0x3F6A3A, 0x8B8C86, 0xF1F3F6].map((x) => new THREE.Color(x)), tmp = new THREE.Color();
-  const sm = THREE.MathUtils.smoothstep;
-  for (let i = 0; i < p.count; i++) {
-    const x = p.getX(i), z = p.getZ(i), t = (Math.hypot(x, z) - inner) / (outer - inner), wx = x + C.x, wz = z + C.z;
-    const valley = sm(Math.min(Math.abs(wz - roadZ), Math.abs(wx - crossX)), rw * 1.3, rw * 4 + span * 1.8);
-    const h = Math.pow(t, 1.25) * amp * (.2 + 1.0 * noise(wx / span * .35, wz / span * .35)) * valley;
-    p.setY(i, floorY - .05 + h); const k = Math.min(h / (amp * .8), .999) * 4, a = Math.floor(k);
-    tmp.copy(cc[a]).lerp(cc[a + 1], k - a); col.set([tmp.r, tmp.g, tmp.b], i * 3);
-  }
-  g.setAttribute('color', new THREE.BufferAttribute(col, 3)); g.computeVertexNormals();
-  const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 1 })); m.position.set(C.x, 0, C.z); m.receiveShadow = true; env.add(m);
+        // 2. sculpted mountain ring with road valleys + altitude colouring (grass → forest → rock → snow)
+        const inner = span * 6.5, outer = span * 26, amp = span * 8, g = new THREE.RingGeometry(inner, outer, 180, 56); g.rotateX(-Math.PI / 2);
+        const p = g.attributes.position, col = new Float32Array(p.count * 3), cc = [0x9CBB84, 0x5F8A4C, 0x3F6A3A, 0x8B8C86, 0xF1F3F6].map((x) => new THREE.Color(x)), tmp = new THREE.Color();
+        const sm = THREE.MathUtils.smoothstep;
+        for (let i = 0; i < p.count; i++) {
+          const x = p.getX(i), z = p.getZ(i), t = (Math.hypot(x, z) - inner) / (outer - inner), wx = x + C.x, wz = z + C.z;
+          const valley = sm(Math.min(Math.abs(wz - roadZ), Math.abs(wx - crossX)), rw * 1.3, rw * 4 + span * 1.8);
+          const h = Math.pow(t, 1.25) * amp * (.2 + 1.0 * noise(wx / span * .35, wz / span * .35)) * valley;
+          p.setY(i, floorY - .05 + h); const k = Math.min(Math.max(h / (amp * .8), 0), .999) * 4, a = Math.min(Math.max(Math.floor(k), 0), cc.length - 2);
+          tmp.copy(cc[a]).lerp(cc[a + 1], k - a); col.set([tmp.r, tmp.g, tmp.b], i * 3);
+        }
+        g.setAttribute('color', new THREE.BufferAttribute(col, 3)); g.computeVertexNormals();
+        const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 1 })); m.position.set(C.x, 0, C.z); m.receiveShadow = true; env.add(m);
 
-  // 3. drifting cloud banks
-  for (let i = 0; i < 16; i++) {
-    const cg = new THREE.Group(), a = Math.random() * 6.283, d = span * (6 + Math.random() * 20), w = span * (4 + Math.random() * 5);
-    for (let k = 0; k < 6; k++) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: ctex, transparent: true, depthWrite: false, fog: false }));
-      s.scale.set(w * (.6 + Math.random() * .6), w * (.28 + Math.random() * .2), 1); s.position.set((Math.random() - .5) * w, Math.random() * w * .12, (Math.random() - .5) * w * .5); cg.add(s); }
-    cg.position.set(C.x + Math.cos(a) * d, floorY + span * (3.5 + Math.random() * 3), C.z + Math.sin(a) * d); cg.userData.v = .4 + Math.random() * .8; env.add(cg); clouds.push(cg);
-  }
+        // 3. drifting cloud banks
+        for (let i = 0; i < 16; i++) {
+          const cg = new THREE.Group(), a = Math.random() * 6.283, d = span * (6 + Math.random() * 20), w = span * (4 + Math.random() * 5);
+          for (let k = 0; k < 6; k++) {
+            const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: ctex, transparent: true, depthWrite: false, fog: false }));
+            s.scale.set(w * (.6 + Math.random() * .6), w * (.28 + Math.random() * .2), 1); s.position.set((Math.random() - .5) * w, Math.random() * w * .12, (Math.random() - .5) * w * .5); cg.add(s);
+          }
+          cg.position.set(C.x + Math.cos(a) * d, floorY + span * (3.5 + Math.random() * 3), C.z + Math.sin(a) * d); cg.userData.v = .4 + Math.random() * .8; env.add(cg); clouds.push(cg);
+        }
+      }
+      R.envHooks.push(() => { buildWorld(); if (state.todEnabled) extras(); });
+      let waterMat = null;
+      function extras() {
+        const B = state.modelBounds, Cn = state.modelCenter, S = state.modelSize, sp = Math.max(S.x, S.z, 12), fy = B.min.y - .02, rw = Math.max(sp * .42, 7.2);
+        const pD = S.z * state.sitePadScale, rz = B.max.z + Math.max(pD * .32, 5) + rw * .5, keep = B.clone().expandByScalar(.7);
+        const pc = document.createElement('canvas'); pc.width = 64; pc.height = 150; const g = pc.getContext('2d'); g.fillStyle = '#fff';
+        g.beginPath(); g.arc(32, 16, 11, 0, 7); g.fill(); g.beginPath(); g.moveTo(18, 34); g.quadraticCurveTo(32, 28, 46, 34); g.lineTo(50, 92); g.lineTo(40, 92); g.lineTo(40, 146); g.lineTo(34, 146); g.lineTo(32, 96); g.lineTo(30, 146); g.lineTo(24, 146); g.lineTo(24, 92); g.lineTo(14, 92); g.closePath(); g.fill();
+        const tex = new THREE.CanvasTexture(pc), tones = [0x2b2d33, 0x7a4b3a, 0x3f5a78, 0x8a8a84, 0x6a3f4f], gap = Math.max(rz - rw * .5 - B.max.z - 1.5, 1.5);
+        for (let i = 0; i < 9; i++) {
+          const x = i < 5 ? Cn.x + (i - 2) * (.7 + S.x * .04) : Cn.x + (i - 7) * sp * .35, z = i < 5 ? B.max.z + 1.2 + (i % 3) * (gap / 3) : rz - rw * .5 - .5;
+          if (keep.containsPoint(new THREE.Vector3(x, B.min.y + 1, z))) continue;
+          const m = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, color: tones[i % 5], transparent: true, alphaTest: .35 })); m.center.set(.5, 0); m.scale.set(.75, 1.75, 1); m.position.set(x, fy + .04, z); env.add(m);
+        }
+        const w = state.lumionEnvGroup.children.find((o) => o.isMesh && o.material?.isMeshPhysicalMaterial && o.material.transparent && o.geometry.type === 'BoxGeometry'); waterMat = null;
+        if (w) {
+          const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d'), d = x.createImageData(128, 128), h = (a, b) => Math.sin(a * .196) * Math.sin(b * .147) + .5 * Math.sin((a + b) * .39);
+          for (let j = 0; j < 128; j++) for (let k = 0; k < 128; k++) { d.data.set([128 + (h(k + 1, j) - h(k, j)) * 140, 128 + (h(k, j + 1) - h(k, j)) * 140, 255, 255], (j * 128 + k) * 4); }
+          x.putImageData(d, 0, 0); const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(5, 5);
+          waterMat = w.material; waterMat.normalMap = t; waterMat.normalScale.set(.5, .5); waterMat.envMapIntensity = 1.8; waterMat.needsUpdate = true;
+        }
+      }
+      R.tick.push((dt) => { if (waterMat?.normalMap) { waterMat.normalMap.offset.x += dt * .018; waterMat.normalMap.offset.y += dt * .011; } });
+
+      const c1 = new THREE.Color(0x16224A), c2 = new THREE.Color(0x2E7BD6), h1 = new THREE.Color(0xF3A06E), h2 = new THREE.Color(0xC4E2F6), gray = new THREE.Color(0x9AA3AB), t1 = new THREE.Color();
+      R.tick.push((dt) => {
+        const cam = R.getCamera(); dome.visible = !!state.todEnabled && !!cam.isPerspectiveCamera; if (!state.todEnabled) return;
+        dome.position.copy(cam.position);
+        const sf = Math.sin(Math.max(.02, Math.min(.98, (state.todTime - 6) / 12)) * Math.PI), w = THREE.MathUtils.smoothstep(sf, .05, .6), wx = weather(), gr = wx === 'clear' ? 0 : wx === 'mist' ? .55 : .7, u = dome.material.uniforms;
+        u.top.value.copy(c1).lerp(c2, w).lerp(gray, gr * .8); u.mid.value.copy(h1).lerp(h2, w).lerp(gray, gr); u.bot.value.copy(u.mid.value).multiplyScalar(.8);
+        u.sunDir.value.copy(sunLight.position).sub(sunLight.target.position); u.sunCol.value.setHex(0xFFC27A).lerp(t1.setHex(0xFFF3DC), w).multiplyScalar(1 - gr);
+        const lim = span * 30; clouds.forEach((c) => {
+          c.position.x += dt * c.userData.v * span * .02; if (c.position.x > state.modelCenter.x + lim) c.position.x -= lim * 2;
+          c.children.forEach((s) => { s.material.opacity = (.35 + .5 * w) * (1 + gr * .3); s.material.color.copy(h1).lerp(t1.setHex(0xFFFFFF), Math.min(1, w + .35)).lerp(gray, gr * .6); });
+        });
+      });
+      buildWorld();
+    }
+  </script>
+
+  <script type="module">
+    /* RENDRA FX — post-processing (AO, bloom, DOF, grade, FXAA), sliders, HDRI, hi-res stills, saved views */
+    const R = window.RENDRA; if (R) {
+      const { THREE, scene, renderer, state, controls, canvas, sunLight } = R, $ = (id) => document.getElementById(id);
+
+      const F = {
+        on: true,
+        ao: false,
+        aoRadius: 0.35,
+        aoThickness: 1.5,
+        aoScale: 1.1,
+        bloom: true,
+        bloomStrength: 0.25,
+        bloomRadius: 0.45,
+        bloomThreshold: 0.90,
+        dof: false,
+        dofAperture: 0.004,
+        dofMaxblur: 0.008,
+        aa: true,
+        grade: 0,
+        contrast: 1.0,
+        saturation: 1.0,
+        scale: 1,
+        hdri: false
+      };
+
+      const GRADES = [
+        ['Neutral', 1, 1, [1, 1, 1], 0],
+        ['Warm Arch', 1.05, 1.08, [1.06, 1, .92], 0],
+        ['Cool Nordic', 1.04, .9, [.94, 1, 1.08], 0],
+        ['High Contrast', 1.22, 1.12, [1, 1, 1], -.02],
+        ['Film', 1.12, .85, [1.05, .98, .9], .01]
+      ];
+
+      const css = document.createElement('style');
+      css.textContent = `
+#dirFx {
+  position: fixed;
+  left: 50%;
+  bottom: 58px;
+  transform: translateX(-50%);
+  z-index: 31;
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  width: min(440px, 94vw);
+  max-height: min(460px, 75vh);
+  overflow-y: auto;
+  padding: 10px;
 }
-R.envHooks.push(buildWorld);
-const c1 = new THREE.Color(0x16224A), c2 = new THREE.Color(0x2E7BD6), h1 = new THREE.Color(0xF3A06E), h2 = new THREE.Color(0xC4E2F6), gray = new THREE.Color(0x9AA3AB), t1 = new THREE.Color();
-R.tick.push((dt) => {
-  const cam = R.getCamera(); dome.visible = !!state.todEnabled && !!cam.isPerspectiveCamera; if (!state.todEnabled) return;
-  dome.position.copy(cam.position);
-  const sf = Math.sin(Math.max(.02, Math.min(.98, (state.todTime - 6) / 12)) * Math.PI), w = THREE.MathUtils.smoothstep(sf, .05, .6), wx = weather(), gr = wx === 'clear' ? 0 : wx === 'mist' ? .55 : .7, u = dome.material.uniforms;
-  u.top.value.copy(c1).lerp(c2, w).lerp(gray, gr * .8); u.mid.value.copy(h1).lerp(h2, w).lerp(gray, gr); u.bot.value.copy(u.mid.value).multiplyScalar(.8);
-  u.sunDir.value.copy(sunLight.position).sub(sunLight.target.position); u.sunCol.value.setHex(0xFFC27A).lerp(t1.setHex(0xFFF3DC), w).multiplyScalar(1 - gr);
-  const lim = span * 30; clouds.forEach((c) => { c.position.x += dt * c.userData.v * span * .02; if (c.position.x > state.modelCenter.x + lim) c.position.x -= lim * 2;
-    c.children.forEach((s) => { s.material.opacity = (.35 + .5 * w) * (1 + gr * .3); s.material.color.copy(h1).lerp(t1.setHex(0xFFFFFF), Math.min(1, w + .35)).lerp(gray, gr * .6); }); });
-});
-buildWorld();
+#dirFx.open { display: flex; }
+#dirViews {
+  position: fixed;
+  left: 50%;
+  bottom: 58px;
+  transform: translateX(-50%);
+  z-index: 31;
+  display: none;
+  padding: 6px;
+  gap: 4px;
+  flex-wrap: wrap;
+  width: min(430px, 92vw);
 }
-</script>
+#dirViews.open { display: flex; }
+@media (max-width: 700px) {
+  #dirFx, #dirViews { bottom: 130px; }
+}
+.fx-section {
+  padding: 8px;
+  border-radius: 8px;
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.fx-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.fx-row label {
+  opacity: 0.75;
+  white-space: nowrap;
+  font-size: 9px;
+  text-transform: uppercase;
+}
+.fx-row .val {
+  font-weight: bold;
+  min-width: 42px;
+  text-align: right;
+  opacity: 0.9;
+}
+`;
+      document.head.appendChild(css);
+
+      document.body.insertAdjacentHTML('beforeend', `
+<div id="dirFx" class="glass-card">
+  <div class="flex items-center justify-between pb-1 border-b" style="border-color: var(--border);">
+    <div class="flex items-center gap-2">
+      <span class="font-bold text-xs mono tracking-wider uppercase">POST-PROCESSING (FX)</span>
+      <button id="fxMasterBtn" class="tool-btn tool-btn-primary px-2 py-0.5 text-[9px]">Pipeline: ON</button>
+    </div>
+    <button id="fxCloseBtn" class="tool-btn px-1.5 py-0.5 text-[10px]">✕</button>
+  </div>
+
+  <!-- Bloom -->
+  <div class="fx-section">
+    <div class="flex items-center justify-between">
+      <span class="font-bold text-[10px]">Bloom Glow</span>
+      <button id="fxBloomBtn" class="tool-btn tool-btn-solid text-[9px] px-2 py-0.5 active">ON</button>
+    </div>
+    <div class="fx-row">
+      <label>Intensity</label>
+      <input type="range" id="fxBloomStr" min="0" max="150" value="25" class="studio-slider flex-1" />
+      <span id="fxBloomStrVal" class="val">0.25</span>
+    </div>
+    <div class="fx-row">
+      <label>Radius</label>
+      <input type="range" id="fxBloomRad" min="5" max="100" value="45" class="studio-slider flex-1" />
+      <span id="fxBloomRadVal" class="val">0.45</span>
+    </div>
+    <div class="fx-row">
+      <label>Threshold</label>
+      <input type="range" id="fxBloomThresh" min="50" max="100" value="90" class="studio-slider flex-1" />
+      <span id="fxBloomThreshVal" class="val">0.90</span>
+    </div>
+  </div>
+
+  <!-- Ambient Occlusion (GTAO) -->
+  <div class="fx-section">
+    <div class="flex items-center justify-between">
+      <div>
+        <span class="font-bold text-[10px]">Ambient Occlusion (GTAO)</span>
+        <span class="text-[8px] opacity-60 block">Crevice shadows</span>
+      </div>
+      <button id="fxAoBtn" class="tool-btn tool-btn-solid text-[9px] px-2 py-0.5">OFF</button>
+    </div>
+    <div class="fx-row">
+      <label>Radius</label>
+      <input type="range" id="fxAoRadius" min="10" max="200" value="35" class="studio-slider flex-1" />
+      <span id="fxAoRadiusVal" class="val">0.35m</span>
+    </div>
+    <div class="fx-row">
+      <label>Scale</label>
+      <input type="range" id="fxAoScale" min="5" max="30" value="11" class="studio-slider flex-1" />
+      <span id="fxAoScaleVal" class="val">1.1x</span>
+    </div>
+  </div>
+
+  <!-- Depth of Field -->
+  <div class="fx-section">
+    <div class="flex items-center justify-between">
+      <div>
+        <span class="font-bold text-[10px]">Depth of Field (Bokeh)</span>
+        <span class="text-[8px] opacity-60 block">Lens focus blur</span>
+      </div>
+      <button id="fxDofBtn" class="tool-btn tool-btn-solid text-[9px] px-2 py-0.5">OFF</button>
+    </div>
+    <div class="fx-row">
+      <label>Aperture</label>
+      <input type="range" id="fxDofAperture" min="1" max="25" value="4" class="studio-slider flex-1" />
+      <span id="fxDofApertureVal" class="val">0.004</span>
+    </div>
+    <div class="fx-row">
+      <label>Max Blur</label>
+      <input type="range" id="fxDofBlur" min="2" max="25" value="8" class="studio-slider flex-1" />
+      <span id="fxDofBlurVal" class="val">0.008</span>
+    </div>
+  </div>
+
+  <!-- Live Color Grading -->
+  <div class="fx-section">
+    <div class="flex items-center justify-between">
+      <span class="font-bold text-[10px]">Color Grading</span>
+      <button id="fxGradeBtn" class="tool-btn tool-btn-solid text-[9px] px-2 py-0.5">Neutral</button>
+    </div>
+    <div class="fx-row">
+      <label>Contrast</label>
+      <input type="range" id="fxContrast" min="70" max="150" value="100" class="studio-slider flex-1" />
+      <span id="fxContrastVal" class="val">1.00x</span>
+    </div>
+    <div class="fx-row">
+      <label>Saturation</label>
+      <input type="range" id="fxSat" min="0" max="200" value="100" class="studio-slider flex-1" />
+      <span id="fxSatVal" class="val">1.00x</span>
+    </div>
+  </div>
+
+  <!-- HDRI & Quality Quick Grid -->
+  <div class="grid grid-cols-3 gap-1 pt-1">
+    <button id="fxHdriBtn" class="tool-btn tool-btn-solid text-[9px] py-1">HDRI: OFF</button>
+    <button id="fxAaBtn" class="tool-btn tool-btn-solid active text-[9px] py-1">FXAA: ON</button>
+    <button id="fxPhotoBtn" class="tool-btn tool-btn-solid text-[9px] py-1">Still: 1x</button>
+  </div>
+</div>
+<div id="dirViews" class="glass-card"></div>
+`);
+
+      $('dTour').insertAdjacentHTML('beforebegin', '<button class="tool-btn tool-btn-solid" id="dFx">FX</button><button class="tool-btn" id="dViews">Views</button>');
+
+      const fx = $('dirFx'), vw = $('dirViews');
+
+      // Toggle FX Card
+      $('dFx').onclick = () => {
+        vw.classList.remove('open');
+        $('dirLooks')?.classList.remove('open');
+        fx.classList.toggle('open');
+      };
+      $('fxCloseBtn').onclick = () => fx.classList.remove('open');
+
+      // Master Switch
+      $('fxMasterBtn').onclick = (e) => {
+        F.on = !F.on;
+        e.currentTarget.classList.toggle('tool-btn-primary', F.on);
+        e.currentTarget.textContent = `Pipeline: ${F.on ? 'ON' : 'OFF'}`;
+      };
+
+      // Bloom Sliders & Toggle
+      $('fxBloomBtn').onclick = (e) => {
+        F.bloom = !F.bloom;
+        e.currentTarget.classList.toggle('active', F.bloom);
+        e.currentTarget.textContent = F.bloom ? 'ON' : 'OFF';
+      };
+      $('fxBloomStr').oninput = (e) => {
+        F.bloomStrength = parseFloat(e.target.value) / 100;
+        $('fxBloomStrVal').textContent = F.bloomStrength.toFixed(2);
+        if (P.bloom) P.bloom.strength = F.bloomStrength;
+      };
+      $('fxBloomRad').oninput = (e) => {
+        F.bloomRadius = parseFloat(e.target.value) / 100;
+        $('fxBloomRadVal').textContent = F.bloomRadius.toFixed(2);
+        if (P.bloom) P.bloom.radius = F.bloomRadius;
+      };
+      $('fxBloomThresh').oninput = (e) => {
+        F.bloomThreshold = parseFloat(e.target.value) / 100;
+        $('fxBloomThreshVal').textContent = F.bloomThreshold.toFixed(2);
+        if (P.bloom) P.bloom.threshold = F.bloomThreshold;
+      };
+
+      // Ambient Occlusion Sliders & Toggle
+      $('fxAoBtn').onclick = (e) => {
+        F.ao = !F.ao;
+        e.currentTarget.classList.toggle('active', F.ao);
+        e.currentTarget.textContent = F.ao ? 'ON' : 'OFF';
+      };
+      $('fxAoRadius').oninput = (e) => {
+        F.aoRadius = parseFloat(e.target.value) / 100;
+        $('fxAoRadiusVal').textContent = `${F.aoRadius.toFixed(2)}m`;
+        if (P.ao) try { P.ao.updateGtaoMaterial({ radius: F.aoRadius }); } catch (err) { }
+      };
+      $('fxAoScale').oninput = (e) => {
+        F.aoScale = parseFloat(e.target.value) / 10;
+        $('fxAoScaleVal').textContent = `${F.aoScale.toFixed(1)}x`;
+        if (P.ao) try { P.ao.updateGtaoMaterial({ scale: F.aoScale }); } catch (err) { }
+      };
+
+      // Depth of Field Sliders & Toggle
+      $('fxDofBtn').onclick = (e) => {
+        F.dof = !F.dof;
+        e.currentTarget.classList.toggle('active', F.dof);
+        e.currentTarget.textContent = F.dof ? 'ON' : 'OFF';
+      };
+      $('fxDofAperture').oninput = (e) => {
+        F.dofAperture = parseFloat(e.target.value) / 1000;
+        $('fxDofApertureVal').textContent = F.dofAperture.toFixed(3);
+        if (P.dof) P.dof.uniforms.aperture.value = F.dofAperture;
+      };
+      $('fxDofBlur').oninput = (e) => {
+        F.dofMaxblur = parseFloat(e.target.value) / 1000;
+        $('fxDofBlurVal').textContent = F.dofMaxblur.toFixed(3);
+        if (P.dof) P.dof.uniforms.maxblur.value = F.dofMaxblur;
+      };
+
+      // Grade & Sliders
+      $('fxGradeBtn').onclick = (e) => {
+        F.grade = (F.grade + 1) % GRADES.length;
+        e.currentTarget.textContent = GRADES[F.grade][0];
+      };
+      $('fxContrast').oninput = (e) => {
+        F.contrast = parseFloat(e.target.value) / 100;
+        $('fxContrastVal').textContent = `${F.contrast.toFixed(2)}x`;
+      };
+      $('fxSat').oninput = (e) => {
+        F.saturation = parseFloat(e.target.value) / 100;
+        $('fxSatVal').textContent = `${F.saturation.toFixed(2)}x`;
+      };
+
+      // FXAA & Photo
+      $('fxAaBtn').onclick = (e) => {
+        F.aa = !F.aa;
+        e.currentTarget.classList.toggle('active', F.aa);
+        e.currentTarget.textContent = `FXAA: ${F.aa ? 'ON' : 'OFF'}`;
+      };
+      $('fxPhotoBtn').onclick = (e) => {
+        F.scale = F.scale === 1 ? 2 : F.scale === 2 ? 4 : 1;
+        e.currentTarget.textContent = `Still: ${F.scale}x`;
+      };
+
+      // HDRI Sky Toggle (Phase 2)
+      let hdriTexture = null;
+      let origEnv = scene.environment;
+      $('fxHdriBtn').onclick = async (e) => {
+        F.hdri = !F.hdri;
+        e.currentTarget.classList.toggle('active', F.hdri);
+        e.currentTarget.textContent = `HDRI: ${F.hdri ? 'ON' : 'OFF'}`;
+        if (F.hdri) {
+          if (!hdriTexture) {
+            try {
+              const { RGBELoader } = await import('three/addons/loaders/RGBELoader.js');
+              const loader = new RGBELoader();
+              loader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js@r170/examples/textures/equirectangular/royal_esplanade_1k.hdr', (tex) => {
+                tex.mapping = THREE.EquirectangularReflectionMapping;
+                hdriTexture = tex;
+                if (F.hdri) {
+                  scene.environment = hdriTexture;
+                  scene.background = hdriTexture;
+                }
+              });
+            } catch (err) {
+              console.warn('HDRI load failed:', err);
+            }
+          } else {
+            scene.environment = hdriTexture;
+            scene.background = hdriTexture;
+          }
+        } else {
+          scene.environment = origEnv || scene.environment;
+          if (state.todEnabled) {
+            const s = $('todTimeSlider');
+            if (s) s.dispatchEvent(new Event('input'));
+          } else {
+            scene.background = new THREE.Color(state.darkMode ? 0x141519 : 0xECECE6);
+          }
+        }
+      };
+
+      // ---- composer pipeline
+      let C = null, P = {};
+      (async () => {
+        try {
+          const A = 'three/addons/', I = (p) => import(A + p);
+          const [ec, rp, op, ub, bk, gt, sp, fa] = await Promise.all([
+            I('postprocessing/EffectComposer.js'),
+            I('postprocessing/RenderPass.js'),
+            I('postprocessing/OutputPass.js'),
+            I('postprocessing/UnrealBloomPass.js'),
+            I('postprocessing/BokehPass.js'),
+            I('postprocessing/GTAOPass.js'),
+            I('postprocessing/ShaderPass.js'),
+            I('shaders/FXAAShader.js')
+          ]);
+
+          const sz = renderer.getSize(new THREE.Vector2()), cam = R.getCamera();
+          C = new ec.EffectComposer(renderer);
+          C.setPixelRatio(renderer.getPixelRatio());
+          C.setSize(sz.x, sz.y);
+
+          P.render = new rp.RenderPass(scene, cam);
+          P.ao = new gt.GTAOPass(scene, cam, sz.x, sz.y);
+          try {
+            P.ao.updateGtaoMaterial({ radius: F.aoRadius, distanceExponent: 1.5, thickness: F.aoThickness, scale: F.aoScale, samples: 16 });
+          } catch (e) { }
+
+          P.bloom = new ub.UnrealBloomPass(new THREE.Vector2(sz.x, sz.y), F.bloomStrength, F.bloomRadius, F.bloomThreshold);
+          P.dof = new bk.BokehPass(scene, cam, { focus: 20, aperture: F.dofAperture, maxblur: F.dofMaxblur });
+          P.out = new op.OutputPass();
+
+          P.grade = new sp.ShaderPass({
+            uniforms: {
+              tDiffuse: { value: null },
+              con: { value: 1 },
+              sat: { value: 1 },
+              lift: { value: 0 },
+              tint: { value: new THREE.Vector3(1, 1, 1) }
+            },
+            vertexShader: 'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+            fragmentShader: 'uniform sampler2D tDiffuse;uniform float con,sat,lift;uniform vec3 tint;varying vec2 vUv;void main(){vec4 c=texture2D(tDiffuse,vUv);vec3 x=c.rgb*tint+lift;x=(x-.5)*con+.5;float l=dot(x,vec3(.299,.587,.114));gl_FragColor=vec4(clamp(mix(vec3(l),x,sat),0.,1.),c.a);}'
+          });
+
+          P.fxaa = new sp.ShaderPass(fa.FXAAShader);
+
+          ['render', 'ao', 'bloom', 'dof', 'out', 'grade', 'fxaa'].forEach((k) => C.addPass(P[k]));
+          R.C = C; R.P = P; R.F = F;
+          R.fxReady = true;
+        } catch (e) {
+          console.warn('FX pipeline unavailable, using plain renderer', e);
+          C = null;
+          $('dFx').title = 'Post-processing could not load';
+        }
+      })();
+
+      let last = '', v2 = new THREE.Vector2();
+      function fxRender(sc, cam) {
+        if (!C || !F.on) {
+          renderer.render(sc, cam);
+          return;
+        }
+        const persp = !!cam.isPerspectiveCamera;
+        renderer.getSize(v2);
+        const key = v2.x + 'x' + v2.y + '@' + renderer.getPixelRatio();
+        if (key !== last) {
+          last = key;
+          C.setPixelRatio(renderer.getPixelRatio());
+          C.setSize(v2.x, v2.y);
+          const r = renderer.getPixelRatio();
+          P.fxaa.material.uniforms.resolution.value.set(1 / (v2.x * r), 1 / (v2.y * r));
+        }
+
+        P.render.camera = P.ao.camera = P.dof.camera = cam;
+        P.ao.enabled = F.ao && persp && !state.wireframe;
+        P.bloom.enabled = F.bloom && !state.wireframe;
+        P.dof.enabled = F.dof && persp && !state.wireframe;
+        P.fxaa.enabled = F.aa;
+
+        if (P.dof.enabled) {
+          const d = cam.position.distanceTo(controls.target);
+          P.dof.uniforms.focus.value = d;
+        }
+
+        const g = GRADES[F.grade], u = P.grade.uniforms;
+        u.con.value = g[1] * F.contrast;
+        u.sat.value = g[2] * F.saturation;
+        u.tint.value.set(...g[3]);
+        u.lift.value = g[4];
+        P.grade.enabled = (F.grade !== 0 || F.contrast !== 1.0 || F.saturation !== 1.0) && !state.wireframe;
+
+        C.render();
+      }
+      R.render = fxRender;
+
+      // ---- hi-res still (1x/2x/4x, capped to GPU limits)
+      R.capture = (cb) => {
+        const w = canvas.clientWidth, h = canvas.clientHeight, gl = renderer.getContext();
+        const max = Math.min(8192, gl.getParameter(gl.MAX_TEXTURE_SIZE) || 4096);
+        const s = Math.max(1, Math.min(F.scale, max / Math.max(w, h))), pr = renderer.getPixelRatio();
+        renderer.setPixelRatio(s);
+        renderer.setSize(w, h, false);
+        last = '';
+        R.getCamera().updateProjectionMatrix();
+        fxRender(scene, R.getCamera());
+        canvas.toBlob((b) => { cb(b); });
+        renderer.setPixelRatio(pr);
+        renderer.setSize(w, h, false);
+        last = '';
+      };
+
+      // ---- saved camera views (localStorage)
+      let views = [];
+      try { views = JSON.parse(localStorage.getItem('rendra-views') || '[]'); } catch (e) { }
+      const saveViews = () => { try { localStorage.setItem('rendra-views', JSON.stringify(views)); } catch (e) { } };
+      const mkBtn = (par, txt, fn) => { const b = document.createElement('button'); b.className = 'tool-btn tool-btn-solid'; b.textContent = txt; b.onclick = () => fn(b); par.appendChild(b); return b; };
+
+      function drawViews() {
+        vw.innerHTML = '';
+        mkBtn(vw, '+ Save current view', () => {
+          views.push({
+            n: `View ${views.length + 1}`,
+            p: R.getCamera().position.toArray(),
+            t: controls.target.toArray()
+          });
+          saveViews();
+          drawViews();
+        });
+        state.savedViews = views;
+        views.forEach((v, i) => {
+          const b = mkBtn(vw, v.n, () => {
+            const cam = R.getCamera();
+            state.camTween = {
+              startPos: cam.position.clone(),
+              endPos: new THREE.Vector3(...v.p),
+              startTarget: controls.target.clone(),
+              endTarget: new THREE.Vector3(...v.t),
+              progress: 0
+            };
+          });
+          b.title = 'Click to fly · right-click to delete';
+          b.oncontextmenu = (e) => {
+            e.preventDefault();
+            views.splice(i, 1);
+            saveViews();
+            drawViews();
+          };
+        });
+      }
+
+      // Sync drawer sliders with popover sliders
+      function syncAllFxControls() {
+        const isBloom = F.bloom && !state.wireframe;
+        const isAo = F.ao && !state.wireframe;
+        const isDof = F.dof && !state.wireframe;
+
+        $('fxMasterBtn').textContent = `Pipeline: ${F.on ? 'ON' : 'OFF'}`;
+        $('fxMasterBtn').classList.toggle('tool-btn-primary', F.on);
+        if ($('drawerFxMasterBtn')) {
+          $('drawerFxMasterBtn').textContent = `Pipeline: ${F.on ? 'ON' : 'OFF'}`;
+          $('drawerFxMasterBtn').classList.toggle('tool-btn-primary', F.on);
+        }
+
+        $('fxBloomBtn').classList.toggle('active', isBloom);
+        $('fxBloomBtn').textContent = isBloom ? 'ON' : 'OFF';
+        if ($('drawerFxBloomBtn')) {
+          $('drawerFxBloomBtn').classList.toggle('active', isBloom);
+          $('drawerFxBloomBtn').textContent = isBloom ? 'ON' : 'OFF';
+        }
+
+        $('fxAoBtn').classList.toggle('active', isAo);
+        $('fxAoBtn').textContent = isAo ? 'ON' : 'OFF';
+        if ($('drawerFxAoBtn')) {
+          $('drawerFxAoBtn').classList.toggle('active', isAo);
+          $('drawerFxAoBtn').textContent = isAo ? 'ON' : 'OFF';
+        }
+
+        $('fxDofBtn').classList.toggle('active', isDof);
+        $('fxDofBtn').textContent = isDof ? 'ON' : 'OFF';
+        if ($('drawerFxDofBtn')) {
+          $('drawerFxDofBtn').classList.toggle('active', isDof);
+          $('drawerFxDofBtn').textContent = isDof ? 'ON' : 'OFF';
+        }
+
+        $('fxGradeBtn').textContent = GRADES[F.grade][0];
+        if ($('drawerFxGradeBtn')) $('drawerFxGradeBtn').textContent = GRADES[F.grade][0];
+
+        $('fxHdriBtn').classList.toggle('active', F.hdri);
+        $('fxHdriBtn').textContent = `HDRI: ${F.hdri ? 'ON' : 'OFF'}`;
+        if ($('drawerFxHdriBtn')) {
+          $('drawerFxHdriBtn').classList.toggle('active', F.hdri);
+          $('drawerFxHdriBtn').textContent = `HDRI: ${F.hdri ? 'ON' : 'OFF'}`;
+        }
+
+        $('fxAaBtn').classList.toggle('active', F.aa);
+        $('fxAaBtn').textContent = `FXAA: ${F.aa ? 'ON' : 'OFF'}`;
+        if ($('drawerFxAaBtn')) {
+          $('drawerFxAaBtn').classList.toggle('active', F.aa);
+          $('drawerFxAaBtn').textContent = `FXAA: ${F.aa ? 'ON' : 'OFF'}`;
+        }
+      }
+
+      // Bind drawer controls
+      if ($('drawerFxMasterBtn')) {
+        $('drawerFxMasterBtn').onclick = () => { $('fxMasterBtn').click(); syncAllFxControls(); };
+        $('drawerFxBloomBtn').onclick = () => { $('fxBloomBtn').click(); syncAllFxControls(); };
+        $('drawerBloomStr').oninput = (e) => { $('fxBloomStr').value = e.target.value; $('fxBloomStr').dispatchEvent(new Event('input')); $('drawerBloomStrVal').textContent = F.bloomStrength.toFixed(2); };
+        $('drawerBloomRad').oninput = (e) => { $('fxBloomRad').value = e.target.value; $('fxBloomRad').dispatchEvent(new Event('input')); $('drawerBloomRadVal').textContent = F.bloomRadius.toFixed(2); };
+        $('drawerBloomThresh').oninput = (e) => { $('fxBloomThresh').value = e.target.value; $('fxBloomThresh').dispatchEvent(new Event('input')); $('drawerBloomThreshVal').textContent = F.bloomThreshold.toFixed(2); };
+
+        $('drawerFxAoBtn').onclick = () => { $('fxAoBtn').click(); syncAllFxControls(); };
+        $('drawerAoRadius').oninput = (e) => { $('fxAoRadius').value = e.target.value; $('fxAoRadius').dispatchEvent(new Event('input')); $('drawerAoRadiusVal').textContent = `${F.aoRadius.toFixed(2)}m`; };
+        $('drawerAoScale').oninput = (e) => { $('fxAoScale').value = e.target.value; $('fxAoScale').dispatchEvent(new Event('input')); $('drawerAoScaleVal').textContent = `${F.aoScale.toFixed(1)}x`; };
+
+        $('drawerFxDofBtn').onclick = () => { $('fxDofBtn').click(); syncAllFxControls(); };
+        $('drawerDofAperture').oninput = (e) => { $('fxDofAperture').value = e.target.value; $('fxDofAperture').dispatchEvent(new Event('input')); $('drawerDofApertureVal').textContent = F.dofAperture.toFixed(3); };
+        $('drawerDofBlur').oninput = (e) => { $('fxDofBlur').value = e.target.value; $('fxDofBlur').dispatchEvent(new Event('input')); $('drawerDofBlurVal').textContent = F.dofMaxblur.toFixed(3); };
+
+        $('drawerFxGradeBtn').onclick = () => { $('fxGradeBtn').click(); syncAllFxControls(); };
+        $('drawerContrast').oninput = (e) => { $('fxContrast').value = e.target.value; $('fxContrast').dispatchEvent(new Event('input')); $('drawerContrastVal').textContent = `${F.contrast.toFixed(2)}x`; };
+        $('drawerSat').oninput = (e) => { $('fxSat').value = e.target.value; $('fxSat').dispatchEvent(new Event('input')); $('drawerSatVal').textContent = `${F.saturation.toFixed(2)}x`; };
+
+        $('drawerFxHdriBtn').onclick = () => { $('fxHdriBtn').click(); syncAllFxControls(); };
+        $('drawerFxAaBtn').onclick = () => { $('fxAaBtn').click(); syncAllFxControls(); };
+        syncAllFxControls();
+      }
+      drawViews();
+      $('dViews').onclick = () => {
+        fx.classList.remove('open');
+        $('dirLooks')?.classList.remove('open');
+        vw.classList.toggle('open');
+      };
+    }
+  </script>
 
 </body>
+
 </html>
