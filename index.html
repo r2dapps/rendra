@@ -338,6 +338,13 @@
     .spinner-hoist {
       animation: hoistLift 0.9s infinite ease-in-out;
     }
+
+    /* Mobile & Tablet Virtual Joysticks (Direction A: Precision CAD) */
+    @media (min-width: 1025px) and (pointer: fine) {
+      #walkTouchControls {
+        display: none !important;
+      }
+    }
   </style>
 </head>
 
@@ -404,6 +411,27 @@
     </div>
   </div>
 
+  <!-- PWA Install Banner (Dismissible, High-Contrast AEC Neutral) -->
+  <div id="pwaInstallBanner"
+    class="fixed top-3 left-1/2 -translate-x-1/2 z-50 hidden items-center gap-3 px-3 sm:px-4 py-2 rounded-xl border border-[var(--border-strong)] bg-[var(--glass-bg)] text-[var(--fg)] backdrop-blur-md text-[11px] font-medium shadow-2xl select-none max-w-[94vw] sm:max-w-md transition-all">
+    <div class="w-7 h-7 rounded-lg bg-[var(--surface-mute)] border border-[var(--border-strong)] flex items-center justify-center shrink-0">
+      <svg class="w-4 h-4 text-[var(--fg)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+      </svg>
+    </div>
+    <div class="flex-1 min-w-0">
+      <div class="mono font-bold text-[10px] sm:text-[11px] tracking-wide truncate">INSTALL RENDRA STUDIO</div>
+      <div class="text-[9px] opacity-70 truncate">Fast offline 3D CAD & SKP viewing</div>
+    </div>
+    <div class="flex items-center gap-1.5 shrink-0">
+      <button id="pwaInstallActionBtn"
+        class="mono px-2.5 py-1 rounded text-[10px] bg-[var(--fg)] text-[var(--bg)] font-bold hover:opacity-85 transition-opacity">Install</button>
+      <button id="pwaDismissBannerBtn"
+        class="mono px-1.5 py-1 rounded text-[10px] text-[var(--fg)] opacity-60 hover:opacity-100 transition-opacity"
+        title="Dismiss">✕</button>
+    </div>
+  </div>
+
   <!-- First-Person Walk Navigation HUD -->
   <div id="walkHud"
     class="fixed top-3 left-1/2 -translate-x-1/2 z-50 hidden items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 rounded-full border border-[var(--border-strong)] bg-[var(--glass-bg)] text-[var(--fg)] backdrop-blur-md text-[10px] sm:text-[11px] font-medium shadow-lg select-none max-w-[94vw]">
@@ -422,6 +450,46 @@
     <button id="exitWalkBtn"
       class="mono px-2 py-0.5 rounded text-[10px] bg-[var(--fg)] text-[var(--bg)] font-bold hover:opacity-80">Exit
       [V]</button>
+  </div>
+
+  <!-- Mobile & Tablet Touch Virtual Joysticks (Direction A: Precision CAD) -->
+  <div id="walkTouchControls" class="fixed inset-0 pointer-events-none z-50 hidden select-none">
+    <!-- Left Move Joystick -->
+    <div id="joystickMoveZone"
+      class="absolute bottom-6 left-6 w-28 h-28 sm:w-32 sm:h-32 rounded-full border border-white/20 bg-black/40 backdrop-blur-md pointer-events-auto flex items-center justify-center touch-none shadow-2xl">
+      <div id="joystickMoveThumb"
+        class="w-11 h-11 sm:w-12 sm:h-12 rounded-full border border-white/40 bg-white/75 shadow-lg pointer-events-none flex items-center justify-center">
+        <span class="mono text-[8px] font-bold text-black tracking-wider opacity-90">MOVE</span>
+      </div>
+      <span class="absolute top-1 text-[8px] mono text-white/50 pointer-events-none font-bold">▲</span>
+      <span class="absolute bottom-1 text-[8px] mono text-white/50 pointer-events-none font-bold">▼</span>
+      <span class="absolute left-1.5 text-[8px] mono text-white/50 pointer-events-none font-bold">◀</span>
+      <span class="absolute right-1.5 text-[8px] mono text-white/50 pointer-events-none font-bold">▶</span>
+    </div>
+
+    <!-- Right Controls: Look Joystick + Action Buttons (Sprint & Jump) -->
+    <div class="absolute bottom-6 right-6 flex items-end gap-2.5 pointer-events-auto">
+      <!-- Quick Action Buttons -->
+      <div class="flex flex-col gap-2 mb-1">
+        <button id="touchSprintBtn"
+          class="w-11 h-11 rounded-full border border-white/25 bg-black/45 backdrop-blur-md text-white mono text-[9px] font-bold active:bg-white active:text-black transition-colors touch-none flex items-center justify-center shadow-lg">RUN</button>
+        <button id="touchJumpBtn"
+          class="w-11 h-11 rounded-full border border-white/25 bg-black/45 backdrop-blur-md text-white mono text-[9px] font-bold active:bg-white active:text-black transition-colors touch-none flex items-center justify-center shadow-lg">JUMP</button>
+      </div>
+
+      <!-- Look Joystick -->
+      <div id="joystickLookZone"
+        class="w-28 h-28 sm:w-32 sm:h-32 rounded-full border border-white/20 bg-black/40 backdrop-blur-md flex items-center justify-center touch-none shadow-2xl">
+        <div id="joystickLookThumb"
+          class="w-11 h-11 sm:w-12 sm:h-12 rounded-full border border-white/40 bg-white/75 shadow-lg pointer-events-none flex items-center justify-center">
+          <span class="mono text-[8px] font-bold text-black tracking-wider opacity-90">LOOK</span>
+        </div>
+        <span class="absolute top-1 text-[8px] mono text-white/50 pointer-events-none font-bold">▲</span>
+        <span class="absolute bottom-1 text-[8px] mono text-white/50 pointer-events-none font-bold">▼</span>
+        <span class="absolute left-1.5 text-[8px] mono text-white/50 pointer-events-none font-bold">◀</span>
+        <span class="absolute right-1.5 text-[8px] mono text-white/50 pointer-events-none font-bold">▶</span>
+      </div>
+    </div>
   </div>
 
   <!-- ==========================================================================
@@ -1359,7 +1427,10 @@
         isGrounded: true,
         jumpForce: 4.8,
         gravity: 14.0,
-        keys: { forward: false, backward: false, left: false, right: false, sprint: false, jump: false }
+        keys: { forward: false, backward: false, left: false, right: false, sprint: false, jump: false },
+        joystickMove: { x: 0, y: 0 },
+        joystickLook: { x: 0, y: 0 },
+        touchSprint: false
       },
       hdri: {
         enabled: false,
@@ -4434,6 +4505,11 @@
         targetBadge.style.color = 'var(--bg)';
       }
 
+      // Automatically open Materials Panel when an object is selected
+      if (state.inspectorCollapsed || state.activeTab !== 'materials') {
+        activateTab('materials');
+      }
+
       if (shouldFocusCamera) {
         focusCameraOnMesh(mesh);
       }
@@ -4593,6 +4669,19 @@
         hud.classList.add('flex');
       }
 
+      const isTouchOrMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || window.innerWidth <= 1024;
+      const touchControls = document.getElementById('walkTouchControls');
+      if (touchControls && isTouchOrMobile) {
+        touchControls.classList.remove('hidden');
+        // Declutter bottom toolbars on mobile/tablet during walk mode
+        const dirBar = document.getElementById('dir');
+        if (dirBar) dirBar.style.display = 'none';
+        const mic = document.getElementById('modelInfoCard');
+        if (mic) mic.style.display = 'none';
+        const selHud = document.getElementById('selectedObjHud');
+        if (selHud) selHud.classList.add('hidden');
+      }
+
       const btn = document.getElementById('dWalk');
       if (btn) btn.classList.add('active');
     }
@@ -4600,6 +4689,9 @@
     function disableWalkMode() {
       state.walkMode.active = false;
       state.walkMode.keys = { forward: false, backward: false, left: false, right: false, sprint: false, jump: false };
+      state.walkMode.joystickMove = { x: 0, y: 0 };
+      state.walkMode.joystickLook = { x: 0, y: 0 };
+      state.walkMode.touchSprint = false;
 
       if (document.pointerLockElement === canvas) {
         document.exitPointerLock?.();
@@ -4615,6 +4707,16 @@
         hud.classList.add('hidden');
         hud.classList.remove('flex');
       }
+
+      const touchControls = document.getElementById('walkTouchControls');
+      if (touchControls) {
+        touchControls.classList.add('hidden');
+      }
+
+      const dirBar = document.getElementById('dir');
+      if (dirBar) dirBar.style.display = '';
+      const mic = document.getElementById('modelInfoCard');
+      if (mic) mic.style.display = '';
 
       const btn = document.getElementById('dWalk');
       if (btn) btn.classList.remove('active');
@@ -4644,9 +4746,22 @@
       if (k.right) move.add(right);
       if (k.left) move.sub(right);
 
+      // Virtual joystick move input (mobile/tablet)
+      if (wm.joystickMove && (wm.joystickMove.x !== 0 || wm.joystickMove.y !== 0)) {
+        move.addScaledVector(fwd, -wm.joystickMove.y);
+        move.addScaledVector(right, wm.joystickMove.x);
+      }
+
       if (move.lengthSq() > 0) move.normalize();
-      const spd = k.sprint ? wm.sprintSpeed : wm.moveSpeed;
+      const spd = (k.sprint || wm.touchSprint) ? wm.sprintSpeed : wm.moveSpeed;
       activeCamera.position.addScaledVector(move, spd * dt);
+
+      // Virtual joystick look input (mobile/tablet)
+      if (wm.joystickLook && (wm.joystickLook.x !== 0 || wm.joystickLook.y !== 0)) {
+        wm.yaw -= wm.joystickLook.x * dt * 2.4;
+        wm.pitch -= wm.joystickLook.y * dt * 1.8;
+        wm.pitch = Math.max(-1.45, Math.min(1.45, wm.pitch));
+      }
 
       // 2. Downward Floor Collision & Step Detection
       const origin = new THREE.Vector3(activeCamera.position.x, activeCamera.position.y + 0.5, activeCamera.position.z);
@@ -4754,6 +4869,116 @@
     });
 
     document.getElementById('exitWalkBtn')?.addEventListener('click', disableWalkMode);
+
+    function initWalkTouchJoysticks() {
+      const moveZone = document.getElementById('joystickMoveZone');
+      const moveThumb = document.getElementById('joystickMoveThumb');
+      const lookZone = document.getElementById('joystickLookZone');
+      const lookThumb = document.getElementById('joystickLookThumb');
+      const sprintBtn = document.getElementById('touchSprintBtn');
+      const jumpBtn = document.getElementById('touchJumpBtn');
+
+      if (!moveZone || !lookZone) return;
+
+      function bindJoystick(zone, thumb, onMove, onRelease) {
+        let activePointerId = null;
+        let startX = 0, startY = 0;
+        const maxRadius = 38;
+
+        zone.addEventListener('pointerdown', (e) => {
+          if (activePointerId !== null) return;
+          activePointerId = e.pointerId;
+          try { zone.setPointerCapture(e.pointerId); } catch (_) { }
+          const rect = zone.getBoundingClientRect();
+          startX = rect.left + rect.width / 2;
+          startY = rect.top + rect.height / 2;
+          update(e.clientX, e.clientY);
+        });
+
+        zone.addEventListener('pointermove', (e) => {
+          if (e.pointerId !== activePointerId) return;
+          update(e.clientX, e.clientY);
+        });
+
+        const endDrag = (e) => {
+          if (e.pointerId !== activePointerId) return;
+          activePointerId = null;
+          try { zone.releasePointerCapture(e.pointerId); } catch (_) { }
+          thumb.style.transform = 'translate(0px, 0px)';
+          if (onRelease) onRelease();
+        };
+
+        zone.addEventListener('pointerup', endDrag);
+        zone.addEventListener('pointercancel', endDrag);
+
+        function update(clientX, clientY) {
+          let dx = clientX - startX;
+          let dy = clientY - startY;
+          const dist = Math.hypot(dx, dy);
+          if (dist > maxRadius) {
+            dx = (dx / dist) * maxRadius;
+            dy = (dy / dist) * maxRadius;
+          }
+          thumb.style.transform = `translate(${dx}px, ${dy}px)`;
+          if (onMove) onMove(dx / maxRadius, dy / maxRadius);
+        }
+      }
+
+      bindJoystick(
+        moveZone,
+        moveThumb,
+        (nx, ny) => {
+          if (state.walkMode) {
+            state.walkMode.joystickMove.x = nx;
+            state.walkMode.joystickMove.y = ny;
+          }
+        },
+        () => {
+          if (state.walkMode) {
+            state.walkMode.joystickMove.x = 0;
+            state.walkMode.joystickMove.y = 0;
+          }
+        }
+      );
+
+      bindJoystick(
+        lookZone,
+        lookThumb,
+        (nx, ny) => {
+          if (state.walkMode) {
+            state.walkMode.joystickLook.x = nx;
+            state.walkMode.joystickLook.y = ny;
+          }
+        },
+        () => {
+          if (state.walkMode) {
+            state.walkMode.joystickLook.x = 0;
+            state.walkMode.joystickLook.y = 0;
+          }
+        }
+      );
+
+      if (sprintBtn) {
+        sprintBtn.addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          if (!state.walkMode) return;
+          state.walkMode.touchSprint = !state.walkMode.touchSprint;
+          sprintBtn.style.background = state.walkMode.touchSprint ? '#FFFFFF' : 'rgba(0,0,0,0.45)';
+          sprintBtn.style.color = state.walkMode.touchSprint ? '#000000' : '#FFFFFF';
+        });
+      }
+
+      if (jumpBtn) {
+        jumpBtn.addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          if (state.walkMode && state.walkMode.active && state.walkMode.isGrounded) {
+            state.walkMode.velocity.y = state.walkMode.jumpForce;
+            state.walkMode.isGrounded = false;
+          }
+        });
+      }
+    }
+    initWalkTouchJoysticks();
 
     async function buildDemoArchitecturalVilla() {
       await showSpinner('BUILDING ARCHITECTURAL VILLA...', 'Constructing perimeter estate, interior rooms & cantilever slabs', 35);
@@ -5877,9 +6102,28 @@
         });
       }
 
-      // Animate Pedestrians Crossing at Zebra Crosswalks
+      // Animate Pedestrians Crossing at Zebra Crosswalks with Traffic Signal Compliance
       if (state.todEnabled && state.animatedPedestrians && state.animatedPedestrians.length > 0) {
+        const cycle = (performance.now() * 0.001) % 12.0;
+        const ewGreen = cycle < 4.5;
+        const ewAmber = cycle >= 4.5 && cycle < 6.0;
+        const nsGreen = cycle >= 6.0 && cycle < 10.5;
+        const nsAmber = cycle >= 10.5 && cycle < 12.0;
+
         state.animatedPedestrians.forEach((ped) => {
+          // Cars on the intersected street: NS cars for ped.isEW, EW cars for !ped.isEW
+          const carTrafficHasGo = ped.isEW ? (nsGreen || nsAmber) : (ewGreen || ewAmber);
+          const pos = ped.mesh.position[ped.axis];
+          const isAtCurb = (ped.dir > 0 && pos <= ped.minPos + 0.12) || (ped.dir < 0 && pos >= ped.maxPos - 0.12);
+
+          if (carTrafficHasGo && isAtCurb) {
+            // Idle on curb waiting for Walk signal: legs reset to neutral
+            if (ped.mesh.userData.leftLeg) ped.mesh.userData.leftLeg.rotation.x = 0;
+            if (ped.mesh.userData.rightLeg) ped.mesh.userData.rightLeg.rotation.x = 0;
+            return;
+          }
+
+          // Walk Signal is active (or pedestrian is finishing clearing the crossing)
           ped.walkCycle += dt * 4.2;
           const stride = Math.sin(ped.walkCycle) * 0.28;
           if (ped.mesh.userData.leftLeg) ped.mesh.userData.leftLeg.rotation.x = stride;
@@ -5888,9 +6132,11 @@
           ped.mesh.position[ped.axis] += ped.dir * ped.speed * dt;
           if (ped.dir > 0 && ped.mesh.position[ped.axis] >= ped.maxPos) {
             ped.dir = -1;
+            ped.mesh.position[ped.axis] = ped.maxPos;
             ped.mesh.rotation.y = ped.axis === 'z' ? Math.PI : -Math.PI / 2;
           } else if (ped.dir < 0 && ped.mesh.position[ped.axis] <= ped.minPos) {
             ped.dir = 1;
+            ped.mesh.position[ped.axis] = ped.minPos;
             ped.mesh.rotation.y = ped.axis === 'z' ? 0 : Math.PI / 2;
           }
         });
@@ -6190,10 +6436,51 @@ body.clean .glass-card,body.clean .glass-pill,body.clean nav,body.clean #dir{opa
         ({ KeyP: () => (shot = true), KeyT: () => tourToggle(), KeyR: () => $('dRec').click(), KeyH: clean })[e.code]?.();
       });
 
-      // ---- PWA install + service worker
-      let ip; addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); ip = e; $('dInstall').style.display = ''; });
-      $('dInstall').onclick = async () => { if (ip) { ip.prompt(); await ip.userChoice; ip = null; $('dInstall').style.display = 'none'; } };
-      if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => { });
+      // ---- PWA install banner + service worker
+      let ip = null;
+      const pwaBanner = document.getElementById('pwaInstallBanner');
+      const pwaInstallAction = document.getElementById('pwaInstallActionBtn');
+      const pwaDismissAction = document.getElementById('pwaDismissBannerBtn');
+
+      addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        ip = e;
+        const dismissed = localStorage.getItem('rendra_pwa_banner_dismissed') === '1';
+        if (pwaBanner && !dismissed) {
+          pwaBanner.classList.remove('hidden');
+          pwaBanner.classList.add('flex');
+        }
+        if ($('dInstall')) $('dInstall').style.display = '';
+      });
+
+      const triggerPwaInstall = async () => {
+        if (ip) {
+          ip.prompt();
+          await ip.userChoice;
+          ip = null;
+          if ($('dInstall')) $('dInstall').style.display = 'none';
+        }
+        if (pwaBanner) {
+          pwaBanner.classList.add('hidden');
+          pwaBanner.classList.remove('flex');
+        }
+      };
+
+      if (pwaInstallAction) pwaInstallAction.onclick = triggerPwaInstall;
+      if ($('dInstall')) $('dInstall').onclick = triggerPwaInstall;
+      if (pwaDismissAction) {
+        pwaDismissAction.onclick = () => {
+          if (pwaBanner) {
+            pwaBanner.classList.add('hidden');
+            pwaBanner.classList.remove('flex');
+          }
+          localStorage.setItem('rendra_pwa_banner_dismissed', '1');
+        };
+      }
+
+      if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+        navigator.serviceWorker.register('sw.js').catch(() => { });
+      }
 
       // ---- frame hooks
       R.tick.push((dt, time) => {
