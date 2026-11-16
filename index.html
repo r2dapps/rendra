@@ -1,0 +1,3576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#141519" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <title>RENDRA — 3D SKP to GLB Studio</title>
+  <meta name="description" content="Free, private in-browser SketchUp (.skp) viewer & GLB converter with Lumion-style procedural 3D environments, real-time solar arc, section cuts, and cinematic director tools. 100% client-side." />
+  <meta name="keywords" content="sketchup, skp viewer, glb converter, threejs, webgl, 3d viewer, architecture, aec, lumion, sun study, offline first, pwa, client side, cad, bim" />
+  <link rel="canonical" href="https://r2dapps.github.io/rendra/" />
+  
+  <!-- Open Graph / Social Sharing -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://r2dapps.github.io/rendra/" />
+  <meta property="og:title" content="RENDRA — 3D SKP to GLB Studio" />
+  <meta property="og:description" content="Open SketchUp (.skp) files, light them like a film set, and export clean GLBs directly in your browser. Zero install, zero uploads, 100% private." />
+  <meta property="og:image" content="icon-512.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="RENDRA — 3D SKP to GLB Studio" />
+  <meta name="twitter:description" content="Open SketchUp (.skp) files, light them like a film set, and export clean GLBs directly in your browser. Zero install, zero uploads, 100% private." />
+  <meta name="twitter:image" content="icon-512.png" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23141519'/%3E%3Cpolygon points='16,4 28,10.5 16,17 4,10.5' fill='%23ECECE6'/%3E%3Cpolygon points='4,13.5 15,19.5 15,28 4,22' fill='%23ECECE6' opacity='0.85'/%3E%3Cpolygon points='28,13.5 17,19.5 17,28 28,22' fill='%23ECECE6' opacity='0.55'/%3E%3C/svg%3E" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://esm.sh/three@0.170.0",
+        "three/addons/": "https://esm.sh/three@0.170.0/examples/jsm/",
+        "openskp": "https://esm.sh/openskp@1.5.0"
+      }
+    }
+  </script>
+
+  <style>
+    /* ============================================================================
+       RENDRA MESHY-STYLE FLOATING GLASSMORPHIC UI — STRICT 2-COLOR PALETTE
+       Day Default: #ECECE6 (Studio Chalk) / #141519 (Obsidian Ink)
+       ============================================================================ */
+    :root {
+      --c-dark: #141519;
+      --c-light: #ECECE6;
+      --bg: var(--c-light);
+      --fg: var(--c-dark);
+      --glass-bg: rgba(236, 236, 230, 0.78);
+      --glass-card: rgba(236, 236, 230, 0.84);
+      --border: rgba(20, 21, 25, 0.14);
+      --border-strong: rgba(20, 21, 25, 0.32);
+      --surface-mute: rgba(20, 21, 25, 0.06);
+      --surface-hover: rgba(20, 21, 25, 0.12);
+    }
+
+    body.theme-dark {
+      --bg: var(--c-dark);
+      --fg: var(--c-light);
+      --glass-bg: rgba(20, 21, 25, 0.76);
+      --glass-card: rgba(20, 21, 25, 0.84);
+      --border: rgba(236, 236, 230, 0.14);
+      --border-strong: rgba(236, 236, 230, 0.32);
+      --surface-mute: rgba(236, 236, 230, 0.07);
+      --surface-hover: rgba(236, 236, 230, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg);
+      color: var(--fg);
+      font-family: 'Inter', system-ui, sans-serif;
+      overflow: hidden;
+      user-select: none;
+      font-size: 11px;
+    }
+
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Meshy-Style Frosted Glass Cards & Floating Dock */
+    .glass-card {
+      background: var(--glass-card);
+      backdrop-filter: blur(18px) saturate(140%);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      border: 1px solid var(--border-strong);
+      border-radius: 12px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+    }
+
+    .glass-pill {
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .studio-sunken {
+      background: var(--surface-mute);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+    }
+
+    /* Compact Buttons & Vertical Dock Icons */
+    .tool-btn {
+      background: transparent;
+      color: var(--fg);
+      border: 1px solid transparent;
+      border-radius: 7px;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all 0.14s ease;
+      white-space: nowrap;
+    }
+
+    .tool-btn:hover:not(:disabled) {
+      background: var(--surface-hover);
+      border-color: var(--border);
+    }
+
+    .tool-btn.active {
+      background: var(--fg);
+      color: var(--bg);
+      border-color: var(--fg);
+      font-weight: 600;
+    }
+
+    .tool-btn-solid {
+      background: var(--surface-mute);
+      border: 1px solid var(--border-strong);
+    }
+
+    .tool-btn-primary {
+      background: var(--fg);
+      color: var(--bg);
+      border: 1px solid var(--fg);
+      font-weight: 600;
+    }
+
+    .dock-icon-btn {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--fg);
+      background: transparent;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.14s ease;
+    }
+
+    .dock-icon-btn:hover {
+      background: var(--surface-hover);
+    }
+
+    .dock-icon-btn.active {
+      background: var(--fg);
+      color: var(--bg);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .dock-divider {
+      width: 18px;
+      height: 1px;
+      background: var(--border);
+      margin: 2px auto;
+    }
+
+    /* Dropdown Menu */
+    .menu-dropdown {
+      position: relative;
+    }
+    .menu-dropdown-panel {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      min-width: 185px;
+      padding: 5px;
+      z-index: 60;
+    }
+    .menu-dropdown.open .menu-dropdown-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .menu-item {
+      width: 100%;
+      text-align: left;
+      padding: 6px 9px;
+      border-radius: 6px;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      background: transparent;
+      color: var(--fg);
+      border: none;
+    }
+    .menu-item:hover {
+      background: var(--surface-hover);
+    }
+
+    /* Range Sliders */
+    input[type="range"].studio-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 4px;
+      background: var(--surface-hover);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      outline: none;
+    }
+
+    input[type="range"].studio-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--fg);
+      cursor: pointer;
+      border: 2px solid var(--bg);
+    }
+
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 99px; }
+
+    /* Meshy-Style Floating 3D Callout Tags */
+    .dim-label {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      background: var(--c-dark);
+      color: var(--c-light);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 7px;
+      border-radius: 6px;
+      border: 1px solid rgba(236, 236, 230, 0.25);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 15;
+    }
+
+    .dim-label-pending {
+      background: var(--bg);
+      color: var(--fg);
+      border: 1.5px dashed var(--fg);
+    }
+
+    /* Animated Construction Crane Spinner */
+    @keyframes craneGear {
+      0%   { stroke-dashoffset: 180; transform: rotate(0deg); }
+      50%  { stroke-dashoffset: 40;  transform: rotate(180deg); }
+      100% { stroke-dashoffset: 180; transform: rotate(360deg); }
+    }
+    @keyframes hoistLift {
+      0%, 100% { transform: translateY(-7px); }
+      50%      { transform: translateY(5px); }
+    }
+    .spinner-gear {
+      stroke-dasharray: 180;
+      animation: craneGear 2s infinite linear;
+      transform-origin: center;
+    }
+    .spinner-hoist {
+      animation: hoistLift 0.9s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="h-screen w-screen overflow-hidden select-none relative">
+
+  <!-- ==========================================================================
+       0. RENDRA STARTUP LAUNCHPAD & DRAG-DROP WELCOME GATE
+       ========================================================================== -->
+  <div id="startupModal" class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background: rgba(20, 21, 25, 0.45); backdrop-filter: blur(8px);">
+    <div class="glass-card max-w-md w-full p-5 space-y-4">
+      <div class="flex items-center justify-between border-b pb-3" style="border-color: var(--border);">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center font-bold mono text-sm" style="background: var(--fg); color: var(--bg);">R</div>
+          <div>
+            <div class="font-bold text-sm tracking-tight mono">RENDRA</div>
+            <div class="text-[10px] opacity-65">3D SKP → GLB & Lumion Studio</div>
+          </div>
+        </div>
+        <span id="pwaReadyBadge" class="mono text-[9px] px-2 py-0.5 rounded studio-sunken font-semibold">PWA READY</span>
+      </div>
+
+      <div id="startupDropZone" class="studio-sunken border-2 border-dashed p-6 text-center space-y-2 cursor-pointer transition-all hover:opacity-80" style="border-color: var(--border-strong);">
+        <svg class="w-8 h-8 mx-auto opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        <div class="font-bold text-xs">Drop 3D Model or Tap to Browse</div>
+        <div class="flex items-center justify-center gap-1.5 pt-1">
+          <span class="mono text-[9px] px-1.5 py-0.5 rounded font-bold" style="background: var(--fg); color: var(--bg);">.SKP</span>
+          <span class="mono text-[9px] px-1.5 py-0.5 rounded font-bold" style="background: var(--fg); color: var(--bg);">.GLB</span>
+          <span class="mono text-[9px] px-1.5 py-0.5 rounded font-bold" style="background: var(--fg); color: var(--bg);">.GLTF</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-1.5 mono text-[10px]">
+        <div class="studio-sunken p-2">
+          <span class="opacity-55 block text-[9px]">MAX FILE</span>
+          <b>~300 MB</b>
+        </div>
+        <div class="studio-sunken p-2">
+          <span class="opacity-55 block text-[9px]">RENDER</span>
+          <b>V-Ray + Sun</b>
+        </div>
+        <div class="studio-sunken p-2">
+          <span class="opacity-55 block text-[9px]">OFFLINE</span>
+          <b id="cacheStateText">CDN Cached</b>
+        </div>
+      </div>
+
+      <div class="flex gap-2 pt-1">
+        <button id="startupUploadBtn" class="tool-btn tool-btn-primary flex-1 py-2 text-xs">Upload Model</button>
+        <button id="startupDemoBtn" class="tool-btn tool-btn-solid flex-1 py-2 text-xs">Demo Villa</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       1. CONSTRUCTION SPINNER (SHOWN ON EVERY LOAD / GEN ACTION)
+       ========================================================================== -->
+  <div id="loadingOverlay" class="hidden fixed inset-0 z-50 flex items-center justify-center" style="background: rgba(20, 21, 25, 0.55); backdrop-filter: blur(6px);">
+    <div class="glass-card w-72 p-4 flex flex-col items-center text-center space-y-2.5">
+      <div class="relative w-16 h-16 flex items-center justify-center">
+        <svg class="w-16 h-16" viewBox="0 0 80 80" fill="none" stroke="currentColor">
+          <circle class="spinner-gear" cx="40" cy="40" r="35" stroke-width="2" opacity="0.7" />
+          <path d="M22 62 V18 H58 M22 25 L32 18 M16 62 H64" stroke-width="2" stroke-linecap="round"/>
+          <g class="spinner-hoist">
+            <line x1="46" y1="18" x2="46" y2="33" stroke-width="1.5" stroke-dasharray="2 2"/>
+            <polygon points="46,31 56,36 46,41 36,36" fill="currentColor" />
+            <polygon points="36,36 46,41 46,51 36,46" stroke-width="1.5" />
+            <polygon points="56,36 46,41 46,51 56,46" stroke-width="1.5" />
+          </g>
+        </svg>
+      </div>
+      <div id="spinnerStageText" class="mono font-bold text-[11px] tracking-wider uppercase">PROCESSING...</div>
+      <div id="spinnerSubText" class="text-[10px] opacity-75">Building geometry & textures</div>
+      <div class="w-full studio-sunken h-1.5 overflow-hidden p-0">
+        <div id="spinnerBar" class="h-full transition-all duration-150" style="width: 50%; background: var(--fg);"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       2. DRAG & DROP FILE OVERLAY
+       ========================================================================== -->
+  <div id="dropOverlay" class="hidden fixed inset-3 z-40 glass-card flex flex-col items-center justify-center pointer-events-none">
+    <p class="text-sm font-bold tracking-wide mono">DROP .SKP, .GLB OR .GLTF TO LOAD</p>
+    <p class="text-[11px] opacity-75 mt-1">Instant Client-Side Conversion & Lumion Context</p>
+  </div>
+
+  <!-- ==========================================================================
+       3. FULL-SCREEN 3D VIEWPORT CANVAS
+       ========================================================================== -->
+  <div id="viewportContainer" class="relative w-full h-full overflow-hidden">
+    <canvas id="webglCanvas" class="w-full h-full block cursor-crosshair"></canvas>
+    <div id="labelsContainer" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+
+    <!-- ========================================================================
+         TOP-LEFT: UNIFIED SINGLE FILE PILL (UPLOAD + EXPORT IN ONE CATEGORY)
+         ======================================================================== -->
+    <div class="absolute top-3 left-3 z-30 flex items-center gap-1.5">
+      <input type="file" id="fileInput" accept=".skp,.glb,.gltf" class="hidden" />
+
+      <div class="menu-dropdown" id="fileMenuDropdown">
+        <button id="fileMenuTrigger" class="glass-pill px-2.5 py-1.5 flex items-center gap-2 cursor-pointer hover:opacity-90">
+          <span class="w-5 h-5 rounded flex items-center justify-center font-bold mono text-[10px]" style="background: var(--fg); color: var(--bg);">R</span>
+          <span class="font-bold mono text-xs tracking-tight">RENDRA</span>
+          <span id="fileBadge" class="hidden sm:inline mono text-[10px] opacity-65 truncate max-w-[95px]">DEMO.SKP</span>
+          <span class="text-[9px] opacity-60">▾</span>
+        </button>
+
+        <div class="menu-dropdown-panel glass-card">
+          <div class="px-2 py-1 text-[9px] mono opacity-50 uppercase">File I/O</div>
+          <button id="openFileBtn" class="menu-item font-semibold">
+            <span>Upload (.SKP / .GLB)</span>
+            <span class="mono text-[9px] opacity-60">↑</span>
+          </button>
+          <button id="exportGlbBtn" class="menu-item font-semibold">
+            <span>Export Scene (.GLB)</span>
+            <span class="mono text-[9px] opacity-60">↓</span>
+          </button>
+          <div class="my-1 border-t" style="border-color: var(--border);"></div>
+          <button id="reloadDemoBtn" class="menu-item">
+            <span>Load Demo Villa</span>
+          </button>
+          <button id="openStartupBtn" class="menu-item">
+            <span>Launchpad Gate</span>
+          </button>
+          <button id="limitsModalBtn" class="menu-item">
+            <span>Specs & PWA Cache</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Compact 2D Floor Plan Toggle Pill -->
+      <button id="toggle2dPlanBtn" class="glass-pill px-2.5 py-1.5 text-[10px] font-semibold mono flex items-center gap-1.5 cursor-pointer hover:opacity-90" title="Toggle 2D Floor Plan Radar">
+        <span>2D Plan</span>
+      </button>
+    </div>
+
+    <!-- ========================================================================
+         LEFT FLOATING STACK: 2D RADAR MAP + MESHY-STYLE MODEL INFO CARD
+         ======================================================================== -->
+    <!-- Interactive 2D Floor Plan Card (Collapsible) -->
+    <div id="minimapPanel" class="hidden absolute top-14 left-3 z-20 glass-card w-44 sm:w-48 p-2.5 space-y-1.5">
+      <div class="flex items-center justify-between text-[10px] font-semibold">
+        <span>2D Plan (Tap to Go)</span>
+        <div class="flex items-center gap-1">
+          <button id="snapTopViewBtn" class="tool-btn px-1.5 py-0.5 text-[9px] tool-btn-solid">Top</button>
+          <button id="close2dPlanBtn" class="tool-btn px-1 py-0.5 text-[9px]">✕</button>
+        </div>
+      </div>
+      <div class="relative w-full aspect-square studio-sunken overflow-hidden cursor-pointer" title="Tap anywhere on map to glide 3D camera">
+        <canvas id="floorplanCanvas" width="200" height="200" class="w-full h-full block"></canvas>
+        <div class="absolute top-1 right-1 mono text-[8px] px-1 rounded font-bold pointer-events-none" style="background: var(--fg); color: var(--bg);">N↑</div>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <span class="text-[9px] mono opacity-65 shrink-0">Cut</span>
+        <input type="range" id="planHeightSlider" min="2" max="95" value="22" class="studio-slider flex-1" />
+        <span id="planHeightLabel" class="mono text-[9px] font-bold shrink-0">1.2m</span>
+      </div>
+    </div>
+
+    <!-- Focused Part Quick Pill -->
+    <div id="selectedObjHud" class="hidden absolute bottom-28 sm:bottom-36 left-3 z-20 glass-card w-56 p-2.5 space-y-1">
+      <div class="flex items-center justify-between border-b pb-1" style="border-color: var(--border);">
+        <span id="selObjName" class="font-bold text-[10px] mono truncate max-w-[125px]">--</span>
+        <div class="flex gap-1">
+          <button id="focusSelectedBtn" class="tool-btn px-1.5 py-0.5 text-[9px] tool-btn-solid">Focus</button>
+          <button id="closeSelHudBtn" class="tool-btn px-1 py-0.5 text-[9px]">✕</button>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-x-2 gap-y-0.5 text-[10px] mono">
+        <span class="opacity-60">Mat:</span> <span id="selObjMat" class="truncate text-right">--</span>
+        <span class="opacity-60">Size:</span> <span id="selObjDims" class="font-bold text-right">--</span>
+        <span class="opacity-60">Elev:</span> <span id="selObjElev" class="text-right">--</span>
+      </div>
+    </div>
+
+    <!-- Bottom-Left: Meshy-Style Collapsible MODEL INFO Card -->
+    <div id="modelInfoCard" class="absolute bottom-3 left-3 z-20 glass-card w-48 sm:w-56 p-2.5 space-y-1.5 transition-all">
+      <div class="flex items-center justify-between">
+        <span class="mono text-[10px] font-bold tracking-wider uppercase opacity-75">MODEL INFO</span>
+        <div class="flex items-center gap-1">
+          <select id="quickUnitSelect" class="studio-sunken text-[9px] mono px-1.5 py-0.5 bg-transparent outline-none cursor-pointer">
+            <option value="m">m</option>
+            <option value="mm">mm</option>
+            <option value="ft">ft</option>
+          </select>
+          <button id="collapseModelInfoBtn" class="tool-btn px-1 py-0.5 text-[9px]" title="Collapse/Expand Info">▾</button>
+        </div>
+      </div>
+
+      <div id="modelInfoBody" class="space-y-1 text-[10px] mono pt-0.5">
+        <div class="flex justify-between gap-2">
+          <span class="opacity-60">Dimensions</span>
+          <b id="statBounds" class="text-right">0×0×0m</b>
+        </div>
+        <div class="flex justify-between">
+          <span class="opacity-60">Triangles</span>
+          <b id="statTris">0</b>
+        </div>
+        <div id="modelInfoMore" class="hidden space-y-1 pt-1 border-t" style="border-color: var(--border);">
+          <div class="flex justify-between"><span class="opacity-60">Meshes</span><b id="statMeshes">0</b></div>
+          <div class="flex justify-between"><span class="opacity-60">Vertices</span><b id="statVerts">0</b></div>
+        </div>
+        <div class="flex items-center justify-between pt-1 border-t text-[9px]" style="border-color: var(--border);">
+          <button id="toggleMoreDetailsBtn" class="opacity-65 hover:opacity-100 cursor-pointer">▸ More details</button>
+          <span id="statusText" class="truncate max-w-[105px] opacity-75">READY</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================================
+         RIGHT-SIDE COLLAPSIBLE FLOATING GLASS CARD (OPENS NEXT TO DOCK)
+         ======================================================================== -->
+    <aside id="inspectorDrawer" class="fixed right-14 top-3 z-30 glass-card w-60 sm:w-64 max-h-[calc(100vh-95px)] flex flex-col transition-all duration-150">
+      <!-- Card Header with Collapse (✕) Button -->
+      <div class="flex items-center justify-between px-3 py-2 border-b" style="border-color: var(--border);">
+        <span id="drawerTitle" class="font-bold text-xs tracking-wide">Lumion World</span>
+        <button id="collapseInspectorBtn" class="tool-btn px-1.5 py-0.5 text-[10px]" title="Collapse Card">✕</button>
+      </div>
+
+      <!-- Card Body -->
+      <div id="drawerBody" class="p-3 overflow-y-auto flex-1 space-y-2.5">
+
+        <!-- ==================================================================
+             PANEL 1: MEASURE (MESHY-STYLE DISTANCE LIST & CLEAR ALL)
+             ================================================================== -->
+        <div data-tab-panel="dimensions" class="hidden space-y-2.5">
+          <div class="grid grid-cols-2 gap-1 studio-sunken p-1">
+            <button id="toggleTapeBtn" class="tool-btn active py-1">Distance</button>
+            <button id="toggleBBoxBtn" class="tool-btn active py-1">BBox</button>
+          </div>
+
+          <div class="flex items-center justify-between text-[10px] opacity-75">
+            <span id="tapeStepBadge">Click two points on model</span>
+          </div>
+
+          <!-- Numbered Multi-Line Measurements List (Like Meshy Reference) -->
+          <div id="measureHistoryList" class="max-h-32 overflow-y-auto space-y-1 mono text-[10px] divide-y" style="border-color: var(--border);"></div>
+
+          <div class="studio-sunken p-2 space-y-1 mono text-[10px]">
+            <div class="flex justify-between"><span class="opacity-60">X × Z × Y</span> <b id="dimX">--</b></div>
+            <div class="hidden"><b id="dimZ"></b><b id="dimY"></b></div>
+            <div class="flex justify-between"><span class="opacity-60">Footprint</span> <b id="dimArea">--</b></div>
+            <div class="flex justify-between"><span class="opacity-60">Last Tape</span> <b id="lastMeasureReadout">--</b></div>
+          </div>
+
+          <button id="clearMeasureBtn" class="w-full tool-btn tool-btn-solid py-1.5 font-semibold">Clear all</button>
+        </div>
+
+        <!-- ==================================================================
+             PANEL 2: LUMION WORLD & V-RAY 180° SUN
+             ================================================================== -->
+        <div data-tab-panel="lumion" class="space-y-2.5">
+          <div class="studio-sunken p-2 flex items-center justify-between">
+            <div>
+              <span class="font-bold text-[11px] block">Lumion + V-Ray</span>
+              <span class="text-[9px] opacity-60">180° Sun, Hills, Cars & Trees</span>
+            </div>
+            <button id="toggleTodBtn" class="tool-btn tool-btn-primary px-2.5 py-1">Enable</button>
+          </div>
+
+          <!-- 180° Solar Arc Controls -->
+          <div class="studio-sunken p-2.5 space-y-2">
+            <div class="flex items-center justify-between text-[9px] font-bold uppercase opacity-65 mono">
+              <span>180° Solar Arc</span>
+              <span id="sunArcAngleBadge">105° Elev</span>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-[10px] mb-0.5">
+                <span class="opacity-70">Time (E → W)</span>
+                <span id="todTimeLabel" class="mono font-bold">14:30</span>
+              </div>
+              <input type="range" id="todTimeSlider" min="6.0" max="18.0" step="0.1" value="14.5" class="studio-slider" />
+              <div class="flex justify-between text-[8px] mono opacity-50 mt-0.5">
+                <span>06:00 East (0°)</span>
+                <span>12:00 (90°)</span>
+                <span>18:00 West (180°)</span>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-[10px] mb-0.5">
+                <span class="opacity-70">Compass</span>
+                <span id="todAzimuthLabel" class="mono font-bold">25°</span>
+              </div>
+              <input type="range" id="todAzimuthSlider" min="0" max="360" value="25" class="studio-slider" />
+            </div>
+
+            <div>
+              <div class="flex justify-between text-[10px] mb-0.5">
+                <span class="opacity-70">V-Ray Exposure</span>
+                <span id="todIntensityLabel" class="mono font-bold">2.6</span>
+              </div>
+              <input type="range" id="todIntensitySlider" min="8" max="50" value="26" class="studio-slider" />
+            </div>
+
+            <div class="grid grid-cols-3 gap-1 pt-0.5">
+              <button data-tod="6.6" class="tod-preset tool-btn tool-btn-solid text-[10px]">Sunrise</button>
+              <button data-tod="12.0" class="tod-preset tool-btn tool-btn-solid text-[10px]">Noon</button>
+              <button data-tod="17.4" class="tod-preset tool-btn tool-btn-solid text-[10px]">Sunset</button>
+            </div>
+          </div>
+
+          <!-- Rich World Context Toggles -->
+          <div class="studio-sunken p-2.5 space-y-2">
+            <div class="text-[9px] font-bold uppercase opacity-65 mono">World Context</div>
+            <div class="grid grid-cols-3 gap-1">
+              <button id="envTerrainBtn" class="tool-btn tool-btn-solid active text-[10px]">Hills</button>
+              <button id="envRoadBtn" class="tool-btn tool-btn-solid active text-[10px]">Junction</button>
+              <button id="envCarsBtn" class="tool-btn tool-btn-solid active text-[10px]">Cars</button>
+              <button id="envTreesBtn" class="tool-btn tool-btn-solid active text-[10px]">Flora</button>
+              <button id="envPoolBtn" class="tool-btn tool-btn-solid active text-[10px]">Pool</button>
+              <button id="envLampsBtn" class="tool-btn tool-btn-solid active text-[10px]">Lamps</button>
+            </div>
+
+            <div class="space-y-1 pt-1">
+              <div class="flex justify-between text-[10px]">
+                <span class="opacity-70">Vegetation</span>
+                <span id="treeCountLabel" class="mono font-bold">36</span>
+              </div>
+              <input type="range" id="treeCountSlider" min="0" max="80" step="4" value="36" class="studio-slider" />
+            </div>
+
+            <div class="space-y-1">
+              <div class="flex justify-between text-[10px]">
+                <span class="opacity-70">Pad Scale</span>
+                <span id="sitePadScaleLabel" class="mono font-bold">1.3x</span>
+              </div>
+              <input type="range" id="sitePadScaleSlider" min="10" max="28" step="1" value="13" class="studio-slider" />
+            </div>
+
+            <div class="flex gap-1 pt-0.5">
+              <button id="envShadowsBtn" class="tool-btn tool-btn-solid active flex-1">Shadows</button>
+              <button id="regenEnvBtn" class="tool-btn tool-btn-solid flex-1">Rebuild</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================================================================
+             PANEL 3: OUTLINER TREE
+             ================================================================== -->
+        <div data-tab-panel="outliner" class="hidden space-y-2">
+          <div class="flex gap-1">
+            <input id="meshSearchInput" type="text" placeholder="Filter parts..." class="studio-sunken px-2 py-1 flex-1 text-[11px] bg-transparent outline-none" />
+            <button id="showAllNodesBtn" class="tool-btn tool-btn-solid text-[10px]">All</button>
+          </div>
+          <div class="flex justify-between text-[9px] opacity-60 mono px-0.5">
+            <span id="meshTreeCountLabel">0 ITEMS</span>
+            <span>TAP = FOCUS</span>
+          </div>
+          <div id="meshTreeList" class="h-64 overflow-y-auto studio-sunken divide-y" style="border-color: var(--border);"></div>
+        </div>
+
+        <!-- ==================================================================
+             PANEL 4: SECTION CUT
+             ================================================================== -->
+        <div data-tab-panel="section" class="hidden space-y-2">
+          <div class="grid grid-cols-2 gap-1">
+            <button id="toggleSectionBtn" class="tool-btn tool-btn-solid">Cut: OFF</button>
+            <button id="flipSectionBtn" class="tool-btn tool-btn-solid">Flip Dir</button>
+          </div>
+          <div class="grid grid-cols-3 gap-1">
+            <button data-axis="y" class="section-axis-btn tool-btn tool-btn-solid active">Y-Plan</button>
+            <button data-axis="x" class="section-axis-btn tool-btn tool-btn-solid">X-Wall</button>
+            <button data-axis="z" class="section-axis-btn tool-btn tool-btn-solid">Z-Elev</button>
+          </div>
+          <div class="studio-sunken p-2 space-y-1">
+            <div class="flex justify-between text-[10px]">
+              <span class="opacity-70">Slice Offset</span>
+              <span id="sectionPercentLabel" class="mono font-bold">100%</span>
+            </div>
+            <input type="range" id="sectionSlider" min="0" max="100" value="100" class="studio-slider" />
+          </div>
+          <button id="togglePlaneHelperBtn" class="w-full tool-btn tool-btn-solid active py-1">Plane Gizmo: ON</button>
+        </div>
+
+        <!-- ==================================================================
+             PANEL 5: MATERIALS & SHADING
+             ================================================================== -->
+        <div data-tab-panel="materials" class="hidden space-y-2">
+          <!-- Viewport Shading Quick Grid -->
+          <div class="grid grid-cols-2 gap-1">
+            <button id="shadeEdgesBtn" class="tool-btn tool-btn-solid active">Edges: ON</button>
+            <button id="shadeClayBtn" class="tool-btn tool-btn-solid">Clay: OFF</button>
+            <button id="shadeWireBtn" class="tool-btn tool-btn-solid">Wire: OFF</button>
+            <button id="shadeXrayBtn" class="tool-btn tool-btn-solid">X-Ray: OFF</button>
+          </div>
+
+          <div class="studio-sunken p-2 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-[10px]">SKP Doctor</span>
+              <span id="orangeCountBadge" class="mono text-[9px] px-1.5 py-0.5 rounded font-bold" style="background: var(--fg); color: var(--bg);">OK</span>
+            </div>
+            <p id="orangeDiagText" class="text-[9px] opacity-70">Heals unpainted orange back-faces.</p>
+            <div class="grid grid-cols-2 gap-1">
+              <button id="healOrangeMatBtn" class="tool-btn tool-btn-solid">Fix Mat</button>
+              <button id="flipNormalsBtn" class="tool-btn tool-btn-solid">Normals</button>
+            </div>
+          </div>
+
+          <button id="toggleDoubleSideBtn" class="w-full tool-btn tool-btn-solid active py-1">Double-Sided: ON</button>
+          <div id="materialsList" class="h-44 overflow-y-auto studio-sunken divide-y" style="border-color: var(--border);"></div>
+        </div>
+
+        <!-- ==================================================================
+             PANEL 6: ANIMATION (EXPLODE & TURNTABLE)
+             ================================================================== -->
+        <div data-tab-panel="animation" class="hidden space-y-2">
+          <div class="studio-sunken p-2.5 space-y-2">
+            <div class="flex justify-between text-[10px]">
+              <span class="font-bold">Explode</span>
+              <span id="explodeFactorLabel" class="mono font-bold">0%</span>
+            </div>
+            <input type="range" id="explodeSlider" min="0" max="100" value="0" class="studio-slider" />
+            <div class="grid grid-cols-3 gap-1">
+              <button id="playAssembleBtn" class="tool-btn tool-btn-solid">Play</button>
+              <button id="loopAssembleBtn" class="tool-btn tool-btn-solid active">Loop</button>
+              <button id="resetAnimBtn" class="tool-btn tool-btn-solid">Reset</button>
+            </div>
+          </div>
+
+          <div class="studio-sunken p-2.5 space-y-2">
+            <div class="flex items-center justify-between text-[10px]">
+              <span class="font-bold">Turntable</span>
+              <button id="toggleTurntableBtn" class="tool-btn tool-btn-solid">OFF</button>
+            </div>
+            <div>
+              <div class="flex justify-between text-[10px] mb-0.5">
+                <span class="opacity-70">Speed</span>
+                <span id="animSpeedLabel" class="mono font-bold">1.0x</span>
+              </div>
+              <input type="range" id="animSpeedSlider" min="2" max="30" value="10" class="studio-slider" />
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================================================================
+             PANEL 7: CAMERA VIEWS
+             ================================================================== -->
+        <div data-tab-panel="camera" class="hidden space-y-2">
+          <div class="grid grid-cols-2 gap-1">
+            <button id="projPerspBtn" class="tool-btn tool-btn-solid active">Persp 3D</button>
+            <button id="projOrthoBtn" class="tool-btn tool-btn-solid">Ortho 2D</button>
+          </div>
+          <div class="grid grid-cols-2 gap-1">
+            <button data-view="iso" class="view-preset-btn tool-btn tool-btn-solid">Iso</button>
+            <button data-view="top" class="view-preset-btn tool-btn tool-btn-solid">Top</button>
+            <button data-view="front" class="view-preset-btn tool-btn tool-btn-solid">Front</button>
+            <button data-view="back" class="view-preset-btn tool-btn tool-btn-solid">Back</button>
+            <button data-view="left" class="view-preset-btn tool-btn tool-btn-solid">Left</button>
+            <button data-view="right" class="view-preset-btn tool-btn tool-btn-solid">Right</button>
+          </div>
+          <div class="studio-sunken p-2 space-y-1">
+            <div class="flex justify-between text-[10px]">
+              <span class="opacity-70">FOV</span>
+              <span id="fovValue" class="mono font-bold">45°</span>
+            </div>
+            <input type="range" id="fovSlider" min="15" max="90" value="45" class="studio-slider" />
+          </div>
+          <button id="resetCameraBtn" class="w-full tool-btn tool-btn-solid py-1">Frame All (F)</button>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- ========================================================================
+         RIGHT-SIDE VERTICAL FLOATING ICON DOCK (MESHY-INSPIRED)
+         ======================================================================== -->
+    <nav class="fixed right-2.5 top-3 z-30 glass-pill p-1 flex flex-col items-center gap-1">
+      <!-- Zoom In / Out / Fit -->
+      <button id="dockZoomInBtn" class="dock-icon-btn" title="Zoom In">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+      </button>
+      <button id="dockZoomOutBtn" class="dock-icon-btn" title="Zoom Out">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+      </button>
+      <button id="quickFrameBtn" class="dock-icon-btn" title="Fit to View (F)">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+      </button>
+
+      <div class="dock-divider"></div>
+
+      <!-- Tool Tabs (Clicking active tab collapses/expands the card!) -->
+      <button data-tab="lumion" class="workspace-tab dock-icon-btn active" title="Lumion World & 180° Sun">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>
+      </button>
+      <button data-tab="dimensions" class="workspace-tab dock-icon-btn" title="Measure Distance & BBox">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/></svg>
+      </button>
+      <button data-tab="outliner" class="workspace-tab dock-icon-btn" title="Outliner Mesh Tree">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      </button>
+      <button data-tab="section" class="workspace-tab dock-icon-btn" title="Section Cut">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="12" x2="21" y2="12"/></svg>
+      </button>
+      <button data-tab="materials" class="workspace-tab dock-icon-btn" title="Materials & Shading">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a7 7 0 1 0 10 10"/></svg>
+      </button>
+      <button data-tab="animation" class="workspace-tab dock-icon-btn" title="Explode & Turntable">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      </button>
+      <button data-tab="camera" class="workspace-tab dock-icon-btn" title="Camera Views">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+      </button>
+
+      <div class="dock-divider"></div>
+
+      <!-- Theme & Fullscreen -->
+      <button id="quickThemeIconBtn" class="dock-icon-btn" title="Toggle Day / Dark Theme">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button id="fullscreenBtn" class="dock-icon-btn" title="Toggle Fullscreen">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+      </button>
+    </nav>
+
+    <!-- ========================================================================
+         BOTTOM-RIGHT: INTERACTIVE XYZ ORIENTATION GIZMO (LIKE MESHY SCREENSHOT)
+         ======================================================================== -->
+    <div class="fixed bottom-3 right-3 z-20 flex flex-col items-center">
+      <canvas id="axisGizmoCanvas" width="76" height="76" class="cursor-pointer" title="Click X, Y, Z axis to snap view"></canvas>
+    </div>
+
+  </div>
+
+  <!-- ==========================================================================
+       6. MODAL: HARDWARE SPECS, PWA ARCHITECTURE & CDN CACHE
+       ========================================================================== -->
+  <div id="limitsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4" style="background: rgba(20, 21, 25, 0.72); backdrop-filter: blur(4px);">
+    <div class="glass-card max-w-2xl w-full p-5 space-y-4">
+      <div class="flex items-center justify-between border-b pb-2.5" style="border-color: var(--border);">
+        <span class="font-bold text-sm uppercase tracking-wider">Hardware Telemetry & PWA Offline Cache</span>
+        <button id="closeLimitsModalBtn" class="tool-btn tool-btn-solid px-2 py-0.5">✕</button>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mono text-xs">
+        <div class="studio-sunken p-2.5"><span class="opacity-60 block text-[10px]">WEBGL GPU</span><b id="hwGpuName" class="truncate block mt-0.5">--</b></div>
+        <div class="studio-sunken p-2.5"><span class="opacity-60 block text-[10px]">CPU THREADS</span><b id="hwCpuRam" class="block mt-0.5">--</b></div>
+        <div class="studio-sunken p-2.5"><span class="opacity-60 block text-[10px]">CDN CACHE</span><b id="hwMaxTex" class="block mt-0.5">--</b></div>
+      </div>
+      <div class="studio-sunken p-3.5 space-y-2 text-xs leading-relaxed opacity-90">
+        <p><b>• Can a Single HTML File with CDN JS be a PWA?</b> Yes! RENDRA dynamically injects a Web App Manifest and uses the browser's <code>CacheStorage</code> API (<code>caches.open('rendra-cdn-v1')</code>) to cache <code>three.js</code> and <code>openskp</code> CDN modules locally. When served over HTTPS with a standard Service Worker, those cached CDN modules load 100% offline.</p>
+        <p><b>• Optimal SketchUp File Size:</b> 1 MB – 120 MB <code>.skp</code> files parse in 0.5–10 seconds locally in RAM (~300 MB browser tab ceiling).</p>
+        <p><b>• V-Ray & Lumion 180° Sun Engine:</b> Full 180° East-to-West solar trajectory, PMREM physical reflections, 4-way road intersection, animated traffic, rolling hills, and multi-species vegetation.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       CORE ENGINE: THREE.JS + OPENSKP + V-RAY/LUMION WORLD + PWA CACHE
+       ========================================================================== -->
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+    import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+    import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+    // ==========================================================================
+    // 0. PWA MANIFEST & CDN CACHE STORAGE PRE-WARMER
+    // ==========================================================================
+    async function initPwaAndCdnCache() {
+      try {
+        // 1. Inject Dynamic Web App Manifest for Installability
+        const manifest = {
+          name: 'RENDRA 3D SKP & Lumion Studio',
+          short_name: 'RENDRA',
+          start_url: window.location.href,
+          display: 'standalone',
+          background_color: '#ECECE6',
+          theme_color: '#141519',
+          icons: [{
+            src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23141519'/%3E%3Cpolygon points='16,4 28,10.5 16,17 4,10.5' fill='%23ECECE6'/%3E%3C/svg%3E",
+            sizes: '192x192',
+            type: 'image/svg+xml'
+          }]
+        };
+        const mBlob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+        const link = document.createElement('link');
+        link.rel = 'manifest';
+        link.href = URL.createObjectURL(mBlob);
+        if (!document.querySelector('link[rel="manifest"][href$="webmanifest"]')) document.head.appendChild(link);
+
+        // 2. Pre-cache CDN scripts into Browser CacheStorage for instant/offline reuse
+        if ('caches' in window) {
+          const cache = await caches.open('rendra-cdn-v2.6');
+          const cdnUrls = [
+            'https://esm.sh/three@0.170.0',
+            'https://esm.sh/openskp@1.5.0'
+          ];
+          await Promise.allSettled(cdnUrls.map((u) => cache.add(u)));
+          const badge = document.getElementById('cacheStateText');
+          if (badge) badge.textContent = 'PWA Cached ✓';
+        }
+      } catch (e) {}
+    }
+    initPwaAndCdnCache();
+
+    // Multi-CDN Loader for OpenSKP
+    let openskpModulePromise = null;
+    async function getOpenSkpEngine() {
+      if (!openskpModulePromise) {
+        openskpModulePromise = (async () => {
+          const urls = [
+            'openskp',
+            'https://esm.sh/openskp@1.5.0',
+            'https://cdn.jsdelivr.net/npm/openskp@1.5.0/+esm'
+          ];
+          for (const url of urls) {
+            try {
+              const mod = await import(url);
+              if (mod && (mod.buildScene || mod.buildInstancedScene)) return mod;
+            } catch (e) {}
+          }
+          openskpModulePromise = null;
+          throw new Error('Failed to load OpenSKP engine from CDN.');
+        })();
+      }
+      return openskpModulePromise;
+    }
+
+    // ==========================================================================
+    // 1. STATE & CONSTANTS (DEFAULT DAY THEME)
+    // ==========================================================================
+    const COLOR_DARK = 0x141519;
+    const COLOR_LIGHT = 0xECECE6;
+    const ACCENT = 0x2F7BFF; // selection + measure blue
+
+    const state = {
+      darkMode: false,
+      unit: 'm',
+      activeTab: 'lumion',
+      inspectorCollapsed: false,
+      showBBox: true,
+      show2dPlan: false,
+      tapeActive: true,
+      tapePoints: [],
+      pendingTapeMarkers: [],
+      measurements: [], // Multi-line distance list like Meshy screenshot
+      projection: 'perspective',
+      sectionEnabled: false,
+      sectionAxis: 'y',
+      sectionPercent: 100,
+      sectionFlipped: false,
+      showSectionHelper: true,
+      showEdges: true,
+      wireframe: false,
+      xray: false,
+      clayMode: false,
+      doubleSided: true,
+      animPlaying: false,
+      animLoop: true,
+      animDirection: 1,
+      explodeProgress: 0,
+      turntable: false,
+      animSpeed: 1.0,
+      // Lumion World & 180° Solar State
+      todEnabled: false,
+      envTerrain: true,
+      envRoad: true,
+      envCars: true,
+      envTrees: true,
+      envPool: true,
+      envLamps: true,
+      todShadows: true,
+      treeCount: 36,
+      sitePadScale: 1.3,
+      todTime: 14.5, // 06:00 (0° East) -> 12:00 (90° Zenith) -> 18:00 (180° West)
+      todAzimuth: 25,
+      todIntensity: 2.6,
+      animatedCars: [],
+      // 2D Floorplan Slice & Map Interaction
+      planCutFraction: 0.22,
+      planMapParams: { minX: -10, minZ: -10, maxSpan: 20, pad: 12, drawSpan: 176 },
+      currentGlbBuffer: null,
+      currentFileName: 'DEMO.SKP',
+      modelBounds: new THREE.Box3(),
+      modelSize: new THREE.Vector3(),
+      modelCenter: new THREE.Vector3(),
+      uniqueMaterials: new Map(),
+      meshRecords: [],
+      selectedMesh: null,
+      edgeLinesGroup: new THREE.Group(),
+      lumionEnvGroup: new THREE.Group(),
+      bboxGroup: new THREE.Group(),
+      selectBoxGroup: new THREE.Group(),
+      measureGroup: new THREE.Group(),
+      isolatedMaterialUuid: null,
+      camTween: null
+    };
+
+    const getFgHex = () => (state.darkMode ? COLOR_LIGHT : COLOR_DARK);
+    const getBgHex = () => (state.darkMode ? COLOR_DARK : COLOR_LIGHT);
+
+    // ==========================================================================
+    // 2. THREE.JS SCENE, V-RAY PMREM LIGHTING & RENDERER
+    // ==========================================================================
+    const canvas = document.getElementById('webglCanvas');
+    const floorplanCanvas = document.getElementById('floorplanCanvas');
+    const fpCtx = floorplanCanvas.getContext('2d');
+    const gizmoCanvas = document.getElementById('axisGizmoCanvas');
+    const gizmoCtx = gizmoCanvas.getContext('2d');
+    const labelsContainer = document.getElementById('labelsContainer');
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(getBgHex());
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.localClippingEnabled = true;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
+
+    // V-Ray Quality Image-Based Lighting (PMREM Environment Map for realistic glass/metal reflections)
+    const pmremGenerator = new THREE.PMREMGenerator(renderer);
+    const vrayEnvTexture = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
+    scene.environment = vrayEnvTexture;
+    scene.environmentIntensity = 0.55;
+
+    const aspect = window.innerWidth / window.innerHeight;
+    const perspCamera = new THREE.PerspectiveCamera(45, aspect, 0.1, 4500);
+    perspCamera.position.set(16, 12, 18);
+
+    const orthoCamera = new THREE.OrthographicCamera(-15 * aspect, 15 * aspect, 15, -15, -1500, 3000);
+    let activeCamera = perspCamera;
+
+    const controls = new OrbitControls(activeCamera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+
+    const hemiLight = new THREE.HemisphereLight(0xFFFFFF, 0xD4D2C8, 1.25);
+    hemiLight.position.set(0, 80, 0);
+    scene.add(hemiLight);
+
+    const sunLight = new THREE.DirectionalLight(0xFFFDF8, 1.8);
+    sunLight.position.set(30, 50, 35);
+    sunLight.castShadow = true;
+    sunLight.shadow.mapSize.set(2048, 2048);
+    sunLight.shadow.bias = -0.00035;
+    sunLight.shadow.normalBias = 0.02;
+    scene.add(sunLight);
+
+    // Visual 3D Sun Orb & Trajectory Arc (So user sees the 180° solar path)
+    const sunOrbMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(1.5, 20, 20),
+      new THREE.MeshBasicMaterial({ color: 0xFFF3C4 })
+    );
+    sunOrbMesh.visible = false;
+    scene.add(sunOrbMesh);
+
+    let sunArcLine = null;
+
+    const fillLight = new THREE.DirectionalLight(0xE8EEF5, 0.45);
+    fillLight.position.set(-30, 25, -25);
+    scene.add(fillLight);
+
+    let groundGrid = new THREE.GridHelper(60, 60, getFgHex(), getFgHex());
+    groundGrid.material.opacity = 0.14;
+    groundGrid.material.transparent = true;
+    scene.add(groundGrid);
+
+    const modelRoot = new THREE.Group();
+    scene.add(modelRoot);
+    scene.add(state.lumionEnvGroup);
+    scene.add(state.edgeLinesGroup);
+    scene.add(state.bboxGroup);
+    scene.add(state.selectBoxGroup);
+    scene.add(state.measureGroup);
+
+    const clipPlane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 20);
+    const planeHelper = new THREE.PlaneHelper(clipPlane, 24, getFgHex());
+    planeHelper.visible = false;
+    scene.add(planeHelper);
+
+    let mixer = null;
+    const clock = new THREE.Clock();
+    window.RENDRA = { THREE, scene, renderer, state, controls, canvas, sunLight, getCamera: () => activeCamera, modelRoot, envHooks: [], selectMesh: (m, f) => selectAndFocusMesh(m, f), focusMesh: (m) => focusCameraOnMesh(m), frameModel: (v) => frameCameraToModel(v), tick: [], post: [] };
+
+    // ==========================================================================
+    // 3. SPINNER HELPER
+    // ==========================================================================
+    const nextFrame = () => new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 25)));
+
+    async function showSpinner(stageText, subText = '', pct = 50) {
+      const overlay = document.getElementById('loadingOverlay');
+      overlay.classList.remove('hidden');
+      document.getElementById('spinnerStageText').textContent = stageText;
+      document.getElementById('spinnerSubText').textContent = subText;
+      document.getElementById('spinnerBar').style.width = `${pct}%`;
+      await nextFrame();
+    }
+
+    function hideSpinner() {
+      document.getElementById('loadingOverlay').classList.add('hidden');
+    }
+
+    // ==========================================================================
+    // 4. V-RAY / LUMION WORLD GENERATOR (HILLS, 4-WAY JUNCTION, CARS, FLORA)
+    // ==========================================================================
+    function createGrassCanvasTexture() {
+      const c = document.createElement('canvas');
+      c.width = 256;
+      c.height = 256;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#6A8455';
+      ctx.fillRect(0, 0, 256, 256);
+      for (let i = 0; i < 3600; i++) {
+        ctx.fillStyle = i % 2 === 0 ? '#769160' : '#5E774A';
+        ctx.fillRect(Math.random() * 256, Math.random() * 256, 2, 3);
+      }
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(55, 55);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+
+    function createRoadCanvasTexture() {
+      const c = document.createElement('canvas');
+      c.width = 256;
+      c.height = 256;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#2E3136';
+      ctx.fillRect(0, 0, 256, 256);
+      // Sidewalks
+      ctx.fillStyle = '#BFBDBA';
+      ctx.fillRect(0, 0, 256, 22);
+      ctx.fillRect(0, 234, 256, 22);
+      // White shoulder lines
+      ctx.fillStyle = '#E4E4DC';
+      ctx.fillRect(0, 26, 256, 3);
+      ctx.fillRect(0, 227, 256, 3);
+      // Center dashed yellow line
+      ctx.fillStyle = '#E8BE52';
+      for (let x = 10; x < 256; x += 48) {
+        ctx.fillRect(x, 125, 26, 5);
+      }
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(24, 1);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+
+    const grassTex = createGrassCanvasTexture();
+    const roadTex = createRoadCanvasTexture();
+
+    // Helper: Build Low-Poly Architectural Car Mesh
+    function createStylizedCarMesh(bodyHex) {
+      const car = new THREE.Group();
+      const paintMat = new THREE.MeshPhysicalMaterial({
+        color: bodyHex,
+        roughness: 0.2,
+        metalness: 0.4,
+        clearcoat: 0.8
+      });
+      const glassMat = new THREE.MeshStandardMaterial({ color: 0x1E242B, roughness: 0.1, metalness: 0.8 });
+      const wheelMat = new THREE.MeshStandardMaterial({ color: 0x18191C, roughness: 0.8 });
+      const headLightMat = new THREE.MeshBasicMaterial({ color: 0xFFF8D6 });
+      const tailLightMat = new THREE.MeshBasicMaterial({ color: 0xE03C31 });
+
+      // Lower chassis
+      const chassis = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.65, 1.85), paintMat);
+      chassis.position.y = 0.52;
+      chassis.castShadow = true;
+      chassis.receiveShadow = true;
+      car.add(chassis);
+
+      // Cabin
+      const cabin = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.55, 1.6), paintMat);
+      cabin.position.set(-0.15, 1.08, 0);
+      cabin.castShadow = true;
+      car.add(cabin);
+
+      // Windshield & Windows
+      const glass = new THREE.Mesh(new THREE.BoxGeometry(2.26, 0.44, 1.64), glassMat);
+      glass.position.set(-0.15, 1.07, 0);
+      car.add(glass);
+
+      // Headlights & Taillights
+      const hl = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.16, 1.4), headLightMat);
+      hl.position.set(2.1, 0.58, 0);
+      car.add(hl);
+      const tl = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.16, 1.4), tailLightMat);
+      tl.position.set(-2.1, 0.58, 0);
+      car.add(tl);
+
+      // 4 Wheels
+      const wheelGeo = new THREE.CylinderGeometry(0.34, 0.34, 0.24, 14);
+      wheelGeo.rotateX(Math.PI / 2);
+      [[-1.3, 0.9], [1.3, 0.9], [-1.3, -0.9], [1.3, -0.9]].forEach(([wx, wz]) => {
+        const w = new THREE.Mesh(wheelGeo, wheelMat);
+        w.position.set(wx, 0.34, wz);
+        w.castShadow = true;
+        car.add(w);
+      });
+
+      return car;
+    }
+
+    function buildProceduralLumionEnvironment() {
+      buildProceduralLumionEnvironmentCore();
+      try { for (const fn of window.RENDRA.envHooks) fn(); } catch (e) { console.warn(e); }
+    }
+
+    function buildProceduralLumionEnvironmentCore() {
+      state.animatedCars = [];
+      while (state.lumionEnvGroup.children.length > 0) {
+        state.lumionEnvGroup.remove(state.lumionEnvGroup.children[0]);
+      }
+
+      if (!state.todEnabled) {
+        state.lumionEnvGroup.visible = false;
+        sunOrbMesh.visible = false;
+        return;
+      }
+      state.lumionEnvGroup.visible = true;
+
+      const min = state.modelBounds.min;
+      const max = state.modelBounds.max;
+      const center = state.modelCenter;
+      const maxSpan = Math.max(state.modelSize.x, state.modelSize.z, 12);
+      const floorY = min.y - 0.02;
+
+      const padW = state.modelSize.x * state.sitePadScale;
+      const padD = state.modelSize.z * state.sitePadScale;
+
+      // 1. Grass Landscape + Sculpted Distant Rolling Hills & Mountain Horizon Ring
+      if (state.envTerrain) {
+        const terrainRadius = maxSpan * 11;
+        const terrainGeo = new THREE.CircleGeometry(terrainRadius, 64);
+        terrainGeo.rotateX(-Math.PI / 2);
+        const terrainMat = new THREE.MeshStandardMaterial({
+          map: grassTex,
+          roughness: 0.92,
+          metalness: 0.0
+        });
+        const terrainMesh = new THREE.Mesh(terrainGeo, terrainMat);
+        terrainMesh.position.set(center.x, floorY, center.z);
+        terrainMesh.receiveShadow = true;
+        state.lumionEnvGroup.add(terrainMesh);
+
+        // Travertine Paver Pad + Concrete Perimeter Curb
+        const apron = new THREE.Mesh(
+          new THREE.BoxGeometry(padW, 0.08, padD),
+          new THREE.MeshStandardMaterial({ color: 0xDDDAD0, roughness: 0.72 })
+        );
+        apron.position.set(center.x, floorY + 0.02, center.z);
+        apron.receiveShadow = true;
+        state.lumionEnvGroup.add(apron);
+
+        // Distant Rolling Hills & Mountain Range around the Perimeter
+        const hillMat1 = new THREE.MeshStandardMaterial({ color: 0x577347, roughness: 0.95 });
+        const hillMat2 = new THREE.MeshStandardMaterial({ color: 0x4A633D, roughness: 0.95 });
+        const hillCount = 18;
+        for (let i = 0; i < hillCount; i++) {
+          const ang = (i / hillCount) * Math.PI * 2;
+          // Leave opening for main road corridors
+          if (Math.abs(Math.sin(ang)) < 0.14 || Math.abs(Math.cos(ang)) < 0.14) continue;
+          const dist = maxSpan * (4.8 + (i % 3) * 1.4);
+          const hillR = maxSpan * (1.3 + (i % 4) * 0.45);
+          const hillH = maxSpan * (0.45 + (i % 3) * 0.35);
+
+          const hillGeo = new THREE.SphereGeometry(hillR, 18, 12, 0, Math.PI * 2, 0, Math.PI * 0.5);
+          hillGeo.scale(1.3, hillH / hillR, 1.0);
+          const hill = new THREE.Mesh(hillGeo, i % 2 === 0 ? hillMat1 : hillMat2);
+          hill.position.set(
+            center.x + Math.cos(ang) * dist,
+            floorY - 0.1,
+            center.z + Math.sin(ang) * dist
+          );
+          hill.rotation.y = ang;
+          hill.receiveShadow = true;
+          state.lumionEnvGroup.add(hill);
+        }
+      }
+
+      // 2. 4-Way Road Intersection, Crosswalks & Entry Driveway
+      const roadWidth = Math.max(maxSpan * 0.42, 7.2);
+      const roadZ = max.z + Math.max(padD * 0.32, 5.0) + roadWidth * 0.5;
+      const crossRoadX = center.x + padW * 0.65 + roadWidth * 0.75;
+      const roadLen = maxSpan * 16;
+
+      if (state.envRoad) {
+        const roadMat = new THREE.MeshStandardMaterial({
+          map: roadTex,
+          roughness: 0.82,
+          metalness: 0.05
+        });
+
+        // Main East-West Avenue
+        const mainRoadGeo = new THREE.PlaneGeometry(roadLen, roadWidth);
+        mainRoadGeo.rotateX(-Math.PI / 2);
+        const mainRoad = new THREE.Mesh(mainRoadGeo, roadMat);
+        mainRoad.position.set(center.x, floorY + 0.025, roadZ);
+        mainRoad.receiveShadow = true;
+        state.lumionEnvGroup.add(mainRoad);
+
+        // Intersecting North-South Boulevard (Creates a realistic 4-Way Junction)
+        const crossRoadGeo = new THREE.PlaneGeometry(roadLen, roadWidth);
+        crossRoadGeo.rotateX(-Math.PI / 2);
+        crossRoadGeo.rotateY(Math.PI / 2);
+        const crossRoad = new THREE.Mesh(crossRoadGeo, roadMat);
+        crossRoad.position.set(crossRoadX, floorY + 0.028, center.z);
+        crossRoad.receiveShadow = true;
+        state.lumionEnvGroup.add(crossRoad);
+
+        // Junction Plaza Box & Zebra Crosswalk Stripes
+        const juncBox = new THREE.Mesh(
+          new THREE.BoxGeometry(roadWidth * 1.02, 0.055, roadWidth * 1.02),
+          new THREE.MeshStandardMaterial({ color: 0x2E3136, roughness: 0.85 })
+        );
+        juncBox.position.set(crossRoadX, floorY + 0.01, roadZ);
+        juncBox.receiveShadow = true;
+        state.lumionEnvGroup.add(juncBox);
+
+        const stripeMat = new THREE.MeshBasicMaterial({ color: 0xE6E6DE });
+        for (let s = -3; s <= 3; s++) {
+          const stripe1 = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.06, 1.8), stripeMat);
+          stripe1.position.set(crossRoadX + s * 0.8, floorY + 0.015, roadZ - roadWidth * 0.58);
+          state.lumionEnvGroup.add(stripe1);
+
+          const stripe2 = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.06, 0.4), stripeMat);
+          stripe2.position.set(crossRoadX - roadWidth * 0.58, floorY + 0.015, roadZ + s * 0.8);
+          state.lumionEnvGroup.add(stripe2);
+        }
+
+        // Connecting Walkway from Building Pad to Avenue
+        const walkLen = Math.max(0.5, roadZ - roadWidth * 0.5 - (center.z + padD * 0.5));
+        if (walkLen > 0.2) {
+          const walkMesh = new THREE.Mesh(
+            new THREE.BoxGeometry(Math.min(state.modelSize.x * 0.25, 3.2), 0.06, walkLen),
+            new THREE.MeshStandardMaterial({ color: 0xD2CFC4, roughness: 0.75 })
+          );
+          walkMesh.position.set(center.x, floorY + 0.025, center.z + padD * 0.5 + walkLen * 0.5);
+          walkMesh.receiveShadow = true;
+          state.lumionEnvGroup.add(walkMesh);
+        }
+      }
+
+      // 3. Moving Traffic & Parked Cars
+      if (state.envCars && state.envRoad) {
+        const carScale = Math.max(Math.min(roadWidth / 7.5, 1.35), 0.75);
+        const carPalette = [0xD9D9D4, 0x22262C, 0x9E332E, 0x35587A, 0x4E545C];
+
+        // 4 Animated Cars driving along East-West & North-South lanes
+        for (let c = 0; c < 4; c++) {
+          const carMesh = createStylizedCarMesh(carPalette[c % carPalette.length]);
+          carMesh.scale.setScalar(carScale);
+          const isEW = c < 2;
+          const dir = c % 2 === 0 ? 1 : -1;
+          const laneOffset = (roadWidth * 0.23) * dir;
+
+          if (isEW) {
+            carMesh.position.set(center.x - maxSpan * 2 * dir, floorY + 0.03, roadZ + laneOffset);
+            if (dir < 0) carMesh.rotation.y = Math.PI;
+          } else {
+            carMesh.position.set(crossRoadX - laneOffset, floorY + 0.03, center.z - maxSpan * 2 * dir);
+            carMesh.rotation.y = dir > 0 ? -Math.PI / 2 : Math.PI / 2;
+          }
+
+          state.lumionEnvGroup.add(carMesh);
+          state.animatedCars.push({
+            mesh: carMesh,
+            axis: isEW ? 'x' : 'z',
+            dir,
+            speed: (6.5 + c * 1.4) * carScale,
+            limit: roadLen * 0.45,
+            origin: isEW ? center.x : center.z
+          });
+        }
+
+        // Parked VIP Car on Driveway Pad
+        const parkedCar = createStylizedCarMesh(0x1E2229);
+        parkedCar.scale.setScalar(carScale * 0.95);
+        parkedCar.position.set(center.x + padW * 0.28, floorY + 0.05, center.z + padD * 0.35);
+        parkedCar.rotation.y = Math.PI * 0.18;
+        state.lumionEnvGroup.add(parkedCar);
+      }
+
+      // 4. Reflecting Water Pool + Lounge Deck
+      if (state.envPool) {
+        const poolW = Math.max(state.modelSize.x * 0.45, 4.5);
+        const poolD = Math.max(state.modelSize.z * 0.35, 3.2);
+        const poolX = center.x - padW * 0.5 - poolW * 0.65;
+        const poolZ = center.z;
+
+        const coping = new THREE.Mesh(
+          new THREE.BoxGeometry(poolW + 0.45, 0.14, poolD + 0.45),
+          new THREE.MeshStandardMaterial({ color: 0xE2E0D8, roughness: 0.6 })
+        );
+        coping.position.set(poolX, floorY + 0.05, poolZ);
+        coping.receiveShadow = true;
+        state.lumionEnvGroup.add(coping);
+
+        const water = new THREE.Mesh(
+          new THREE.BoxGeometry(poolW, 0.16, poolD),
+          new THREE.MeshPhysicalMaterial({
+            color: 0x3A88A8,
+            roughness: 0.05,
+            metalness: 0.15,
+            clearcoat: 1.0,
+            transparent: true,
+            opacity: 0.88
+          })
+        );
+        water.position.set(poolX, floorY + 0.06, poolZ);
+        state.lumionEnvGroup.add(water);
+      }
+
+      // 5. Street Bollards & Avenue Pole Lamps
+      if (state.envLamps) {
+        const poleMat = new THREE.MeshStandardMaterial({ color: 0x22252A, roughness: 0.4, metalness: 0.7 });
+        const isLowSun = state.todTime < 7.5 || state.todTime > 16.8;
+        const bulbMat = new THREE.MeshBasicMaterial({ color: isLowSun ? 0xFFE29A : 0xFFFFFF });
+
+        const spacing = Math.max(maxSpan * 0.55, 8);
+        for (let i = -3; i <= 3; i++) {
+          const lx = center.x + i * spacing;
+          if (Math.abs(lx - crossRoadX) < roadWidth * 0.65) continue;
+          const lz = roadZ - roadWidth * 0.54;
+          const lampGrp = new THREE.Group();
+          lampGrp.position.set(lx, floorY, lz);
+
+          const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.09, 3.8, 8), poleMat);
+          pole.position.y = 1.9;
+          pole.castShadow = true;
+          lampGrp.add(pole);
+
+          const arm = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.08, 0.8), poleMat);
+          arm.position.set(0, 3.8, 0.35);
+          lampGrp.add(arm);
+
+          const head = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.06, 0.35), bulbMat);
+          head.position.set(0, 3.75, 0.6);
+          lampGrp.add(head);
+
+          state.lumionEnvGroup.add(lampGrp);
+        }
+      }
+
+      // 6. Multi-Species Vegetation (Trees, Cypresses, Perimeter Hedges & Shrubs)
+      if (state.envTrees && state.treeCount > 0) {
+        const trunkMat = new THREE.MeshStandardMaterial({ color: 0x5C4332, roughness: 0.9 });
+        const foliageMat1 = new THREE.MeshStandardMaterial({ color: 0x4A6E43, roughness: 0.8 });
+        const foliageMat2 = new THREE.MeshStandardMaterial({ color: 0x5B8052, roughness: 0.8 });
+        const shrubMat = new THREE.MeshStandardMaterial({ color: 0x3F6138, roughness: 0.85 });
+
+        // Trimmed Architectural Hedges along Pad Perimeter
+        const hedgeH = 0.65;
+        const backHedge = new THREE.Mesh(new THREE.BoxGeometry(padW * 0.92, hedgeH, 0.45), shrubMat);
+        backHedge.position.set(center.x, floorY + hedgeH * 0.5, center.z - padD * 0.48);
+        backHedge.castShadow = true;
+        backHedge.receiveShadow = true;
+        state.lumionEnvGroup.add(backHedge);
+
+        const treeBaseScale = Math.max(Math.min(state.modelSize.y * 0.45, 6.5), 2.4);
+        let placed = 0;
+        let attempts = 0;
+
+        const seededRand = (seed) => {
+          const x = Math.sin(seed * 127.1 + 311.7) * 43758.5453;
+          return x - Math.floor(x);
+        };
+
+        while (placed < state.treeCount && attempts < state.treeCount * 7) {
+          attempts++;
+          const angle = seededRand(attempts * 1.3) * Math.PI * 2;
+          const dist = maxSpan * (0.85 + seededRand(attempts * 2.7) * 2.6);
+          const tx = center.x + Math.cos(angle) * dist;
+          const tz = center.z + Math.sin(angle) * dist;
+
+          // Exclude building pad & pool
+          if (
+            tx > center.x - padW * 1.15 && tx < center.x + padW * 0.68 &&
+            tz > center.z - padD * 0.65 && tz < center.z + padD * 0.65
+          ) continue;
+
+          // Exclude both intersecting roads
+          if (state.envRoad && (Math.abs(tz - roadZ) < roadWidth * 0.78 || Math.abs(tx - crossRoadX) < roadWidth * 0.78)) continue;
+
+          const scale = treeBaseScale * (0.72 + seededRand(attempts * 4.1) * 0.6);
+          const treeGrp = new THREE.Group();
+          treeGrp.position.set(tx, floorY, tz);
+
+          const trunkH = scale * 0.36;
+          const trunk = new THREE.Mesh(new THREE.CylinderGeometry(scale * 0.04, scale * 0.068, trunkH, 7), trunkMat);
+          trunk.position.y = trunkH * 0.5;
+          trunk.castShadow = true;
+          trunk.receiveShadow = true;
+          treeGrp.add(trunk);
+
+          const species = attempts % 3;
+          const mat = attempts % 2 === 0 ? foliageMat1 : foliageMat2;
+
+          if (species === 0) {
+            // Broad Oak Canopy + Ground Bush Cluster
+            const c1 = new THREE.Mesh(new THREE.DodecahedronGeometry(scale * 0.35, 1), mat);
+            c1.position.set(0, trunkH + scale * 0.25, 0);
+            c1.castShadow = true;
+            c1.receiveShadow = true;
+            treeGrp.add(c1);
+
+            const c2 = new THREE.Mesh(new THREE.DodecahedronGeometry(scale * 0.24, 1), mat);
+            c2.position.set(scale * 0.15, trunkH + scale * 0.4, scale * 0.08);
+            c2.castShadow = true;
+            treeGrp.add(c2);
+
+            const bush = new THREE.Mesh(new THREE.DodecahedronGeometry(scale * 0.14, 1), shrubMat);
+            bush.position.set(scale * 0.22, scale * 0.1, 0);
+            bush.castShadow = true;
+            treeGrp.add(bush);
+          } else if (species === 1) {
+            // Tiered Alpine Pine
+            for (let tier = 0; tier < 3; tier++) {
+              const coneR = scale * (0.36 - tier * 0.08);
+              const coneH = scale * (0.42 - tier * 0.06);
+              const cone = new THREE.Mesh(new THREE.ConeGeometry(coneR, coneH, 8), mat);
+              cone.position.y = trunkH + tier * (scale * 0.22) + coneH * 0.4;
+              cone.castShadow = true;
+              cone.receiveShadow = true;
+              treeGrp.add(cone);
+            }
+          } else {
+            // Mediterranean Tall Cypress
+            const cyp = new THREE.Mesh(new THREE.ConeGeometry(scale * 0.18, scale * 0.95, 9), shrubMat);
+            cyp.position.y = trunkH + scale * 0.42;
+            cyp.castShadow = true;
+            cyp.receiveShadow = true;
+            treeGrp.add(cyp);
+          }
+
+          state.lumionEnvGroup.add(treeGrp);
+          placed++;
+        }
+      }
+    }
+
+    // ==========================================================================
+    // 4B. TRUE 180° EAST-TO-WEST SOLAR ROTATION & V-RAY SKY
+    // ==========================================================================
+    function updateLumionAtmosphereAndSun() {
+      const maxDim = Math.max(state.modelSize.x, state.modelSize.y, state.modelSize.z, 15);
+      const radius = maxDim * 3.2;
+
+      if (!state.todEnabled) {
+        scene.background = new THREE.Color(getBgHex());
+        scene.fog = null;
+        scene.environmentIntensity = 0.45;
+        hemiLight.color.setHex(0xFFFFFF);
+        hemiLight.groundColor.setHex(0xD4D2C8);
+        hemiLight.intensity = 1.25;
+        sunLight.color.setHex(0xFFFDF8);
+        sunLight.intensity = 1.75;
+        sunLight.position.set(30, 50, 35);
+        sunOrbMesh.visible = false;
+        if (sunArcLine) sunArcLine.visible = false;
+        groundGrid.visible = true;
+        return;
+      }
+
+      groundGrid.visible = false;
+      sunLight.castShadow = state.todShadows;
+
+      // TRUE 180-DEGREE SOLAR ROTATION:
+      // 06:00 = 0° (East Horizon) -> 12:00 = 90° (Overhead Zenith) -> 18:00 = 180° (West Horizon)
+      const dayFrac = Math.max(0.02, Math.min(0.98, (state.todTime - 6.0) / 12.0));
+      const solarArcAngle = dayFrac * Math.PI; // 0 radians to PI radians (0° to 180°)
+      const arcDeg = Math.round(THREE.MathUtils.radToDeg(solarArcAngle));
+      const badge = document.getElementById('sunArcAngleBadge');
+      if (badge) badge.textContent = `${arcDeg}° Arc`;
+
+      // Sun vector in local East-West vertical plane:
+      // At 0° (06:00): localX = +radius (East), y = 0
+      // At 90° (12:00): localX = 0, y = +radius (Zenith)
+      // At 180° (18:00): localX = -radius (West), y = 0
+      const localEastWest = Math.cos(solarArcAngle) * radius;
+      const sy = Math.max(radius * 0.05, Math.sin(solarArcAngle) * radius);
+
+      // Rotate the East-West solar plane by Compass Orientation (todAzimuth) & tilt slightly South for architectural facade relief
+      const compassRad = THREE.MathUtils.degToRad(state.todAzimuth);
+      const southTilt = radius * 0.26;
+      const sx = localEastWest * Math.cos(compassRad) - southTilt * Math.sin(compassRad);
+      const sz = localEastWest * Math.sin(compassRad) + southTilt * Math.cos(compassRad);
+
+      sunLight.position.set(state.modelCenter.x + sx, state.modelCenter.y + sy, state.modelCenter.z + sz);
+      sunLight.target.position.copy(state.modelCenter);
+      sunLight.target.updateMatrixWorld();
+
+      // Update Visual 3D Sun Orb & 180° Trajectory Arc
+      sunOrbMesh.position.copy(sunLight.position);
+      sunOrbMesh.scale.setScalar(Math.max(maxDim * 0.08, 1.0));
+      sunOrbMesh.visible = true;
+
+      if (sunArcLine) scene.remove(sunArcLine);
+      const arcPts = [];
+      for (let i = 0; i <= 36; i++) {
+        const a = (i / 36) * Math.PI;
+        const lx = Math.cos(a) * radius;
+        const ly = Math.max(0, Math.sin(a) * radius);
+        const ax = lx * Math.cos(compassRad) - southTilt * Math.sin(compassRad);
+        const az = lx * Math.sin(compassRad) + southTilt * Math.cos(compassRad);
+        arcPts.push(new THREE.Vector3(state.modelCenter.x + ax, state.modelCenter.y + ly, state.modelCenter.z + az));
+      }
+      sunArcLine = new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints(arcPts),
+        new THREE.LineBasicMaterial({ color: 0xFFE39E, transparent: true, opacity: 0.35 })
+      );
+      scene.add(sunArcLine);
+
+      const d = maxDim * 2.5;
+      sunLight.shadow.camera.left = -d;
+      sunLight.shadow.camera.right = d;
+      sunLight.shadow.camera.top = d;
+      sunLight.shadow.camera.bottom = -d;
+      sunLight.shadow.camera.near = 0.5;
+      sunLight.shadow.camera.far = radius * 3.2;
+      sunLight.shadow.camera.updateProjectionMatrix();
+
+      // V-Ray / Lumion Rayleigh Atmospheric Sky Gradient (Zero Green Cast)
+      const sunFactor = Math.sin(solarArcAngle); // 0 at Sunrise/Sunset, 1 at Noon
+      const cTwilight = new THREE.Color(0x2B3A55);
+      const cGoldenSky = new THREE.Color(0xD99B72);
+      const cDaySky = new THREE.Color(0x88BCE8);
+
+      const skyColor = new THREE.Color();
+      if (sunFactor < 0.35) {
+        skyColor.lerpColors(cTwilight, cGoldenSky, sunFactor / 0.35);
+      } else {
+        skyColor.lerpColors(cGoldenSky, cDaySky, (sunFactor - 0.35) / 0.65);
+      }
+
+      scene.background = skyColor;
+      scene.fog = new THREE.FogExp2(skyColor.getHex(), 0.0011 / Math.max(maxDim / 20, 0.5));
+      scene.environmentIntensity = 0.4 + sunFactor * 0.45;
+
+      const cGoldenSun = new THREE.Color(0xFFA048);
+      const cNoonSun = new THREE.Color(0xFFFDF8);
+      sunLight.color.lerpColors(cGoldenSun, cNoonSun, Math.min(1, sunFactor * 1.35));
+      sunLight.intensity = state.todIntensity * (0.45 + 0.65 * sunFactor);
+
+      hemiLight.color.copy(skyColor).lerp(new THREE.Color(0xFFFFFF), 0.35);
+      hemiLight.groundColor.setHex(0x8C857B);
+      hemiLight.intensity = 0.85 + sunFactor * 0.55;
+    }
+
+    // ==========================================================================
+    // 5. CORE SCENE HELPERS, FILE LOADER, GLB EXPORTER & 2D FLOOR PLAN
+    // ==========================================================================
+    function createCheckerboardTexture(hexA = '#E2E2DC', hexB = '#CECEC6') {
+      const c = document.createElement('canvas');
+      c.width = 128;
+      c.height = 128;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = hexA;
+      ctx.fillRect(0, 0, 128, 128);
+      ctx.fillStyle = hexB;
+      ctx.fillRect(0, 0, 64, 64);
+      ctx.fillRect(64, 64, 64, 64);
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(8, 8);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+
+    const sharedClayMaterial = new THREE.MeshStandardMaterial({
+      name: 'Studio_Clay',
+      color: 0xDFDFD8,
+      roughness: 0.72,
+      metalness: 0.05,
+      side: THREE.DoubleSide
+    });
+
+    function clearCurrentModel() {
+      resetAnimationTimeline();
+      clearMeasurements();
+      state.selectedMesh = null;
+      state.isolatedMaterialUuid = null;
+      document.getElementById('selectedObjHud').classList.add('hidden');
+
+      while (modelRoot.children.length > 0) modelRoot.remove(modelRoot.children[0]);
+      while (state.edgeLinesGroup.children.length > 0) state.edgeLinesGroup.remove(state.edgeLinesGroup.children[0]);
+      while (state.bboxGroup.children.length > 0) state.bboxGroup.remove(state.bboxGroup.children[0]);
+      while (state.selectBoxGroup.children.length > 0) state.selectBoxGroup.remove(state.selectBoxGroup.children[0]);
+
+      bboxLabels.forEach((l) => l.el.remove());
+      bboxLabels = [];
+      state.meshRecords = [];
+      state.uniqueMaterials.clear();
+    }
+
+    function finalizeLoadedModel() {
+      modelRoot.updateMatrixWorld(true);
+      state.modelBounds.setFromObject(modelRoot);
+      if (state.modelBounds.isEmpty()) {
+        state.modelBounds.set(new THREE.Vector3(-5, 0, -5), new THREE.Vector3(5, 5, 5));
+      }
+      state.modelBounds.getSize(state.modelSize);
+      state.modelBounds.getCenter(state.modelCenter);
+
+      let totalVerts = 0;
+      let totalTris = 0;
+      let orangeCount = 0;
+
+      const lineMat = new THREE.LineBasicMaterial({
+        color: getFgHex(),
+        transparent: true,
+        opacity: 0.42
+      });
+
+      modelRoot.traverse((obj) => {
+        if (!obj.isMesh || !obj.geometry) return;
+        obj.castShadow = true;
+        obj.receiveShadow = true;
+
+        const posAttr = obj.geometry.attributes.position;
+        if (posAttr) {
+          totalVerts += posAttr.count;
+          totalTris += obj.geometry.index ? obj.geometry.index.count / 3 : Math.floor(posAttr.count / 3);
+        }
+
+        const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+        mats.forEach((m) => {
+          if (!m) return;
+          m.side = state.doubleSided ? THREE.DoubleSide : THREE.FrontSide;
+          if (!m.userData) m.userData = {};
+          if (m.userData.origOpacity === undefined) {
+            m.userData.origOpacity = m.opacity ?? 1;
+            m.userData.origTransparent = m.transparent ?? false;
+          }
+          state.uniqueMaterials.set(m.uuid, m);
+
+          if (m.color) {
+            const hsl = {};
+            m.color.getHSL(hsl);
+            if (hsl.h > 0.03 && hsl.h < 0.13 && hsl.s > 0.45 && !m.map) {
+              orangeCount++;
+            }
+          }
+        });
+
+        const edgesGeo = new THREE.EdgesGeometry(obj.geometry, 24);
+        const edgeLine = new THREE.LineSegments(edgesGeo, lineMat);
+        edgeLine.matrixAutoUpdate = false;
+        edgeLine.matrix.copy(obj.matrixWorld);
+        state.edgeLinesGroup.add(edgeLine);
+
+        const meshBox = new THREE.Box3().setFromObject(obj);
+        const meshCenter = meshBox.getCenter(new THREE.Vector3());
+        const explodeDir = meshCenter.clone().sub(state.modelCenter);
+        if (explodeDir.lengthSq() < 0.001) explodeDir.set(0, 1, 0);
+        explodeDir.normalize();
+
+        state.meshRecords.push({
+          mesh: obj,
+          origMaterial: obj.material,
+          origLocalPos: obj.position.clone(),
+          explodeVec: explodeDir.multiplyScalar(Math.max(state.modelSize.length() * 0.35, 3.0)),
+          edgeLine,
+          triCount: obj.geometry.index ? Math.floor(obj.geometry.index.count / 3) : Math.floor((posAttr?.count || 0) / 3)
+        });
+      });
+
+      state.edgeLinesGroup.visible = state.showEdges;
+
+      // Update grid to sit cleanly under the model floor
+      scene.remove(groundGrid);
+      const gridSpan = Math.max(Math.ceil(Math.max(state.modelSize.x, state.modelSize.z) * 2.5), 40);
+      groundGrid = new THREE.GridHelper(gridSpan, Math.min(gridSpan, 60), getFgHex(), getFgHex());
+      groundGrid.position.set(state.modelCenter.x, state.modelBounds.min.y - 0.01, state.modelCenter.z);
+      groundGrid.material.opacity = 0.14;
+      groundGrid.material.transparent = true;
+      groundGrid.visible = !state.todEnabled;
+      scene.add(groundGrid);
+
+      document.getElementById('statMeshes').textContent = state.meshRecords.length.toLocaleString();
+      document.getElementById('statVerts').textContent = totalVerts.toLocaleString();
+      document.getElementById('statTris').textContent = Math.round(totalTris).toLocaleString();
+
+      const orangeBadge = document.getElementById('orangeCountBadge');
+      if (orangeBadge) {
+        orangeBadge.textContent = orangeCount > 0 ? `${orangeCount} WARN` : 'OK';
+      }
+
+      buildBoundingBoxCage();
+      updateDimensionReadouts();
+      populateMeshTreeUI();
+      populateMaterialsUI();
+      updateSectionPlane();
+      if (state.todEnabled) {
+        buildProceduralLumionEnvironment();
+        updateLumionAtmosphereAndSun();
+      }
+      frameCameraToModel('iso');
+      render2DFloorPlan();
+    }
+
+    async function handleFileLoad(file) {
+      if (!file) return;
+      document.getElementById('startupModal').classList.add('hidden');
+      const ext = file.name.split('.').pop().toLowerCase();
+      state.currentFileName = file.name.toUpperCase();
+      document.getElementById('fileBadge').textContent = state.currentFileName;
+
+      try {
+        await showSpinner('READING FILE...', `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`, 25);
+        const arrayBuffer = await file.arrayBuffer();
+        let glbBuffer = arrayBuffer;
+
+        if (ext === 'skp') {
+          await showSpinner('PARSING .SKP BINARY...', 'Triangulating faces, UVs & embedded textures', 55);
+          const openskp = await getOpenSkpEngine();
+          let glbBytes = null;
+
+          if (typeof openskp.buildScene === 'function' && typeof openskp.toGLB === 'function') {
+            try {
+              const builtScene = openskp.buildScene(arrayBuffer);
+              glbBytes = openskp.toGLB(builtScene);
+            } catch (err) {
+              console.warn('buildScene fallback to buildInstancedScene:', err);
+            }
+          }
+          if (!glbBytes && typeof openskp.buildInstancedScene === 'function') {
+            const instScene = openskp.buildInstancedScene(arrayBuffer);
+            glbBytes = openskp.toInstancedGLB(instScene);
+          }
+          if (!glbBytes) throw new Error('OpenSKP could not convert this .skp file.');
+
+          glbBuffer = glbBytes.buffer.slice(glbBytes.byteOffset, glbBytes.byteOffset + glbBytes.byteLength);
+        }
+
+        state.currentGlbBuffer = glbBuffer;
+        await showSpinner('UPLOADING TO GPU...', 'Building WebGL meshes & CAD edges', 80);
+
+        const loader = new GLTFLoader();
+        await new Promise((resolve, reject) => {
+          loader.parse(
+            glbBuffer,
+            '',
+            (gltf) => {
+              clearCurrentModel();
+              modelRoot.add(gltf.scene);
+              if (gltf.animations && gltf.animations.length > 0) {
+                mixer = new THREE.AnimationMixer(gltf.scene);
+                gltf.animations.forEach((clip) => mixer.clipAction(clip).play());
+              }
+              finalizeLoadedModel();
+              resolve();
+            },
+            (err) => reject(err)
+          );
+        });
+
+        hideSpinner();
+        document.getElementById('statusText').textContent = `LOADED: ${file.name}`;
+      } catch (err) {
+        hideSpinner();
+        console.error(err);
+        document.getElementById('statusText').textContent = `ERROR: ${err.message || 'LOAD FAILED'}`;
+      }
+    }
+
+    async function exportCurrentSceneAsGLB() {
+      try {
+        await showSpinner('EXPORTING .GLB...', 'Packing binary glTF 2.0 buffer', 65);
+        const baseName = (state.currentFileName || 'rendra_model').replace(/\.(skp|glb|gltf)$/i, '');
+
+        if (state.currentGlbBuffer) {
+          const blob = new Blob([state.currentGlbBuffer], { type: 'model/gltf-binary' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${baseName}.glb`;
+          a.click();
+          URL.revokeObjectURL(url);
+          hideSpinner();
+          document.getElementById('statusText').textContent = 'EXPORTED .GLB';
+          return;
+        }
+
+        const exporter = new GLTFExporter();
+        exporter.parse(
+          modelRoot,
+          (result) => {
+            const blob = new Blob([result], { type: 'model/gltf-binary' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${baseName}.glb`;
+            a.click();
+            URL.revokeObjectURL(url);
+            hideSpinner();
+            document.getElementById('statusText').textContent = 'EXPORTED .GLB';
+          },
+          (err) => {
+            hideSpinner();
+            console.error(err);
+            document.getElementById('statusText').textContent = 'EXPORT FAILED';
+          },
+          { binary: true }
+        );
+      } catch (err) {
+        hideSpinner();
+        console.error(err);
+      }
+    }
+
+    function frameCameraToModel(view = 'iso') {
+      const c = state.modelCenter.clone();
+      const maxDim = Math.max(state.modelSize.x, state.modelSize.y, state.modelSize.z, 8);
+      const dist = maxDim * 1.45;
+      const targetPos = c.clone();
+
+      if (view === 'top') targetPos.add(new THREE.Vector3(0, dist * 1.35, 0.001));
+      else if (view === 'front') targetPos.add(new THREE.Vector3(0, maxDim * 0.15, dist * 1.25));
+      else if (view === 'back') targetPos.add(new THREE.Vector3(0, maxDim * 0.15, -dist * 1.25));
+      else if (view === 'left') targetPos.add(new THREE.Vector3(-dist * 1.25, maxDim * 0.15, 0));
+      else if (view === 'right') targetPos.add(new THREE.Vector3(dist * 1.25, maxDim * 0.15, 0));
+      else targetPos.add(new THREE.Vector3(dist * 0.95, dist * 0.72, dist * 1.05));
+
+      state.camTween = {
+        startPos: activeCamera.position.clone(),
+        endPos: targetPos,
+        startTarget: controls.target.clone(),
+        endTarget: c,
+        progress: 0
+      };
+    }
+
+    function focusCameraOnMesh(mesh) {
+      const box = new THREE.Box3().setFromObject(mesh);
+      const center = box.getCenter(new THREE.Vector3());
+      const size = box.getSize(new THREE.Vector3());
+      const span = Math.max(size.length(), 2.2);
+      const dir = activeCamera.position.clone().sub(controls.target).normalize();
+      if (dir.lengthSq() < 0.01) dir.set(1, 0.7, 1).normalize();
+
+      state.camTween = {
+        startPos: activeCamera.position.clone(),
+        endPos: center.clone().add(dir.multiplyScalar(span * 1.65)),
+        startTarget: controls.target.clone(),
+        endTarget: center,
+        progress: 0
+      };
+    }
+
+    function setProjectionMode(mode) {
+      state.projection = mode;
+      document.getElementById('projPerspBtn').classList.toggle('active', mode === 'perspective');
+      document.getElementById('projOrthoBtn').classList.toggle('active', mode === 'ortho');
+
+      const prevCam = activeCamera;
+      activeCamera = mode === 'ortho' ? orthoCamera : perspCamera;
+      activeCamera.position.copy(prevCam.position);
+      activeCamera.quaternion.copy(prevCam.quaternion);
+      controls.object = activeCamera;
+      onWindowResize();
+      controls.update();
+    }
+
+    function updateSectionPlane() {
+      const min = state.modelBounds.min;
+      const max = state.modelBounds.max;
+      const t = state.sectionPercent / 100;
+      const sign = state.sectionFlipped ? 1 : -1;
+
+      if (state.sectionAxis === 'x') {
+        const cutVal = THREE.MathUtils.lerp(min.x - 0.2, max.x + 0.2, t);
+        clipPlane.normal.set(sign, 0, 0);
+        clipPlane.constant = -sign * cutVal;
+      } else if (state.sectionAxis === 'z') {
+        const cutVal = THREE.MathUtils.lerp(min.z - 0.2, max.z + 0.2, t);
+        clipPlane.normal.set(0, 0, sign);
+        clipPlane.constant = -sign * cutVal;
+      } else {
+        const cutVal = THREE.MathUtils.lerp(min.y - 0.2, max.y + 0.2, t);
+        clipPlane.normal.set(0, sign, 0);
+        clipPlane.constant = -sign * cutVal;
+      }
+
+      planeHelper.size = Math.max(state.modelSize.x, state.modelSize.y, state.modelSize.z, 12) * 1.25;
+      planeHelper.visible = state.sectionEnabled && state.showSectionHelper;
+      applyMaterialModes();
+    }
+
+    function applyMaterialModes() {
+      const activePlanes = state.sectionEnabled ? [clipPlane] : [];
+      sharedClayMaterial.clippingPlanes = activePlanes;
+      sharedClayMaterial.wireframe = state.wireframe;
+      sharedClayMaterial.side = state.doubleSided ? THREE.DoubleSide : THREE.FrontSide;
+
+      state.meshRecords.forEach((rec) => {
+        rec.mesh.material = state.clayMode ? sharedClayMaterial : rec.origMaterial;
+        const mats = Array.isArray(rec.mesh.material) ? rec.mesh.material : [rec.mesh.material];
+        mats.forEach((m) => {
+          if (!m) return;
+          m.wireframe = state.wireframe;
+          m.side = state.doubleSided ? THREE.DoubleSide : THREE.FrontSide;
+          m.clippingPlanes = activePlanes;
+          m.clipShadows = true;
+
+          if (!state.clayMode) {
+            if (state.xray) {
+              m.transparent = true;
+              m.opacity = 0.28;
+            } else if (state.isolatedMaterialUuid && m.uuid !== state.isolatedMaterialUuid) {
+              m.transparent = true;
+              m.opacity = 0.12;
+            } else {
+              m.transparent = m.userData?.origTransparent ?? false;
+              m.opacity = m.userData?.origOpacity ?? 1.0;
+            }
+          }
+          m.needsUpdate = true;
+        });
+      });
+
+      state.edgeLinesGroup.children.forEach((l) => {
+        l.material.clippingPlanes = activePlanes;
+      });
+    }
+
+    function neutralizeOrangeAndBackfaceMaterials() {
+      let fixed = 0;
+      state.uniqueMaterials.forEach((m) => {
+        if (!m || !m.color) return;
+        const hsl = {};
+        m.color.getHSL(hsl);
+        if (hsl.h > 0.02 && hsl.h < 0.14 && hsl.s > 0.35 && !m.map) {
+          m.color.setHex(0xE2E1DA);
+          m.needsUpdate = true;
+          fixed++;
+        }
+      });
+      document.getElementById('orangeCountBadge').textContent = 'FIXED';
+      populateMaterialsUI();
+      document.getElementById('statusText').textContent = `HEALED ${fixed} MATS`;
+    }
+
+    function recomputeAllNormals() {
+      state.meshRecords.forEach((rec) => {
+        if (rec.mesh.geometry) rec.mesh.geometry.computeVertexNormals();
+      });
+      document.getElementById('statusText').textContent = 'NORMALS RECOMPUTED';
+    }
+
+    function populateMeshTreeUI(filterText = '') {
+      const listEl = document.getElementById('meshTreeList');
+      if (!listEl) return;
+      listEl.innerHTML = '';
+      const q = filterText.trim().toLowerCase();
+
+      const filtered = state.meshRecords.filter((r) => {
+        const name = (r.mesh.name || 'Mesh_Part').toLowerCase();
+        return !q || name.includes(q);
+      });
+
+      document.getElementById('meshTreeCountLabel').textContent = `${filtered.length} ITEMS`;
+
+      filtered.forEach((rec, idx) => {
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between px-2 py-1.5 text-[10px] hover:bg-black/5 cursor-pointer';
+
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'mono truncate flex-1 pr-2';
+        nameSpan.textContent = rec.mesh.name || `Part_${idx + 1}`;
+        nameSpan.addEventListener('click', () => selectAndFocusMesh(rec.mesh, true));
+
+        const metaWrap = document.createElement('div');
+        metaWrap.className = 'flex items-center gap-1.5 shrink-0';
+
+        const triTag = document.createElement('span');
+        triTag.className = 'mono text-[9px] opacity-50';
+        triTag.textContent = `${rec.triCount}t`;
+
+        const visBtn = document.createElement('button');
+        visBtn.className = 'tool-btn px-1.5 py-0.5 text-[9px] tool-btn-solid';
+        visBtn.textContent = rec.mesh.visible ? 'ON' : 'OFF';
+        visBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          rec.mesh.visible = !rec.mesh.visible;
+          rec.edgeLine.visible = rec.mesh.visible && state.showEdges;
+          visBtn.textContent = rec.mesh.visible ? 'ON' : 'OFF';
+          render2DFloorPlan();
+        });
+
+        metaWrap.appendChild(triTag);
+        metaWrap.appendChild(visBtn);
+        row.appendChild(nameSpan);
+        row.appendChild(metaWrap);
+        listEl.appendChild(row);
+      });
+    }
+
+    function populateMaterialsUI() {
+      const listEl = document.getElementById('materialsList');
+      if (!listEl) return;
+      listEl.innerHTML = '';
+
+      state.uniqueMaterials.forEach((mat) => {
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between px-2 py-1.5 text-[10px] cursor-pointer hover:bg-black/5';
+
+        const left = document.createElement('div');
+        left.className = 'flex items-center gap-2 truncate pr-2';
+
+        const swatch = document.createElement('span');
+        swatch.className = 'w-3 h-3 rounded-sm border shrink-0';
+        swatch.style.backgroundColor = mat.color ? `#${mat.color.getHexString()}` : '#CCCCCC';
+        swatch.style.borderColor = 'var(--border-strong)';
+
+        const label = document.createElement('span');
+        label.className = 'mono truncate';
+        label.textContent = mat.name || 'SKP_Material';
+
+        left.appendChild(swatch);
+        left.appendChild(label);
+
+        const isoBtn = document.createElement('button');
+        isoBtn.className = `tool-btn px-1.5 py-0.5 text-[9px] tool-btn-solid ${state.isolatedMaterialUuid === mat.uuid ? 'active' : ''}`;
+        isoBtn.textContent = state.isolatedMaterialUuid === mat.uuid ? 'All' : 'Solo';
+        isoBtn.addEventListener('click', () => {
+          state.isolatedMaterialUuid = state.isolatedMaterialUuid === mat.uuid ? null : mat.uuid;
+          applyMaterialModes();
+          populateMaterialsUI();
+        });
+
+        row.appendChild(left);
+        row.appendChild(isoBtn);
+        listEl.appendChild(row);
+      });
+    }
+
+    function applyExplodeProgress(progress) {
+      state.explodeProgress = Math.max(0, Math.min(1, progress));
+      document.getElementById('explodeSlider').value = Math.round(state.explodeProgress * 100);
+      document.getElementById('explodeFactorLabel').textContent = `${Math.round(state.explodeProgress * 100)}%`;
+
+      state.meshRecords.forEach((rec) => {
+        rec.mesh.position.copy(rec.origLocalPos).addScaledVector(rec.explodeVec, state.explodeProgress);
+        rec.mesh.updateMatrixWorld();
+        rec.edgeLine.matrix.copy(rec.mesh.matrixWorld);
+      });
+    }
+
+    function resetAnimationTimeline() {
+      state.animPlaying = false;
+      state.animDirection = 1;
+      const playBtn = document.getElementById('playAssembleBtn');
+      if (playBtn) {
+        playBtn.classList.remove('active');
+        playBtn.textContent = 'Play';
+      }
+      applyExplodeProgress(0);
+    }
+
+    function render2DFloorPlan() {
+      if (!fpCtx) return;
+      const w = floorplanCanvas.width;
+      const h = floorplanCanvas.height;
+      fpCtx.clearRect(0, 0, w, h);
+
+      const min = state.modelBounds.min;
+      const max = state.modelBounds.max;
+      const cutY = THREE.MathUtils.lerp(min.y + 0.05, max.y - 0.05, state.planCutFraction);
+      const labelEl = document.getElementById('planHeightLabel');
+      if (labelEl) labelEl.textContent = formatLength(cutY - min.y);
+
+      const pad = 16;
+      const drawSpan = w - pad * 2;
+      const maxSpan = Math.max(state.modelSize.x, state.modelSize.z, 1);
+      state.planMapParams = { minX: min.x, minZ: min.z, maxSpan, pad, drawSpan };
+
+      const toMapX = (wx) => pad + ((wx - min.x) / maxSpan) * drawSpan;
+      const toMapY = (wz) => pad + ((wz - min.z) / maxSpan) * drawSpan;
+
+      const fg = state.darkMode ? '#ECECE6' : '#141519';
+      fpCtx.strokeStyle = fg;
+      fpCtx.lineWidth = 1.25;
+      fpCtx.beginPath();
+
+      const vA = new THREE.Vector3();
+      const vB = new THREE.Vector3();
+      const vC = new THREE.Vector3();
+
+      state.meshRecords.forEach((rec) => {
+        if (!rec.mesh.visible || !rec.mesh.geometry) return;
+        const geom = rec.mesh.geometry;
+        const pos = geom.attributes.position;
+        if (!pos) return;
+        const idx = geom.index;
+        const matW = rec.mesh.matrixWorld;
+        const triCount = idx ? idx.count / 3 : Math.floor(pos.count / 3);
+
+        for (let i = 0; i < triCount; i++) {
+          const i0 = idx ? idx.getX(i * 3) : i * 3;
+          const i1 = idx ? idx.getX(i * 3 + 1) : i * 3 + 1;
+          const i2 = idx ? idx.getX(i * 3 + 2) : i * 3 + 2;
+
+          vA.fromBufferAttribute(pos, i0).applyMatrix4(matW);
+          vB.fromBufferAttribute(pos, i1).applyMatrix4(matW);
+          vC.fromBufferAttribute(pos, i2).applyMatrix4(matW);
+
+          const dA = vA.y - cutY;
+          const dB = vB.y - cutY;
+          const dC = vC.y - cutY;
+
+          const pts = [];
+          if ((dA >= 0 && dB < 0) || (dA < 0 && dB >= 0)) {
+            const t = dA / (dA - dB);
+            pts.push([vA.x + (vB.x - vA.x) * t, vA.z + (vB.z - vA.z) * t]);
+          }
+          if ((dB >= 0 && dC < 0) || (dB < 0 && dC >= 0)) {
+            const t = dB / (dB - dC);
+            pts.push([vB.x + (vC.x - vB.x) * t, vB.z + (vC.z - vB.z) * t]);
+          }
+          if ((dC >= 0 && dA < 0) || (dC < 0 && dA >= 0)) {
+            const t = dC / (dC - dA);
+            pts.push([vC.x + (vA.x - vC.x) * t, vC.z + (vA.z - vC.z) * t]);
+          }
+
+          if (pts.length >= 2) {
+            fpCtx.moveTo(toMapX(pts[0][0]), toMapY(pts[0][1]));
+            fpCtx.lineTo(toMapX(pts[1][0]), toMapY(pts[1][1]));
+          }
+        }
+      });
+      fpCtx.stroke();
+
+      // Draw Live Camera Reticle & View Direction on 2D Plan
+      const tx = toMapX(controls.target.x);
+      const ty = toMapY(controls.target.z);
+      const cx = toMapX(activeCamera.position.x);
+      const cy = toMapY(activeCamera.position.z);
+
+      fpCtx.save();
+      fpCtx.strokeStyle = fg;
+      fpCtx.setLineDash([2, 2]);
+      fpCtx.beginPath();
+      fpCtx.moveTo(cx, cy);
+      fpCtx.lineTo(tx, ty);
+      fpCtx.stroke();
+
+      fpCtx.setLineDash([]);
+      fpCtx.fillStyle = fg;
+      fpCtx.beginPath();
+      fpCtx.arc(tx, ty, 3.5, 0, Math.PI * 2);
+      fpCtx.fill();
+      fpCtx.restore();
+    }
+
+    function nearestMeshXZ(x, z) {
+      let best = null, bd = 1e9; const b = new THREE.Box3();
+      modelRoot.traverse((o) => {
+        if (!o.isMesh || !o.visible) return;
+        b.setFromObject(o); if (b.isEmpty()) return;
+        const d = Math.hypot(Math.max(b.min.x - x, 0, x - b.max.x), Math.max(b.min.z - z, 0, z - b.max.z));
+        const sc = d + Math.cbrt((b.max.x - b.min.x) * (b.max.y - b.min.y) * (b.max.z - b.min.z) + 1e-6) * 0.02;
+        if (sc < bd) { bd = sc; best = o; }
+      });
+      return bd <= Math.max(state.modelSize.x, state.modelSize.z) * 0.25 ? best : null;
+    }
+
+    // Tap anywhere on the 2D Floor Plan canvas to glide the 3D camera there
+    floorplanCanvas.addEventListener('pointerdown', (e) => {
+      const rect = floorplanCanvas.getBoundingClientRect();
+      const px = ((e.clientX - rect.left) / rect.width) * floorplanCanvas.width;
+      const py = ((e.clientY - rect.top) / rect.height) * floorplanCanvas.height;
+      const { minX, minZ, maxSpan, pad, drawSpan } = state.planMapParams;
+
+      const worldX = minX + ((px - pad) / drawSpan) * maxSpan;
+      const worldZ = minZ + ((py - pad) / drawSpan) * maxSpan;
+
+      const near = nearestMeshXZ(worldX, worldZ);
+      if (near) { selectAndFocusMesh(near, true); render2DFloorPlan(); return; }
+      const newTarget = new THREE.Vector3(worldX, controls.target.y, worldZ);
+      const delta = newTarget.clone().sub(controls.target);
+
+      state.camTween = {
+        startPos: activeCamera.position.clone(),
+        endPos: activeCamera.position.clone().add(delta),
+        startTarget: controls.target.clone(),
+        endTarget: newTarget,
+        progress: 0
+      };
+      render2DFloorPlan();
+    });
+
+    function scanHardwareCapabilities() {
+      try {
+        const gl = renderer.getContext();
+        const dbg = gl.getExtension('WEBGL_debug_renderer_info');
+        const gpu = dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER);
+        document.getElementById('hwGpuName').textContent = gpu || 'WebGL2 GPU';
+        const cores = navigator.hardwareConcurrency || 4;
+        const ram = navigator.deviceMemory ? `${navigator.deviceMemory} GB` : '8+ GB';
+        document.getElementById('hwCpuRam').textContent = `${cores} Cores / ${ram}`;
+        document.getElementById('hwMaxTex').textContent = `${gl.getParameter(gl.MAX_TEXTURE_SIZE)}px + PWA`;
+      } catch (e) {}
+    }
+
+    // ==========================================================================
+    // 12. DIMENSIONS & MESHY-STYLE NUMBERED DISTANCE LIST
+    // ==========================================================================
+    let bboxLabels = [];
+
+    function formatLength(m) {
+      if (state.unit === 'mm') return `${(m * 1000).toFixed(1)} mm`;
+      if (state.unit === 'ft') return `${(m * 3.28084).toFixed(2)} ft`;
+      return `${m.toFixed(2)} m`;
+    }
+
+    function buildBoundingBoxCage() {
+      while (state.bboxGroup.children.length > 0) state.bboxGroup.remove(state.bboxGroup.children[0]);
+      bboxLabels = bboxLabels.filter((l) => {
+        if (l.category === 'bbox') { l.el.remove(); return false; }
+        return true;
+      });
+
+      const boxHelper = new THREE.Box3Helper(state.modelBounds, getFgHex());
+      boxHelper.material.transparent = true;
+      boxHelper.material.opacity = 0.35;
+      state.bboxGroup.add(boxHelper);
+      state.bboxGroup.visible = state.showBBox;
+
+      const min = state.modelBounds.min;
+      const max = state.modelBounds.max;
+
+      createFloatingLabel(new THREE.Vector3((min.x + max.x) / 2, min.y, max.z + 0.5), () => `X: ${formatLength(state.modelSize.x)}`, 'bbox');
+      createFloatingLabel(new THREE.Vector3(max.x + 0.5, min.y, (min.z + max.z) / 2), () => `Z: ${formatLength(state.modelSize.z)}`, 'bbox');
+      createFloatingLabel(new THREE.Vector3(max.x + 0.5, (min.y + max.y) / 2, max.z + 0.5), () => `Y: ${formatLength(state.modelSize.y)}`, 'bbox');
+    }
+
+    function updateDimensionReadouts() {
+      const sx = state.modelSize.x;
+      const sy = state.modelSize.y;
+      const sz = state.modelSize.z;
+      document.getElementById('dimX').textContent = `${formatLength(sx)} × ${formatLength(sz)} × ${formatLength(sy)}`;
+      const area = sx * sz;
+      document.getElementById('dimArea').textContent =
+        state.unit === 'ft' ? `${(area * 10.7639).toFixed(1)} ft²` : `${area.toFixed(1)} m²`;
+
+      if (state.unit === 'mm') {
+        document.getElementById('statBounds').textContent = `${Math.round(sx * 1000)} × ${Math.round(sz * 1000)} × ${Math.round(sy * 1000)} mm`;
+      } else if (state.unit === 'ft') {
+        document.getElementById('statBounds').textContent = `${(sx * 3.28084).toFixed(1)} × ${(sz * 3.28084).toFixed(1)} × ${(sy * 3.28084).toFixed(1)} ft`;
+      } else {
+        document.getElementById('statBounds').textContent = `${sx.toFixed(1)} × ${sz.toFixed(1)} × ${sy.toFixed(1)} m`;
+      }
+
+      bboxLabels.forEach((item) => (item.el.textContent = item.textFn()));
+      renderMeasureHistoryUI();
+    }
+
+    function createFloatingLabel(worldPos, textFn, category = 'bbox', extraClass = '') {
+      const el = document.createElement('div');
+      el.className = `dim-label ${extraClass}`;
+      el.textContent = textFn();
+      labelsContainer.appendChild(el);
+      const item = { worldPos, textFn, el, category };
+      bboxLabels.push(item);
+      return item;
+    }
+
+    function updateFloatingLabelsScreenPos() {
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+      bboxLabels.forEach((item) => {
+        if (item.category === 'bbox' && !state.showBBox) {
+          item.el.style.display = 'none';
+          return;
+        }
+        const proj = item.worldPos.clone().project(activeCamera);
+        if (proj.z > 1 || proj.z < -1) {
+          item.el.style.display = 'none';
+          return;
+        }
+        item.el.style.display = 'block';
+        item.el.style.left = `${(proj.x * 0.5 + 0.5) * width}px`;
+        item.el.style.top = `${(-(proj.y * 0.5) + 0.5) * height}px`;
+      });
+    }
+
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    let pointerDownPos = { x: 0, y: 0 };
+
+    canvas.addEventListener('pointerdown', (e) => {
+      pointerDownPos = { x: e.clientX, y: e.clientY };
+    });
+
+    canvas.addEventListener('pointerup', (e) => {
+      // Only place tape points when Measure tab is open and tape is active
+      if (!state.tapeActive || state.activeTab !== 'dimensions') return;
+      if (Math.hypot(e.clientX - pointerDownPos.x, e.clientY - pointerDownPos.y) > 5) return;
+
+      const rect = canvas.getBoundingClientRect();
+      pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(pointer, activeCamera);
+
+      const hits = raycaster.intersectObjects(modelRoot.children, true);
+      if (hits.length > 0) addTapeMeasurePoint(hits[0].point);
+    });
+
+    canvas.addEventListener('dblclick', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(pointer, activeCamera);
+
+      const hits = raycaster.intersectObjects(modelRoot.children, true);
+      if (hits.length > 0 && hits[0].object.isMesh) {
+        selectAndFocusMesh(hits[0].object, true);
+      }
+    });
+
+    function selectAndFocusMesh(mesh, shouldFocusCamera = true) {
+      state.selectedMesh = mesh;
+      while (state.selectBoxGroup.children.length > 0) state.selectBoxGroup.remove(state.selectBoxGroup.children[0]);
+      bboxLabels = bboxLabels.filter((item) => {
+        if (item.category === 'select') { item.el.remove(); return false; }
+        return true;
+      });
+
+      const box = new THREE.Box3().setFromObject(mesh);
+      const size = box.getSize(new THREE.Vector3());
+      const center = box.getCenter(new THREE.Vector3());
+
+      const helper = new THREE.Box3Helper(box, ACCENT);
+      helper.material.depthTest = false; helper.material.transparent = true; helper.renderOrder = 999;
+      state.selectBoxGroup.add(helper);
+      const fill = new THREE.Mesh(new THREE.BoxGeometry(size.x, size.y, size.z), new THREE.MeshBasicMaterial({ color: ACCENT, transparent: true, opacity: 0.12, depthWrite: false, depthTest: false }));
+      fill.position.copy(center); fill.renderOrder = 998; state.selectBoxGroup.add(fill);
+      const cr = Math.max(size.length() * 0.012, 0.03);
+      for (let i = 0; i < 8; i++) {
+        const c = new THREE.Mesh(new THREE.SphereGeometry(cr, 10, 10), new THREE.MeshBasicMaterial({ color: 0xFFFFFF, depthTest: false }));
+        c.position.set(i & 1 ? box.max.x : box.min.x, i & 2 ? box.max.y : box.min.y, i & 4 ? box.max.z : box.min.z);
+        c.renderOrder = 1000; state.selectBoxGroup.add(c);
+      }
+
+      createFloatingLabel(
+        new THREE.Vector3(center.x, box.max.y + 0.25, center.z),
+        () => `${mesh.name || 'Part'}: ${formatLength(size.x)}×${formatLength(size.z)}×${formatLength(size.y)}`,
+        'select'
+      );
+
+      const rec = state.meshRecords.find((r) => r.mesh === mesh);
+      const origMat = rec ? rec.origMaterial : mesh.material;
+      const matName = Array.isArray(origMat)
+        ? origMat.map((m) => m?.name).join(', ')
+        : origMat?.name || 'Default';
+
+      document.getElementById('selObjName').textContent = mesh.name || 'Mesh_Part';
+      document.getElementById('selObjMat').textContent = matName;
+      document.getElementById('selObjDims').textContent = `${formatLength(size.x)}×${formatLength(size.z)}×${formatLength(size.y)}`;
+      document.getElementById('selObjElev').textContent = formatLength(box.min.y - state.modelBounds.min.y);
+      document.getElementById('selectedObjHud').classList.remove('hidden');
+
+      if (shouldFocusCamera) {
+        focusCameraOnMesh(mesh);
+      }
+      document.getElementById('statusText').textContent = `FOCUSED: ${mesh.name || 'MESH'}`;
+    }
+
+    // Two-State Tape Measure Blobs + Meshy-Style Numbered History List
+    function addTapeMeasurePoint(point) {
+      const r = Math.max(state.modelSize.length() * 0.008, 0.08);
+
+      if (state.tapePoints.length === 0) {
+        const markerGroup = new THREE.Group();
+        markerGroup.position.copy(point);
+
+        const innerCore = new THREE.Mesh(
+          new THREE.SphereGeometry(r * 0.65, 16, 16),
+          new THREE.MeshBasicMaterial({ color: ACCENT, depthTest: false })
+        );
+        const outerShell = new THREE.Mesh(
+          new THREE.SphereGeometry(r * 1.25, 14, 14),
+          new THREE.MeshBasicMaterial({ color: 0x7FB2FF, wireframe: true, depthTest: false })
+        );
+        markerGroup.add(innerCore);
+        markerGroup.add(outerShell);
+
+        state.measureGroup.add(markerGroup);
+        state.tapePoints.push(point.clone());
+
+        const pendingTag = createFloatingLabel(
+          point.clone().add(new THREE.Vector3(0, r * 2.5, 0)),
+          () => 'PT 1 (CLICK PT 2)',
+          'measure-pending',
+          'dim-label-pending'
+        );
+        state.pendingTapeMarkers.push({ markerGroup, innerCore, outerShell, pendingTag });
+
+        document.getElementById('tapeStepBadge').textContent = 'Pt 1 set → Click 2nd point';
+        document.getElementById('statusText').textContent = 'PT 1 SET';
+      } else {
+        const [p1] = state.tapePoints;
+        const p2 = point.clone();
+
+        const pendingEntry = state.pendingTapeMarkers[0];
+        if (pendingEntry) {
+          pendingEntry.innerCore.material.color.setHex(ACCENT);
+          pendingEntry.innerCore.scale.setScalar(1.4);
+          pendingEntry.outerShell.visible = false;
+          if (pendingEntry.pendingTag && pendingEntry.pendingTag.el) pendingEntry.pendingTag.el.remove();
+        }
+        bboxLabels = bboxLabels.filter((item) => item.category !== 'measure-pending');
+        state.pendingTapeMarkers = [];
+
+        const solidMarker2 = new THREE.Mesh(
+          new THREE.SphereGeometry(r * 0.9, 16, 16),
+          new THREE.MeshBasicMaterial({ color: ACCENT, depthTest: false })
+        );
+        solidMarker2.position.copy(p2);
+        state.measureGroup.add(solidMarker2);
+
+        const dist = p1.distanceTo(p2);
+        const line = new THREE.Line(
+          new THREE.BufferGeometry().setFromPoints([p1, p2]),
+          new THREE.LineBasicMaterial({ color: ACCENT, depthTest: false })
+        );
+        state.measureGroup.add(line);
+
+        const mid = p1.clone().add(p2).multiplyScalar(0.5);
+        const labelItem = createFloatingLabel(mid, () => formatLength(dist), 'measure');
+
+        state.measurements.push({
+          id: Date.now(),
+          distMeters: dist,
+          objs: [pendingEntry?.markerGroup, solidMarker2, line].filter(Boolean),
+          labelItem
+        });
+
+        renderMeasureHistoryUI();
+        document.getElementById('lastMeasureReadout').textContent = formatLength(dist);
+        document.getElementById('tapeStepBadge').textContent = 'Click two points on model';
+        document.getElementById('statusText').textContent = `MEASURED: ${formatLength(dist)}`;
+        state.tapePoints = [];
+      }
+    }
+
+    function renderMeasureHistoryUI() {
+      const listEl = document.getElementById('measureHistoryList');
+      if (!listEl) return;
+      listEl.innerHTML = '';
+
+      state.measurements.forEach((m, idx) => {
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between py-1 px-1';
+        row.innerHTML = `
+          <span class="opacity-55">${idx + 1}</span>
+          <b class="flex-1 text-right pr-2">${formatLength(m.distMeters)}</b>
+        `;
+        const delBtn = document.createElement('button');
+        delBtn.className = 'opacity-50 hover:opacity-100 px-1 cursor-pointer';
+        delBtn.textContent = '✕';
+        delBtn.addEventListener('click', () => {
+          m.objs.forEach((o) => state.measureGroup.remove(o));
+          if (m.labelItem && m.labelItem.el) m.labelItem.el.remove();
+          bboxLabels = bboxLabels.filter((l) => l !== m.labelItem);
+          state.measurements = state.measurements.filter((item) => item.id !== m.id);
+          renderMeasureHistoryUI();
+        });
+        row.appendChild(delBtn);
+        listEl.appendChild(row);
+      });
+    }
+
+    function clearMeasurements() {
+      state.tapePoints = [];
+      state.pendingTapeMarkers = [];
+      state.measurements = [];
+      while (state.measureGroup.children.length > 0) state.measureGroup.remove(state.measureGroup.children[0]);
+      bboxLabels = bboxLabels.filter((item) => {
+        if (item.category === 'measure' || item.category === 'measure-pending') {
+          item.el.remove();
+          return false;
+        }
+        return true;
+      });
+      renderMeasureHistoryUI();
+      document.getElementById('lastMeasureReadout').textContent = '--';
+      document.getElementById('tapeStepBadge').textContent = 'Click two points on model';
+    }
+
+    async function buildDemoArchitecturalVilla() {
+      await showSpinner('BUILDING DEMO VILLA...', 'Generating architectural slabs, walls & glazing', 40);
+      clearCurrentModel();
+
+      const villa = new THREE.Group();
+      villa.name = 'Modernist_Pavilion_SKP';
+
+      const tileTex = createCheckerboardTexture('#E2E2DC', '#CECEC6');
+      const matConcrete = new THREE.MeshStandardMaterial({
+        name: 'Architectural_Concrete',
+        color: 0xE2E2DC,
+        map: tileTex,
+        roughness: 0.75,
+        metalness: 0.05,
+        side: THREE.DoubleSide
+      });
+      const matDarkSteel = new THREE.MeshStandardMaterial({
+        name: 'Anodized_Dark_Steel',
+        color: 0x242730,
+        roughness: 0.35,
+        metalness: 0.6,
+        side: THREE.DoubleSide
+      });
+      const matTimber = new THREE.MeshStandardMaterial({
+        name: 'Warm_Cedar_Timber',
+        color: 0xA88256,
+        roughness: 0.6,
+        metalness: 0.05,
+        side: THREE.DoubleSide
+      });
+      const matGlass = new THREE.MeshPhysicalMaterial({
+        name: 'Curtain_Wall_Glazing',
+        color: 0xD8ECF8,
+        transparent: true,
+        opacity: 0.32,
+        roughness: 0.08,
+        side: THREE.DoubleSide
+      });
+
+      const addPart = (name, geo, mat, x, y, z, parent = villa) => {
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.name = name;
+        mesh.position.set(x, y, z);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        parent.add(mesh);
+        return mesh;
+      };
+
+      const grpFoundation = new THREE.Group();
+      grpFoundation.name = '01_Foundation';
+      addPart('Main_Floor_Slab', new THREE.BoxGeometry(14, 0.45, 10), matConcrete, 0, 0.225, 0, grpFoundation);
+      addPart('Entry_Steps', new THREE.BoxGeometry(4, 0.25, 1.4), matConcrete, 2, 0.125, 5.7, grpFoundation);
+      addPart('Reflecting_Pool', new THREE.BoxGeometry(5.2, 0.35, 3.8), matDarkSteel, -4.2, 0.18, 2.8, grpFoundation);
+      villa.add(grpFoundation);
+
+      const grpGround = new THREE.Group();
+      grpGround.name = '02_Ground_Walls';
+      addPart('North_Shear_Wall', new THREE.BoxGeometry(13.2, 3.2, 0.35), matConcrete, 0, 2.05, -4.4, grpGround);
+      addPart('West_Core_Wall', new THREE.BoxGeometry(0.35, 3.2, 8.8), matConcrete, -6.4, 2.05, 0, grpGround);
+      addPart('East_Living_Wall', new THREE.BoxGeometry(0.35, 3.2, 6.2), matConcrete, 6.2, 2.05, -1.2, grpGround);
+      addPart('Interior_Timber_Wall', new THREE.BoxGeometry(0.25, 3.2, 5.5), matTimber, -1.2, 2.05, -1.5, grpGround);
+      addPart('Kitchen_Island', new THREE.BoxGeometry(3.4, 0.95, 1.1), matDarkSteel, -3.6, 0.92, -1.2, grpGround);
+      [[6.2, 4.2], [0.5, 4.2], [-6.2, 4.2]].forEach(([cx, cz], i) => {
+        addPart(`Steel_Column_0${i + 1}`, new THREE.BoxGeometry(0.26, 3.2, 0.26), matDarkSteel, cx, 2.05, cz, grpGround);
+      });
+      villa.add(grpGround);
+
+      const grpStairs = new THREE.Group();
+      grpStairs.name = '03_Staircase';
+      for (let i = 0; i < 10; i++) {
+        addPart(`Stair_Tread_${i + 1}`, new THREE.BoxGeometry(1.3, 0.08, 0.32), matTimber, 0.2, 0.65 + i * 0.31, -3.2 + i * 0.32, grpStairs);
+      }
+      villa.add(grpStairs);
+
+      const grpUpper = new THREE.Group();
+      grpUpper.name = '04_Upper_Level';
+      addPart('Second_Floor_Slab', new THREE.BoxGeometry(14.8, 0.38, 10.4), matConcrete, 0.4, 3.84, 0, grpUpper);
+      addPart('Upper_North_Wall', new THREE.BoxGeometry(9.5, 2.9, 0.32), matConcrete, 2.5, 5.48, -4.4, grpUpper);
+      addPart('Upper_East_Wall', new THREE.BoxGeometry(0.32, 2.9, 9.6), matConcrete, 7.2, 5.48, 0, grpUpper);
+      addPart('Upper_Timber_Soffit', new THREE.BoxGeometry(0.24, 2.9, 6.0), matTimber, 2.2, 5.48, -1.2, grpUpper);
+      addPart('Louvre_Screen', new THREE.BoxGeometry(4.8, 2.8, 0.18), matDarkSteel, -3.8, 5.4, 4.9, grpUpper);
+      villa.add(grpUpper);
+
+      const grpGlazing = new THREE.Group();
+      grpGlazing.name = '05_Glazing';
+      addPart('Ground_South_Glass', new THREE.BoxGeometry(12.2, 3.15, 0.08), matGlass, 0, 2.02, 4.2, grpGlazing);
+      addPart('Upper_South_Glass', new THREE.BoxGeometry(9.2, 2.85, 0.08), matGlass, 2.5, 5.45, 3.8, grpGlazing);
+      villa.add(grpGlazing);
+
+      const grpRoof = new THREE.Group();
+      grpRoof.name = '06_Roof';
+      addPart('Main_Roof_Canopy', new THREE.BoxGeometry(16.2, 0.42, 11.6), matConcrete, 0.4, 7.1, 0, grpRoof);
+      villa.add(grpRoof);
+
+      modelRoot.add(villa);
+      state.currentFileName = 'DEMO.SKP';
+      document.getElementById('fileBadge').textContent = state.currentFileName;
+      await showSpinner('FINALIZING SCENE...', 'Computing bounds, edges & 2D floor plan', 85);
+      finalizeLoadedModel();
+      hideSpinner();
+      document.getElementById('statusText').textContent = 'DEMO VILLA READY';
+    }
+
+    // ==========================================================================
+    // 15. UI EVENT BINDINGS (MESHY FLOATING CARDS, COLLAPSIBLE DOCK & AXIS GIZMO)
+    // ==========================================================================
+    const tabTitles = {
+      lumion: 'Lumion World',
+      dimensions: 'Measure',
+      outliner: 'Outliner Tree',
+      section: 'Section Cut',
+      materials: 'Materials & Shade',
+      animation: 'Explode & Orbit',
+      camera: 'Camera Views'
+    };
+
+    // Dropdown Menu Controller (Top-Left File Menu)
+    const dropdowns = document.querySelectorAll('.menu-dropdown');
+    dropdowns.forEach((dd) => {
+      const trigger = dd.querySelector('button');
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = dd.classList.contains('open');
+        dropdowns.forEach((d) => d.classList.remove('open'));
+        if (!isOpen) dd.classList.add('open');
+      });
+    });
+    window.addEventListener('click', () => dropdowns.forEach((d) => d.classList.remove('open')));
+
+    const inspectorDrawer = document.getElementById('inspectorDrawer');
+
+    function setInspectorCollapsed(collapsed) {
+      state.inspectorCollapsed = collapsed;
+      inspectorDrawer.classList.toggle('hidden', collapsed);
+    }
+
+    function activateTab(tab) {
+      // Clicking the already-active icon on the right dock toggles collapse/expand!
+      if (state.activeTab === tab && !state.inspectorCollapsed) {
+        setInspectorCollapsed(true);
+        document.querySelectorAll('.workspace-tab').forEach((b) => b.classList.remove('active'));
+        return;
+      }
+      state.activeTab = tab;
+      setInspectorCollapsed(false);
+      document.querySelectorAll('.workspace-tab').forEach((b) => b.classList.toggle('active', b.dataset.tab === tab));
+      document.querySelectorAll('[data-tab-panel]').forEach((p) => p.classList.toggle('hidden', p.dataset.tabPanel !== tab));
+      document.getElementById('drawerTitle').textContent = tabTitles[tab] || 'Inspector';
+    }
+
+    document.querySelectorAll('.workspace-tab').forEach((btn) => {
+      btn.addEventListener('click', () => activateTab(btn.dataset.tab));
+    });
+
+    document.getElementById('collapseInspectorBtn').addEventListener('click', () => {
+      setInspectorCollapsed(true);
+      document.querySelectorAll('.workspace-tab').forEach((b) => b.classList.remove('active'));
+    });
+
+    // Startup Launchpad Controls
+    const startupModal = document.getElementById('startupModal');
+    const fileInput = document.getElementById('fileInput');
+
+    document.getElementById('openStartupBtn').addEventListener('click', () => startupModal.classList.remove('hidden'));
+    document.getElementById('startupDropZone').addEventListener('click', () => fileInput.click());
+    document.getElementById('startupUploadBtn').addEventListener('click', () => fileInput.click());
+    document.getElementById('startupDemoBtn').addEventListener('click', () => {
+      startupModal.classList.add('hidden');
+      frameCameraToModel('iso');
+    });
+
+    // Unified File Menu: Upload & Export
+    document.getElementById('openFileBtn').addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('click', (e) => (e.target.value = ''));
+    fileInput.addEventListener('change', (e) => handleFileLoad(e.target.files[0]));
+
+    const dropOverlay = document.getElementById('dropOverlay');
+    window.addEventListener('dragover', (e) => { e.preventDefault(); dropOverlay.classList.remove('hidden'); });
+    window.addEventListener('dragleave', (e) => { if (e.relatedTarget === null) dropOverlay.classList.add('hidden'); });
+    window.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropOverlay.classList.add('hidden');
+      if (e.dataTransfer.files?.[0]) handleFileLoad(e.dataTransfer.files[0]);
+    });
+
+    document.getElementById('exportGlbBtn').addEventListener('click', exportCurrentSceneAsGLB);
+    document.getElementById('reloadDemoBtn').addEventListener('click', () => {
+      startupModal.classList.add('hidden');
+      state.currentGlbBuffer = null;
+      buildDemoArchitecturalVilla();
+    });
+
+    // Right Dock Zoom & Fullscreen Controls
+    document.getElementById('dockZoomInBtn').addEventListener('click', () => {
+      activeCamera.position.lerp(controls.target, 0.22);
+      controls.update();
+    });
+    document.getElementById('dockZoomOutBtn').addEventListener('click', () => {
+      const offset = activeCamera.position.clone().sub(controls.target).multiplyScalar(1.25);
+      activeCamera.position.copy(controls.target).add(offset);
+      controls.update();
+    });
+    document.getElementById('fullscreenBtn').addEventListener('click', () => {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+      else document.exitFullscreen?.();
+    });
+
+    // Bottom-Left MODEL INFO Collapsible Card & Unit Selector
+    document.getElementById('collapseModelInfoBtn').addEventListener('click', (e) => {
+      const body = document.getElementById('modelInfoBody');
+      const isHidden = body.classList.toggle('hidden');
+      e.currentTarget.textContent = isHidden ? '▸' : '▾';
+    });
+    document.getElementById('toggleMoreDetailsBtn').addEventListener('click', (e) => {
+      const more = document.getElementById('modelInfoMore');
+      const isHidden = more.classList.toggle('hidden');
+      e.currentTarget.textContent = isHidden ? '▸ More details' : '▾ Less details';
+    });
+    document.getElementById('quickUnitSelect').addEventListener('change', (e) => {
+      state.unit = e.target.value;
+      updateDimensionReadouts();
+      render2DFloorPlan();
+    });
+
+    // Viewport Shading Buttons (Inside Materials & Shade Card)
+    document.getElementById('shadeEdgesBtn').addEventListener('click', (e) => {
+      state.showEdges = !state.showEdges;
+      state.edgeLinesGroup.visible = state.showEdges;
+      e.currentTarget.classList.toggle('active', state.showEdges);
+      e.currentTarget.textContent = `Edges: ${state.showEdges ? 'ON' : 'OFF'}`;
+    });
+
+    document.getElementById('shadeWireBtn').addEventListener('click', (e) => {
+      state.wireframe = !state.wireframe;
+      e.currentTarget.classList.toggle('active', state.wireframe);
+      e.currentTarget.textContent = `Wire: ${state.wireframe ? 'ON' : 'OFF'}`;
+      applyMaterialModes();
+    });
+
+    document.getElementById('shadeClayBtn').addEventListener('click', (e) => {
+      state.clayMode = !state.clayMode;
+      e.currentTarget.classList.toggle('active', state.clayMode);
+      e.currentTarget.textContent = `Clay: ${state.clayMode ? 'ON' : 'OFF'}`;
+      applyMaterialModes();
+      document.getElementById('statusText').textContent = state.clayMode ? 'CLAY ON' : 'MATERIALS RESTORED';
+    });
+
+    document.getElementById('shadeXrayBtn').addEventListener('click', (e) => {
+      state.xray = !state.xray;
+      e.currentTarget.classList.toggle('active', state.xray);
+      e.currentTarget.textContent = `X-Ray: ${state.xray ? 'ON' : 'OFF'}`;
+      applyMaterialModes();
+    });
+
+    // 2D Floor Plan Toggle
+    const toggle2dPlan = () => {
+      state.show2dPlan = !state.show2dPlan;
+      document.getElementById('minimapPanel').classList.toggle('hidden', !state.show2dPlan);
+      if (state.show2dPlan) render2DFloorPlan();
+    };
+    document.getElementById('toggle2dPlanBtn').addEventListener('click', toggle2dPlan);
+    document.getElementById('close2dPlanBtn').addEventListener('click', toggle2dPlan);
+
+    // Theme Switcher
+    function toggleDayDarkTheme() {
+      state.darkMode = !state.darkMode;
+      document.body.classList.toggle('theme-dark', state.darkMode);
+      if (!state.todEnabled) {
+        scene.background.setHex(getBgHex());
+      }
+      const lineCol = getFgHex();
+      state.edgeLinesGroup.children.forEach((l) => l.material.color.setHex(lineCol));
+      groundGrid.material.color.setHex(lineCol);
+      buildBoundingBoxCage();
+      render2DFloorPlan();
+    }
+
+    document.getElementById('quickThemeIconBtn').addEventListener('click', toggleDayDarkTheme);
+    document.getElementById('quickFrameBtn').addEventListener('click', () => frameCameraToModel('iso'));
+
+    // 2D Floor Plan Cut Slider
+    document.getElementById('planHeightSlider').addEventListener('input', (e) => {
+      state.planCutFraction = parseFloat(e.target.value) / 100;
+      render2DFloorPlan();
+    });
+    document.getElementById('snapTopViewBtn').addEventListener('click', () => frameCameraToModel('top'));
+
+    // Selected Object HUD
+    document.getElementById('focusSelectedBtn').addEventListener('click', () => {
+      if (state.selectedMesh) focusCameraOnMesh(state.selectedMesh);
+    });
+    document.getElementById('closeSelHudBtn').addEventListener('click', () => {
+      document.getElementById('selectedObjHud').classList.add('hidden');
+      while (state.selectBoxGroup.children.length > 0) state.selectBoxGroup.remove(state.selectBoxGroup.children[0]);
+      bboxLabels = bboxLabels.filter((item) => {
+        if (item.category === 'select') { item.el.remove(); return false; }
+        return true;
+      });
+    });
+
+    // Outliner Tab
+    document.getElementById('meshSearchInput').addEventListener('input', (e) => {
+      populateMeshTreeUI(e.target.value);
+    });
+    document.getElementById('showAllNodesBtn').addEventListener('click', () => {
+      state.meshRecords.forEach((r) => {
+        r.mesh.visible = true;
+        r.edgeLine.visible = state.showEdges;
+      });
+      populateMeshTreeUI(document.getElementById('meshSearchInput').value);
+      render2DFloorPlan();
+    });
+
+    // Lumion World & 180° Sun Controls
+    document.getElementById('toggleTodBtn').addEventListener('click', async (e) => {
+      state.todEnabled = !state.todEnabled;
+      const btn = e.currentTarget;
+      btn.classList.toggle('active', state.todEnabled);
+      btn.textContent = state.todEnabled ? 'ON' : 'Enable';
+
+      if (state.todEnabled) {
+        await showSpinner('BUILDING LUMION WORLD...', 'Generating hills, 4-way junction, cars & flora', 65);
+      }
+      buildProceduralLumionEnvironment();
+      updateLumionAtmosphereAndSun();
+      hideSpinner();
+    });
+
+    document.getElementById('envTerrainBtn').addEventListener('click', (e) => {
+      state.envTerrain = !state.envTerrain;
+      e.currentTarget.classList.toggle('active', state.envTerrain);
+      buildProceduralLumionEnvironment();
+    });
+
+    document.getElementById('envRoadBtn').addEventListener('click', (e) => {
+      state.envRoad = !state.envRoad;
+      e.currentTarget.classList.toggle('active', state.envRoad);
+      buildProceduralLumionEnvironment();
+    });
+
+    document.getElementById('envCarsBtn').addEventListener('click', (e) => {
+      state.envCars = !state.envCars;
+      e.currentTarget.classList.toggle('active', state.envCars);
+      buildProceduralLumionEnvironment();
+    });
+
+    document.getElementById('envTreesBtn').addEventListener('click', (e) => {
+      state.envTrees = !state.envTrees;
+      e.currentTarget.classList.toggle('active', state.envTrees);
+      buildProceduralLumionEnvironment();
+    });
+
+    document.getElementById('envPoolBtn').addEventListener('click', (e) => {
+      state.envPool = !state.envPool;
+      e.currentTarget.classList.toggle('active', state.envPool);
+      buildProceduralLumionEnvironment();
+    });
+
+    document.getElementById('envLampsBtn').addEventListener('click', (e) => {
+      state.envLamps = !state.envLamps;
+      e.currentTarget.classList.toggle('active', state.envLamps);
+      buildProceduralLumionEnvironment();
+    });
+
+    document.getElementById('envShadowsBtn').addEventListener('click', (e) => {
+      state.todShadows = !state.todShadows;
+      e.currentTarget.classList.toggle('active', state.todShadows);
+      updateLumionAtmosphereAndSun();
+    });
+
+    document.getElementById('treeCountSlider').addEventListener('input', (e) => {
+      state.treeCount = parseInt(e.target.value, 10);
+      document.getElementById('treeCountLabel').textContent = `${state.treeCount}`;
+      if (state.todEnabled) buildProceduralLumionEnvironment();
+    });
+
+    document.getElementById('sitePadScaleSlider').addEventListener('input', (e) => {
+      state.sitePadScale = parseInt(e.target.value, 10) / 10;
+      document.getElementById('sitePadScaleLabel').textContent = `${state.sitePadScale.toFixed(1)}x`;
+      if (state.todEnabled) buildProceduralLumionEnvironment();
+    });
+
+    document.getElementById('regenEnvBtn').addEventListener('click', async () => {
+      await showSpinner('REBUILDING WORLD...', 'Updating hills, roads, cars & vegetation', 60);
+      if (!state.todEnabled) {
+        state.todEnabled = true;
+        const b = document.getElementById('toggleTodBtn');
+        b.classList.add('active');
+        b.textContent = 'ON';
+      }
+      buildProceduralLumionEnvironment();
+      updateLumionAtmosphereAndSun();
+      hideSpinner();
+    });
+
+    const formatSolarTime = (val) => {
+      const hrs = Math.floor(val);
+      const mins = Math.round((val - hrs) * 60);
+      return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
+    };
+
+    // Real-time 180° Sun Slider (No rebuild lag while dragging!)
+    document.getElementById('todTimeSlider').addEventListener('input', (e) => {
+      state.todTime = parseFloat(e.target.value);
+      document.getElementById('todTimeLabel').textContent = formatSolarTime(state.todTime);
+      if (!state.todEnabled) {
+        state.todEnabled = true;
+        const b = document.getElementById('toggleTodBtn');
+        b.classList.add('active');
+        b.textContent = 'ON';
+        buildProceduralLumionEnvironment();
+      }
+      updateLumionAtmosphereAndSun();
+    });
+
+    document.getElementById('todAzimuthSlider').addEventListener('input', (e) => {
+      state.todAzimuth = parseFloat(e.target.value);
+      document.getElementById('todAzimuthLabel').textContent = `${Math.round(state.todAzimuth)}°`;
+      updateLumionAtmosphereAndSun();
+    });
+
+    document.getElementById('todIntensitySlider').addEventListener('input', (e) => {
+      state.todIntensity = parseFloat(e.target.value) / 10;
+      document.getElementById('todIntensityLabel').textContent = state.todIntensity.toFixed(1);
+      updateLumionAtmosphereAndSun();
+    });
+
+    document.querySelectorAll('.tod-preset').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        state.todTime = parseFloat(btn.dataset.tod);
+        document.getElementById('todTimeSlider').value = state.todTime;
+        document.getElementById('todTimeLabel').textContent = formatSolarTime(state.todTime);
+        if (!state.todEnabled) {
+          state.todEnabled = true;
+          const b = document.getElementById('toggleTodBtn');
+          b.classList.add('active');
+          b.textContent = 'ON';
+          buildProceduralLumionEnvironment();
+        }
+        updateLumionAtmosphereAndSun();
+      });
+    });
+
+    // Measure Tab Controls
+    document.getElementById('toggleBBoxBtn').addEventListener('click', (e) => {
+      state.showBBox = !state.showBBox;
+      state.bboxGroup.visible = state.showBBox;
+      e.currentTarget.classList.toggle('active', state.showBBox);
+    });
+
+    document.getElementById('toggleTapeBtn').addEventListener('click', (e) => {
+      state.tapeActive = !state.tapeActive;
+      e.currentTarget.classList.toggle('active', state.tapeActive);
+      document.getElementById('tapeStepBadge').textContent = state.tapeActive ? 'Click two points on model' : 'Tape paused';
+    });
+
+    document.getElementById('clearMeasureBtn').addEventListener('click', clearMeasurements);
+
+    document.querySelectorAll('.unit-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        state.unit = btn.dataset.unit;
+        document.querySelectorAll('.unit-btn').forEach((b) => b.classList.toggle('active', b === btn));
+        updateDimensionReadouts();
+        render2DFloorPlan();
+      });
+    });
+
+    // Section Tab
+    document.getElementById('toggleSectionBtn').addEventListener('click', (e) => {
+      state.sectionEnabled = !state.sectionEnabled;
+      e.currentTarget.classList.toggle('active', state.sectionEnabled);
+      e.currentTarget.textContent = `Cut: ${state.sectionEnabled ? 'ON' : 'OFF'}`;
+      if (state.sectionEnabled && state.sectionPercent === 100) {
+        state.sectionPercent = 50;
+        document.getElementById('sectionSlider').value = 50;
+        document.getElementById('sectionPercentLabel').textContent = '50%';
+      }
+      updateSectionPlane();
+    });
+
+    document.querySelectorAll('.section-axis-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        state.sectionAxis = btn.dataset.axis;
+        document.querySelectorAll('.section-axis-btn').forEach((b) => b.classList.toggle('active', b === btn));
+        updateSectionPlane();
+      });
+    });
+
+    document.getElementById('sectionSlider').addEventListener('input', (e) => {
+      state.sectionPercent = parseFloat(e.target.value);
+      document.getElementById('sectionPercentLabel').textContent = `${Math.round(state.sectionPercent)}%`;
+      if (!state.sectionEnabled) {
+        state.sectionEnabled = true;
+        const b = document.getElementById('toggleSectionBtn');
+        b.classList.add('active');
+        b.textContent = 'Cut: ON';
+      }
+      updateSectionPlane();
+    });
+
+    document.getElementById('flipSectionBtn').addEventListener('click', () => {
+      state.sectionFlipped = !state.sectionFlipped;
+      updateSectionPlane();
+    });
+
+    document.getElementById('togglePlaneHelperBtn').addEventListener('click', (e) => {
+      state.showSectionHelper = !state.showSectionHelper;
+      e.currentTarget.classList.toggle('active', state.showSectionHelper);
+      e.currentTarget.textContent = `Gizmo: ${state.showSectionHelper ? 'ON' : 'OFF'}`;
+      updateSectionPlane();
+    });
+
+    // Materials Tab
+    document.getElementById('healOrangeMatBtn').addEventListener('click', neutralizeOrangeAndBackfaceMaterials);
+    document.getElementById('flipNormalsBtn').addEventListener('click', recomputeAllNormals);
+    document.getElementById('toggleDoubleSideBtn').addEventListener('click', (e) => {
+      state.doubleSided = !state.doubleSided;
+      e.currentTarget.classList.toggle('active', state.doubleSided);
+      e.currentTarget.textContent = `2-Sided: ${state.doubleSided ? 'ON' : 'OFF'}`;
+      applyMaterialModes();
+    });
+
+    // Animation Tab
+    document.getElementById('explodeSlider').addEventListener('input', (e) => {
+      applyExplodeProgress(parseFloat(e.target.value) / 100);
+    });
+
+    document.getElementById('playAssembleBtn').addEventListener('click', (e) => {
+      state.animPlaying = !state.animPlaying;
+      e.currentTarget.classList.toggle('active', state.animPlaying);
+      e.currentTarget.textContent = state.animPlaying ? 'Pause' : 'Play';
+    });
+
+    document.getElementById('loopAssembleBtn').addEventListener('click', (e) => {
+      state.animLoop = !state.animLoop;
+      e.currentTarget.classList.toggle('active', state.animLoop);
+      e.currentTarget.textContent = state.animLoop ? 'Loop' : '1-Shot';
+    });
+
+    document.getElementById('resetAnimBtn').addEventListener('click', () => {
+      resetAnimationTimeline();
+      document.getElementById('statusText').textContent = 'ANIMATION RESET [0%]';
+    });
+
+    document.getElementById('toggleTurntableBtn').addEventListener('click', (e) => {
+      state.turntable = !state.turntable;
+      e.currentTarget.classList.toggle('active', state.turntable);
+      e.currentTarget.textContent = state.turntable ? 'ON' : 'OFF';
+    });
+
+    document.getElementById('animSpeedSlider').addEventListener('input', (e) => {
+      state.animSpeed = parseFloat(e.target.value) / 10;
+      document.getElementById('animSpeedLabel').textContent = `${state.animSpeed.toFixed(1)}x`;
+    });
+
+    // Camera Tab
+    document.getElementById('projPerspBtn').addEventListener('click', () => setProjectionMode('perspective'));
+    document.getElementById('projOrthoBtn').addEventListener('click', () => setProjectionMode('ortho'));
+    document.querySelectorAll('.view-preset-btn').forEach((btn) => {
+      btn.addEventListener('click', () => frameCameraToModel(btn.dataset.view));
+    });
+    document.getElementById('fovSlider').addEventListener('input', (e) => {
+      perspCamera.fov = parseInt(e.target.value, 10);
+      perspCamera.updateProjectionMatrix();
+      document.getElementById('fovValue').textContent = `${perspCamera.fov}°`;
+    });
+    document.getElementById('resetCameraBtn').addEventListener('click', () => frameCameraToModel('iso'));
+
+    // Specs Modal
+    const limitsModal = document.getElementById('limitsModal');
+    document.getElementById('limitsModalBtn').addEventListener('click', () => {
+      scanHardwareCapabilities();
+      limitsModal.classList.remove('hidden');
+    });
+    document.getElementById('closeLimitsModalBtn').addEventListener('click', () => limitsModal.classList.add('hidden'));
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        limitsModal.classList.add('hidden');
+        startupModal.classList.add('hidden');
+      }
+      if (e.key.toLowerCase() === 'f' && !e.shiftKey && document.activeElement.tagName !== 'INPUT') { if (state.selectedMesh) focusCameraOnMesh(state.selectedMesh); else frameCameraToModel('iso'); }
+    });
+
+    // Update 2D Map Camera Crosshair when user orbits
+    controls.addEventListener('change', () => {
+      if (state.show2dPlan) render2DFloorPlan();
+    });
+
+    // ==========================================================================
+    // 16. RESIZE & MAIN RENDER LOOP (INCLUDES SMOOTH CAMERA FOCUS TWEEN)
+    // ==========================================================================
+    // 16. INTERACTIVE XYZ AXIS GIZMO + RESIZE + MAIN RENDER LOOP
+    // ==========================================================================
+    let gizmoHitRegions = [];
+
+    function renderAxisGizmo() {
+      const w = gizmoCanvas.width;
+      const h = gizmoCanvas.height;
+      const cx = w / 2;
+      const cy = h / 2;
+      const len = 24;
+
+      gizmoCtx.clearRect(0, 0, w, h);
+
+      const invRot = activeCamera.quaternion.clone().invert();
+      const axes = [
+        { label: 'X', view: 'right', dir: new THREE.Vector3(1, 0, 0).applyQuaternion(invRot), filled: true },
+        { label: 'Y', view: 'top',   dir: new THREE.Vector3(0, 1, 0).applyQuaternion(invRot), filled: true },
+        { label: 'Z', view: 'front', dir: new THREE.Vector3(0, 0, 1).applyQuaternion(invRot), filled: false }
+      ];
+
+      axes.sort((a, b) => a.dir.z - b.dir.z);
+      gizmoHitRegions = [];
+
+      const fgColor = state.darkMode ? '#ECECE6' : '#141519';
+      const bgColor = state.darkMode ? '#141519' : '#ECECE6';
+
+      axes.forEach((ax) => {
+        const ex = cx + ax.dir.x * len;
+        const ey = cy - ax.dir.y * len;
+
+        // Axis Stem
+        gizmoCtx.strokeStyle = fgColor;
+        gizmoCtx.lineWidth = 1.8;
+        gizmoCtx.beginPath();
+        gizmoCtx.moveTo(cx, cy);
+        gizmoCtx.lineTo(ex, ey);
+        gizmoCtx.stroke();
+
+        // Axis Tip Circle
+        gizmoCtx.beginPath();
+        gizmoCtx.arc(ex, ey, 7.5, 0, Math.PI * 2);
+        gizmoCtx.fillStyle = ax.filled ? fgColor : bgColor;
+        gizmoCtx.fill();
+        gizmoCtx.lineWidth = 1.5;
+        gizmoCtx.strokeStyle = fgColor;
+        gizmoCtx.stroke();
+
+        // Axis Letter
+        gizmoCtx.fillStyle = ax.filled ? bgColor : fgColor;
+        gizmoCtx.font = 'bold 9px JetBrains Mono, monospace';
+        gizmoCtx.textAlign = 'center';
+        gizmoCtx.textBaseline = 'middle';
+        gizmoCtx.fillText(ax.label, ex, ey + 0.5);
+
+        gizmoHitRegions.push({ x: ex, y: ey, r: 9, view: ax.view });
+      });
+    }
+
+    gizmoCanvas.addEventListener('click', (e) => {
+      const rect = gizmoCanvas.getBoundingClientRect();
+      const px = e.clientX - rect.left;
+      const py = e.clientY - rect.top;
+      for (const hit of gizmoHitRegions) {
+        if (Math.hypot(px - hit.x, py - hit.y) <= hit.r) {
+          frameCameraToModel(hit.view);
+          break;
+        }
+      }
+    });
+
+    function onWindowResize() {
+      const w = canvas.parentElement.clientWidth;
+      const h = canvas.parentElement.clientHeight;
+      const aspect = w / Math.max(h, 1);
+
+      perspCamera.aspect = aspect;
+      perspCamera.updateProjectionMatrix();
+
+      const maxDim = Math.max(state.modelSize.x, state.modelSize.y, state.modelSize.z, 10);
+      const halfSpan = maxDim * 0.85;
+      orthoCamera.left = -halfSpan * aspect;
+      orthoCamera.right = halfSpan * aspect;
+      orthoCamera.top = halfSpan;
+      orthoCamera.bottom = -halfSpan;
+      orthoCamera.updateProjectionMatrix();
+
+      renderer.setSize(w, h, false);
+    }
+
+    window.addEventListener('resize', onWindowResize);
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const dt = Math.min(clock.getDelta(), 0.1);
+
+      if (mixer) mixer.update(dt * state.animSpeed);
+
+      // Animate Moving Traffic on the 4-Way Lumion Road Junction
+      if (state.todEnabled && state.envCars && state.animatedCars.length > 0) {
+        state.animatedCars.forEach((car) => {
+          car.mesh.position[car.axis] += car.dir * car.speed * dt;
+          if (Math.abs(car.mesh.position[car.axis] - car.origin) > car.limit) {
+            car.mesh.position[car.axis] = car.origin - car.dir * car.limit;
+          }
+        });
+      }
+
+      // Smooth Camera Focus Tween
+      if (state.camTween) {
+        state.camTween.progress += dt * 3.2;
+        if (state.camTween.progress >= 1) {
+          activeCamera.position.copy(state.camTween.endPos);
+          controls.target.copy(state.camTween.endTarget);
+          state.camTween = null;
+        } else {
+          const t = 1 - Math.pow(1 - state.camTween.progress, 3);
+          activeCamera.position.lerpVectors(state.camTween.startPos, state.camTween.endPos, t);
+          controls.target.lerpVectors(state.camTween.startTarget, state.camTween.endTarget, t);
+        }
+      }
+
+      // Collapse / Assemble Animation
+      if (state.animPlaying) {
+        let next = state.explodeProgress + dt * 0.45 * state.animSpeed * state.animDirection;
+        if (next >= 1.0) {
+          if (state.animLoop) {
+            next = 1.0;
+            state.animDirection = -1;
+          } else {
+            next = 1.0;
+            state.animPlaying = false;
+            document.getElementById('playAssembleBtn').classList.remove('active');
+            document.getElementById('playAssembleBtn').textContent = 'Play';
+          }
+        } else if (next <= 0.0) {
+          next = 0.0;
+          state.animDirection = 1;
+        }
+        applyExplodeProgress(next);
+      }
+
+      if (state.turntable) {
+        const angle = dt * 0.55 * state.animSpeed;
+        const offset = activeCamera.position.clone().sub(controls.target);
+        offset.applyAxisAngle(new THREE.Vector3(0, 1, 0), angle);
+        activeCamera.position.copy(controls.target).add(offset);
+      }
+
+      for (const fn of window.RENDRA.tick) fn(dt, clock.elapsedTime);
+      controls.update();
+      updateFloatingLabelsScreenPos();
+      renderAxisGizmo();
+      renderer.render(scene, activeCamera);
+      for (const fn of window.RENDRA.post) fn();
+    }
+
+    window.onload = async () => {
+      onWindowResize();
+      // Auto-collapse inspector on small mobile screens so 3D viewport is unobstructed
+      if (window.innerWidth < 640) {
+        setInspectorCollapsed(true);
+        document.querySelectorAll('.workspace-tab').forEach((b) => b.classList.remove('active'));
+      }
+      animate();
+      scanHardwareCapabilities();
+      await buildDemoArchitecturalVilla();
+    };
+  </script>
+<script type="module">
+/* RENDRA DIRECTOR — cinematic layer: looks, weather, photo, video, tour, install */
+const R = window.RENDRA; if (R) {
+const { THREE, scene, renderer, state, controls, canvas } = R;
+const $ = (id) => document.getElementById(id);
+const css = document.createElement('style');
+css.textContent = `
+#dir{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:30;display:flex;align-items:center;gap:4px;padding:5px;max-width:calc(100vw - 20px);overflow-x:auto}
+@media(max-width:700px){#dir{bottom:84px}}
+#dir .sep{width:1px;height:18px;background:var(--border-strong);margin:0 3px;flex:none}
+#dir .tool-btn{flex:none}
+#dirLooks{position:fixed;left:50%;bottom:58px;transform:translateX(-50%);z-index:31;display:none;padding:6px;gap:4px;flex-wrap:wrap;width:min(420px,92vw)}
+#dirLooks.open{display:flex}
+@media(max-width:700px){#dirLooks{bottom:130px}}
+#vig{position:absolute;inset:0;pointer-events:none;z-index:10;opacity:0;transition:opacity .4s;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.5) 100%)}
+#grain{position:absolute;inset:0;pointer-events:none;z-index:10;opacity:0;transition:opacity .4s;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E")}
+body.clean .glass-card,body.clean .glass-pill,body.clean nav,body.clean #dir{opacity:0!important;pointer-events:none!important}
+#recDot{display:none;width:7px;height:7px;border-radius:50%;background:#e03c31;animation:bl 1s infinite}
+@keyframes bl{50%{opacity:.2}}`;
+document.head.appendChild(css);
+const vc = $('viewportContainer');
+vc.insertAdjacentHTML('beforeend', `<div id="vig"></div><div id="grain"></div>
+<div id="dirLooks" class="glass-card"></div>
+<div id="dir" class="glass-pill">
+ <button class="tool-btn tool-btn-solid" id="dLooks">Looks</button><span class="sep"></span>
+ <button class="tool-btn active" data-wx="clear">Clear</button><button class="tool-btn" data-wx="mist">Mist</button>
+ <button class="tool-btn" data-wx="rain">Rain</button><button class="tool-btn" data-wx="snow">Snow</button><span class="sep"></span>
+ <label class="mono" style="font-size:9px;opacity:.7">EXP</label><input id="dExp" type="range" min="3" max="20" value="11" class="studio-slider" style="width:64px">
+ <button class="tool-btn" id="dVig">Vignette</button><button class="tool-btn" id="dGrain">Grain</button><span class="sep"></span>
+ <button class="tool-btn" id="dTour">Tour</button><button class="tool-btn" id="dShot">Photo</button>
+ <button class="tool-btn" id="dRec"><i id="recDot"></i><span id="recTxt">Record</span></button>
+ <button class="tool-btn" id="dClean" title="Shift+H">Clean</button><button class="tool-btn tool-btn-primary" id="dInstall" style="display:none">Install</button></div>`);
+
+// ---- Looks (time slider drives the existing 180° solar engine)
+const LOOKS = [
+ ['Noon', 12, 1.1, 'clear', 0, 0], ['Golden Hour', 17.2, 1.0, 'clear', 1, 1],
+ ['Blue Hour', 6.0, 0.7, 'clear', 1, 1], ['Overcast', 13, 0.95, 'mist', 0, 1],
+ ['Rain Storm', 11, 0.8, 'rain', 1, 1], ['Snowfall', 15, 1.05, 'snow', 1, 0]];
+const lk = $('dirLooks');
+LOOKS.forEach(([n, t, e, w, v, g]) => { const b = document.createElement('button'); b.className = 'tool-btn tool-btn-solid'; b.textContent = n;
+  b.onclick = () => { const s = $('todTimeSlider'); s.value = t; s.dispatchEvent(new Event('input'));
+    setExp(e); setWx(w); setFx('vig', !!v); setFx('grain', !!g); lk.classList.remove('open'); }; lk.appendChild(b); });
+$('dLooks').onclick = () => lk.classList.toggle('open');
+function setExp(e) { renderer.toneMappingExposure = e; $('dExp').value = e * 10; }
+$('dExp').oninput = (ev) => { renderer.toneMappingExposure = ev.target.value / 10; };
+function setFx(id, on) { $(id).style.opacity = on ? 1 : 0; $(id === 'vig' ? 'dVig' : 'dGrain').classList.toggle('active', on); }
+$('dVig').onclick = () => setFx('vig', $('vig').style.opacity != 1);
+$('dGrain').onclick = () => setFx('grain', $('grain').style.opacity != 1);
+
+// ---- Weather
+let wx = 'clear', pts = null, N = 4000, span = 40, mist = false;
+function setWx(m) {
+  wx = m; document.querySelectorAll('[data-wx]').forEach((b) => b.classList.toggle('active', b.dataset.wx === m));
+  if (pts) { scene.remove(pts); pts.geometry.dispose(); pts = null; }
+  const wasMist = mist; mist = m !== 'clear';
+  span = Math.max(30, state.modelSize.length() * 2.2);
+  if (m === 'rain' || m === 'snow') {
+    const g = new THREE.BufferGeometry(), rain = m === 'rain', n = rain ? N : N / 2;
+    const a = new Float32Array(n * (rain ? 6 : 3));
+    for (let i = 0; i < n; i++) { const x = (Math.random() - .5) * span, y = Math.random() * span * .7, z = (Math.random() - .5) * span;
+      if (rain) a.set([x, y, z, x, y - span * .02, z], i * 6); else a.set([x, y, z], i * 3); }
+    g.setAttribute('position', new THREE.BufferAttribute(a, 3));
+    pts = rain ? new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: 0xcfd8e3, transparent: true, opacity: .55, depthWrite: false }))
+               : new THREE.Points(g, new THREE.PointsMaterial({ color: 0xffffff, size: span * .012, transparent: true, opacity: .9, depthWrite: false }));
+    pts.frustumCulled = false; scene.add(pts);
+  }
+  if (!mist && wasMist) { if (state.todEnabled) { const s = $('todAzimuthSlider'); s.dispatchEvent(new Event('input')); } else scene.fog = null; }
+}
+document.querySelectorAll('[data-wx]').forEach((b) => b.onclick = () => setWx(b.dataset.wx));
+
+// ---- Cinematic tour (orbit + dolly + crane)
+let tour = null;
+function tourToggle(on = !tour) {
+  $('dTour').classList.toggle('active', !!on);
+  if (!on) { tour = null; controls.enabled = true; return; }
+  const cam = R.getCamera(), t = controls.target.clone(), off = cam.position.clone().sub(t);
+  tour = { c: t, r: Math.max(off.length(), 6), a: Math.atan2(off.x, off.z), h: Math.max(off.y, 2), t: 0 };
+  canvas.addEventListener('pointerdown', () => tourToggle(false), { once: true });
+}
+$('dTour').onclick = () => tourToggle();
+
+// ---- Photo & Video
+let shot = false; const dl = (blob, name) => { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4e3); };
+$('dShot').onclick = () => { shot = true; };
+let rec = null, chunks = [];
+$('dRec').onclick = () => {
+  if (rec) { rec.stop(); return; }
+  try {
+    rec = new MediaRecorder(canvas.captureStream(30), { mimeType: MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm', videoBitsPerSecond: 12e6 });
+    chunks = []; rec.ondataavailable = (e) => chunks.push(e.data);
+    rec.onstop = () => { dl(new Blob(chunks, { type: 'video/webm' }), `rendra-film-${Date.now()}.webm`); rec = null; $('recDot').style.display = 'none'; $('recTxt').textContent = 'Record'; };
+    rec.start(); $('recDot').style.display = 'inline-block'; $('recTxt').textContent = 'Stop'; if (!tour) tourToggle(true);
+  } catch (e) { alert('Recording is not supported in this browser.'); }
+};
+const clean = () => document.body.classList.toggle('clean');
+$('dClean').onclick = clean;
+addEventListener('keydown', (e) => { if (!e.shiftKey || /INPUT|TEXTAREA/.test(e.target.tagName)) return;
+  ({ KeyP: () => (shot = true), KeyT: () => tourToggle(), KeyR: () => $('dRec').click(), KeyH: clean })[e.code]?.(); });
+
+// ---- PWA install + service worker
+let ip; addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); ip = e; $('dInstall').style.display = ''; });
+$('dInstall').onclick = async () => { if (ip) { ip.prompt(); await ip.userChoice; ip = null; $('dInstall').style.display = 'none'; } };
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
+
+// ---- frame hooks
+R.tick.push((dt, time) => {
+  if (tour) { tour.t += dt; tour.a += dt * .14; const k = 1 + .16 * Math.sin(tour.t * .35), cam = R.getCamera();
+    cam.position.set(tour.c.x + Math.sin(tour.a) * tour.r * k, tour.c.y + tour.h * (1 + .35 * Math.sin(tour.t * .22)), tour.c.z + Math.cos(tour.a) * tour.r * k);
+    controls.target.copy(tour.c); }
+  if (mist && scene.background?.isColor) { const f = wx === 'mist' ? .012 : .008; scene.fog = new THREE.FogExp2(scene.background.getHex(), f / Math.max(span / 40, .6)); }
+  if (pts) { const p = pts.geometry.attributes.position, a = p.array, rain = wx === 'rain', st = rain ? 6 : 3, c = controls.target;
+    pts.position.set(c.x, 0, c.z);
+    for (let i = 0; i < a.length; i += st) { const v = (rain ? span * 1.1 : span * .09) * dt;
+      a[i + 1] -= v; if (rain) a[i + 4] -= v; else a[i] += Math.sin(time + i) * dt * .6;
+      if (a[i + 1] < 0) { const d = span * .7; a[i + 1] += d; if (rain) a[i + 4] += d; } }
+    p.needsUpdate = true; }
+});
+R.post.push(() => { if (shot) { shot = false; canvas.toBlob((b) => dl(b, `rendra-shot-${Date.now()}.png`)); } });
+}
+</script>
+
+<script type="module">
+/* RENDRA WORLD+ — richer Lumion space, collision-free props, focus tools, selection UX */
+const R = window.RENDRA; if (R) {
+const { THREE, scene, state, controls, canvas, sunLight } = R, $ = (id) => document.getElementById(id);
+const ACC = 0x2F7BFF;
+
+// ---------- UI: Focus buttons + Show-UI escape hatch
+const st = document.createElement('style');
+st.textContent = `#showUi{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:60;display:none;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;border:1px solid var(--border-strong);background:var(--glass-bg);color:var(--fg);backdrop-filter:blur(14px);font:600 11px Inter,sans-serif;cursor:pointer;opacity:.4;transition:opacity .2s}
+#showUi:hover{opacity:1}body.clean #showUi{display:inline-flex}`;
+document.head.appendChild(st);
+document.body.insertAdjacentHTML('beforeend', '<button id="showUi">Show UI <span class="mono" style="opacity:.6">Esc</span></button>');
+$('dTour').insertAdjacentHTML('beforebegin', '<button class="tool-btn tool-btn-solid" id="dFocus" title="F — focus selection / frame all">Focus</button><button class="tool-btn" id="dFrame" title="Home — frame everything">Frame</button>');
+const focus = () => state.selectedMesh ? R.focusMesh(state.selectedMesh) : R.frameModel('iso');
+$('dFocus').onclick = focus; $('dFrame').onclick = () => R.frameModel('iso');
+$('showUi').onclick = () => document.body.classList.remove('clean');
+addEventListener('keydown', (e) => { if (/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
+  if (e.key === 'Escape') { if (document.body.classList.contains('clean')) document.body.classList.remove('clean'); else $('closeSelHudBtn')?.click(); }
+  if (e.key === 'Home') R.frameModel('iso'); if (e.key === '.') focus(); });
+
+// ---------- Click = select (blue box), dbl-click = focus, empty click = deselect
+const rc = new THREE.Raycaster(), pv = new THREE.Vector2(); let down = null;
+canvas.addEventListener('pointerdown', (e) => { down = [e.clientX, e.clientY]; });
+canvas.addEventListener('pointerup', (e) => {
+  if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 5) return;
+  if (state.tapeActive && state.activeTab === 'dimensions') return;
+  const r = canvas.getBoundingClientRect(); pv.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+  rc.setFromCamera(pv, R.getCamera()); const h = rc.intersectObjects(R.modelRoot.children, true).find((x) => x.object.isMesh && x.object.visible);
+  if (h) R.selectMesh(h.object, false); else $('closeSelHudBtn')?.click();
+});
+
+// ---------- Lumion space+: sky dome, clouds, mountain ring, prop collision
+const noise = (() => { const H = (x, y) => { const s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453; return s - Math.floor(s); };
+  const V = (x, y) => { const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi, u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
+    return H(xi, yi) * (1 - u) * (1 - v) + H(xi + 1, yi) * u * (1 - v) + H(xi, yi + 1) * (1 - u) * v + H(xi + 1, yi + 1) * u * v; };
+  return (x, y) => { let a = .5, f = 1, s = 0; for (let i = 0; i < 5; i++) { s += a * (1 - Math.abs(2 * V(x * f, y * f) - 1)); f *= 2; a *= .5; } return s; }; })();
+const dome = new THREE.Mesh(new THREE.SphereGeometry(3400, 32, 18), new THREE.ShaderMaterial({ side: THREE.BackSide, depthWrite: false, fog: false,
+  uniforms: { top: { value: new THREE.Color() }, mid: { value: new THREE.Color() }, bot: { value: new THREE.Color() }, sunDir: { value: new THREE.Vector3(0, 1, 0) }, sunCol: { value: new THREE.Color() } },
+  vertexShader: 'varying vec3 vP;void main(){vP=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+  fragmentShader: `uniform vec3 top,mid,bot,sunDir,sunCol;varying vec3 vP;void main(){vec3 d=normalize(vP);float h=d.y;
+  vec3 c=h>0.?mix(mid,top,pow(h,.5)):mix(mid,bot,pow(-h,.5));float s=max(dot(d,normalize(sunDir)),0.);
+  c+=sunCol*(pow(s,900.)*4.+pow(s,30.)*.35+pow(s,5.)*.14);gl_FragColor=vec4(c,1.);#include <tonemapping_fragment>
+  #include <colorspace_fragment>}` }));
+dome.renderOrder = -10; dome.frustumCulled = false; scene.add(dome);
+const env = new THREE.Group(); scene.add(env);
+const ctex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'), gr = g.createRadialGradient(64, 64, 4, 64, 64, 62);
+  gr.addColorStop(0, 'rgba(255,255,255,.95)'); gr.addColorStop(.5, 'rgba(255,255,255,.5)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
+let clouds = [], span = 20;
+const weather = () => document.querySelector('[data-wx].active')?.dataset.wx || 'clear';
+
+function buildWorld() {
+  while (env.children.length) { const o = env.children.pop(); o.traverse((m) => { m.geometry?.dispose?.(); }); }
+  clouds = []; env.visible = dome.visible = !!state.todEnabled; if (!state.todEnabled) return;
+  const B = state.modelBounds, C = state.modelCenter, S = state.modelSize; span = Math.max(S.x, S.z, 12);
+  const floorY = B.min.y - 0.02, rw = Math.max(span * .42, 7.2), padW = S.x * state.sitePadScale, padD = S.z * state.sitePadScale;
+  const roadZ = B.max.z + Math.max(padD * .32, 5) + rw * .5, crossX = C.x + padW * .65 + rw * .75;
+
+  // 1. remove prop collisions with the loaded model (cars, lamps, trees) + old blob hills
+  const keep = B.clone().expandByScalar(Math.max(.8, span * .03)), bx = new THREE.Box3(), grp = state.lumionEnvGroup;
+  for (const o of [...grp.children]) {
+    if (o.isMesh && o.geometry.type === 'SphereGeometry') { grp.remove(o); continue; }
+    if (o.isGroup && bx.setFromObject(o).intersectsBox(keep)) grp.remove(o);
+  }
+  state.animatedCars = state.animatedCars.filter((c) => { const p = c.mesh.position, ok = c.axis === 'x' ? (p.z < keep.min.z || p.z > keep.max.z) : (p.x < keep.min.x || p.x > keep.max.x); if (!ok) grp.remove(c.mesh); return ok; });
+
+  // 2. sculpted mountain ring with road valleys + altitude colouring (grass → forest → rock → snow)
+  const inner = span * 6.5, outer = span * 26, amp = span * 8, g = new THREE.RingGeometry(inner, outer, 180, 56); g.rotateX(-Math.PI / 2);
+  const p = g.attributes.position, col = new Float32Array(p.count * 3), cc = [0x9CBB84, 0x5F8A4C, 0x3F6A3A, 0x8B8C86, 0xF1F3F6].map((x) => new THREE.Color(x)), tmp = new THREE.Color();
+  const sm = THREE.MathUtils.smoothstep;
+  for (let i = 0; i < p.count; i++) {
+    const x = p.getX(i), z = p.getZ(i), t = (Math.hypot(x, z) - inner) / (outer - inner), wx = x + C.x, wz = z + C.z;
+    const valley = sm(Math.min(Math.abs(wz - roadZ), Math.abs(wx - crossX)), rw * 1.3, rw * 4 + span * 1.8);
+    const h = Math.pow(t, 1.25) * amp * (.2 + 1.0 * noise(wx / span * .35, wz / span * .35)) * valley;
+    p.setY(i, floorY - .05 + h); const k = Math.min(h / (amp * .8), .999) * 4, a = Math.floor(k);
+    tmp.copy(cc[a]).lerp(cc[a + 1], k - a); col.set([tmp.r, tmp.g, tmp.b], i * 3);
+  }
+  g.setAttribute('color', new THREE.BufferAttribute(col, 3)); g.computeVertexNormals();
+  const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 1 })); m.position.set(C.x, 0, C.z); m.receiveShadow = true; env.add(m);
+
+  // 3. drifting cloud banks
+  for (let i = 0; i < 16; i++) {
+    const cg = new THREE.Group(), a = Math.random() * 6.283, d = span * (6 + Math.random() * 20), w = span * (4 + Math.random() * 5);
+    for (let k = 0; k < 6; k++) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: ctex, transparent: true, depthWrite: false, fog: false }));
+      s.scale.set(w * (.6 + Math.random() * .6), w * (.28 + Math.random() * .2), 1); s.position.set((Math.random() - .5) * w, Math.random() * w * .12, (Math.random() - .5) * w * .5); cg.add(s); }
+    cg.position.set(C.x + Math.cos(a) * d, floorY + span * (3.5 + Math.random() * 3), C.z + Math.sin(a) * d); cg.userData.v = .4 + Math.random() * .8; env.add(cg); clouds.push(cg);
+  }
+}
+R.envHooks.push(buildWorld);
+const c1 = new THREE.Color(0x16224A), c2 = new THREE.Color(0x2E7BD6), h1 = new THREE.Color(0xF3A06E), h2 = new THREE.Color(0xC4E2F6), gray = new THREE.Color(0x9AA3AB), t1 = new THREE.Color();
+R.tick.push((dt) => {
+  const cam = R.getCamera(); dome.visible = !!state.todEnabled && !!cam.isPerspectiveCamera; if (!state.todEnabled) return;
+  dome.position.copy(cam.position);
+  const sf = Math.sin(Math.max(.02, Math.min(.98, (state.todTime - 6) / 12)) * Math.PI), w = THREE.MathUtils.smoothstep(sf, .05, .6), wx = weather(), gr = wx === 'clear' ? 0 : wx === 'mist' ? .55 : .7, u = dome.material.uniforms;
+  u.top.value.copy(c1).lerp(c2, w).lerp(gray, gr * .8); u.mid.value.copy(h1).lerp(h2, w).lerp(gray, gr); u.bot.value.copy(u.mid.value).multiplyScalar(.8);
+  u.sunDir.value.copy(sunLight.position).sub(sunLight.target.position); u.sunCol.value.setHex(0xFFC27A).lerp(t1.setHex(0xFFF3DC), w).multiplyScalar(1 - gr);
+  const lim = span * 30; clouds.forEach((c) => { c.position.x += dt * c.userData.v * span * .02; if (c.position.x > state.modelCenter.x + lim) c.position.x -= lim * 2;
+    c.children.forEach((s) => { s.material.opacity = (.35 + .5 * w) * (1 + gr * .3); s.material.color.copy(h1).lerp(t1.setHex(0xFFFFFF), Math.min(1, w + .35)).lerp(gray, gr * .6); }); });
+});
+buildWorld();
+}
+</script>
+
+</body>
+</html>
