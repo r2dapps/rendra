@@ -404,6 +404,18 @@
     </div>
   </div>
 
+  <!-- First-Person Walk Navigation HUD -->
+  <div id="walkHud" class="fixed top-3 left-1/2 -translate-x-1/2 z-50 hidden items-center gap-3 px-4 py-1.5 rounded-full border border-[var(--border-strong)] bg-[var(--glass-bg)] text-[var(--fg)] backdrop-blur-md text-[11px] font-medium shadow-lg select-none">
+    <span class="mono font-bold tracking-wide">WALK MODE</span>
+    <span class="opacity-40">|</span>
+    <span class="opacity-80"><kbd class="mono px-1 py-0.5 rounded bg-[var(--surface-mute)]">W</kbd><kbd class="mono px-1 py-0.5 rounded bg-[var(--surface-mute)]">A</kbd><kbd class="mono px-1 py-0.5 rounded bg-[var(--surface-mute)]">S</kbd><kbd class="mono px-1 py-0.5 rounded bg-[var(--surface-mute)]">D</kbd> Walk</span>
+    <span class="opacity-80"><kbd class="mono px-1 py-0.5 rounded bg-[var(--surface-mute)]">Shift</kbd> Sprint</span>
+    <span class="opacity-80"><kbd class="mono px-1 py-0.5 rounded bg-[var(--surface-mute)]">Space</kbd> Jump</span>
+    <span class="opacity-80">Click Viewport to Look</span>
+    <span class="opacity-40">|</span>
+    <button id="exitWalkBtn" class="mono px-1.5 py-0.5 rounded text-[10px] bg-[var(--fg)] text-[var(--bg)] font-bold hover:opacity-80">Exit (V / Esc)</button>
+  </div>
+
   <!-- ==========================================================================
        1. CONSTRUCTION SPINNER (SHOWN ON EVERY LOAD / GEN ACTION)
        ========================================================================== -->
@@ -521,7 +533,7 @@
     </div>
 
     <!-- Focused Part Quick Pill -->
-    <div id="selectedObjHud" class="hidden absolute bottom-28 sm:bottom-36 left-3 z-20 glass-card w-56 p-2.5 space-y-1">
+    <div id="selectedObjHud" class="hidden absolute bottom-28 sm:bottom-36 left-3 z-20 glass-card w-56 p-2.5 space-y-1.5">
       <div class="flex items-center justify-between border-b pb-1" style="border-color: var(--border);">
         <span id="selObjName" class="font-bold text-[10px] mono truncate max-w-[125px]">--</span>
         <div class="flex gap-1">
@@ -530,9 +542,13 @@
         </div>
       </div>
       <div class="grid grid-cols-2 gap-x-2 gap-y-0.5 text-[10px] mono">
-        <span class="opacity-60">Mat:</span> <span id="selObjMat" class="truncate text-right">--</span>
+        <span class="opacity-60">Mat:</span> <span id="selObjMat" class="truncate text-right font-medium">--</span>
         <span class="opacity-60">Size:</span> <span id="selObjDims" class="font-bold text-right">--</span>
         <span class="opacity-60">Elev:</span> <span id="selObjElev" class="text-right">--</span>
+      </div>
+      <div class="flex items-center gap-1 pt-1 border-t" style="border-color: var(--border);">
+        <button id="selHudOpenMatsBtn" class="tool-btn tool-btn-solid flex-1 py-0.5 text-[9px]">PBR Finishes</button>
+        <button id="selHudResetMatBtn" class="tool-btn tool-btn-solid flex-1 py-0.5 text-[9px]" title="Reset to original material">Reset Mat</button>
       </div>
     </div>
 
@@ -624,7 +640,7 @@
               <span class="font-bold text-[11px] block">Lumion + V-Ray</span>
               <span class="text-[9px] opacity-60">180° Sun, Hills, Cars & Trees</span>
             </div>
-            <button id="toggleTodBtn" class="tool-btn tool-btn-primary px-2.5 py-1">Enable</button>
+            <button id="toggleTodBtn" class="tool-btn tool-btn-primary active px-2.5 py-1">ON</button>
           </div>
 
           <!-- 180° Solar Arc Controls -->
@@ -669,6 +685,60 @@
               <button data-tod="12.0" class="tod-preset tool-btn tool-btn-solid text-[10px]">Noon</button>
               <button data-tod="17.4" class="tod-preset tool-btn tool-btn-solid text-[10px]">Sunset</button>
             </div>
+          </div>
+
+          <!-- HDRI Environment & Sky Dome (Studio IBL) -->
+          <div class="studio-sunken p-2.5 space-y-2">
+            <div class="flex items-center justify-between text-[9px] font-bold uppercase opacity-65 mono">
+              <span>HDRI Sky & IBL</span>
+              <span id="hdriStatusBadge" class="mono font-bold">RAYLEIGH SKY</span>
+            </div>
+
+            <!-- Preset Selection Grid -->
+            <div class="grid grid-cols-3 gap-1">
+              <button id="hdriPresetDaylight" data-hdri="daylight" class="hdri-preset-btn tool-btn tool-btn-solid text-[10px]">Daylight</button>
+              <button id="hdriPresetOvercast" data-hdri="overcast" class="hdri-preset-btn tool-btn tool-btn-solid text-[10px]">Overcast</button>
+              <button id="hdriPresetSunset" data-hdri="sunset" class="hdri-preset-btn tool-btn tool-btn-solid text-[10px]">Sunset</button>
+            </div>
+
+            <!-- Backdrop Visibility & Custom File Upload -->
+            <div class="grid grid-cols-2 gap-1 pt-0.5">
+              <button id="hdriToggleBgBtn" class="tool-btn tool-btn-solid active text-[9px] py-1">Sky Dome: ON</button>
+              <label class="tool-btn tool-btn-solid text-[9px] py-1 text-center cursor-pointer">
+                Load .HDR
+                <input type="file" id="customHdriInput" accept=".hdr,.exr" class="hidden" />
+              </label>
+            </div>
+
+            <!-- Exposure / IBL Ambient Slider -->
+            <div class="space-y-1">
+              <div class="flex justify-between text-[10px]">
+                <span class="opacity-70">IBL Exposure</span>
+                <span id="hdriExposureLabel" class="mono font-bold">1.0x</span>
+              </div>
+              <input type="range" id="hdriExposureSlider" min="2" max="30" step="1" value="10" class="studio-slider" />
+            </div>
+
+            <!-- Sky Blur / Depth Slider -->
+            <div class="space-y-1">
+              <div class="flex justify-between text-[10px]">
+                <span class="opacity-70">Sky Blur</span>
+                <span id="hdriBlurLabel" class="mono font-bold">0.02</span>
+              </div>
+              <input type="range" id="hdriBlurSlider" min="0" max="60" step="1" value="2" class="studio-slider" />
+            </div>
+
+            <!-- Sky Azimuth Rotation Slider -->
+            <div class="space-y-1">
+              <div class="flex justify-between text-[10px]">
+                <span class="opacity-70">Sky Azimuth</span>
+                <span id="hdriRotationLabel" class="mono font-bold">0°</span>
+              </div>
+              <input type="range" id="hdriRotationSlider" min="0" max="360" step="5" value="0" class="studio-slider" />
+            </div>
+
+            <!-- Return to Rayleigh Sky -->
+            <button id="hdriResetProceduralBtn" class="tool-btn tool-btn-solid w-full text-[9px] py-1 opacity-80 hover:opacity-100">Reset to Rayleigh Physical Sky</button>
           </div>
 
           <!-- Rich World Context Toggles -->
@@ -864,13 +934,33 @@
         <!-- ==================================================================
              PANEL 5: MATERIALS & SHADING
              ================================================================== -->
-        <div data-tab-panel="materials" class="hidden space-y-2">
+        <div data-tab-panel="materials" class="hidden space-y-2.5">
           <!-- Viewport Shading Quick Grid -->
           <div class="grid grid-cols-2 gap-1">
             <button id="shadeEdgesBtn" class="tool-btn tool-btn-solid">Edges: OFF</button>
             <button id="shadeClayBtn" class="tool-btn tool-btn-solid">Clay: OFF</button>
             <button id="shadeWireBtn" class="tool-btn tool-btn-solid">Wire: OFF</button>
             <button id="shadeXrayBtn" class="tool-btn tool-btn-solid">X-Ray: OFF</button>
+          </div>
+
+          <!-- AEC Curated PBR Material Pre-Library (Lazy Loaded) -->
+          <div class="studio-sunken p-2.5 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="mono font-bold text-[9px] uppercase opacity-75">AEC PBR Pre-Library</span>
+              <span id="pbrTargetBadge" class="mono text-[9px] px-1.5 py-0.5 rounded font-bold"
+                style="background: var(--surface-mute); color: var(--fg);">NO SELECTION</span>
+            </div>
+            <p class="text-[9px] opacity-70">Curated architectural finishes with procedural PBR maps (lazy loaded on demand).</p>
+            
+            <div id="pbrLibraryGrid" class="grid grid-cols-2 gap-1.5 max-h-52 overflow-y-auto pr-0.5">
+              <!-- Dynamically populated via initPbrMaterialLibraryUI() -->
+            </div>
+
+            <!-- Material Reset Actions -->
+            <div class="grid grid-cols-2 gap-1 pt-1.5 border-t" style="border-color: var(--border);">
+              <button id="resetSelectedMatBtn" class="tool-btn tool-btn-solid text-[9px] py-1" title="Reset selected mesh part to its initial loaded material">Reset Part</button>
+              <button id="resetAllMatsBtn" class="tool-btn tool-btn-solid text-[9px] py-1" title="Restore all parts in model to original materials">Reset All</button>
+            </div>
           </div>
 
           <div class="studio-sunken p-2 space-y-1.5">
@@ -887,7 +977,9 @@
           </div>
 
           <button id="toggleDoubleSideBtn" class="w-full tool-btn tool-btn-solid active py-1">Double-Sided: ON</button>
-          <div id="materialsList" class="h-44 overflow-y-auto studio-sunken divide-y"
+          
+          <div class="text-[9px] font-bold uppercase opacity-65 mono pt-1">Scene SKP Materials</div>
+          <div id="materialsList" class="h-32 overflow-y-auto studio-sunken divide-y"
             style="border-color: var(--border);"></div>
         </div>
 
@@ -1214,8 +1306,8 @@
       explodeProgress: 0,
       turntable: false,
       animSpeed: 1.0,
-      // Lumion World & 180° Solar State
-      todEnabled: false,
+      // Lumion World & 180° Solar State (Enabled by default for rich realistic site context)
+      todEnabled: true,
       envTerrain: true,
       envRoad: true,
       envCars: true,
@@ -1228,6 +1320,27 @@
       todTime: 14.5, // 06:00 (0° East) -> 12:00 (90° Zenith) -> 18:00 (180° West)
       todAzimuth: 25,
       todIntensity: 2.6,
+      walkMode: {
+        active: false,
+        eyeHeight: 1.65,
+        moveSpeed: 3.4,
+        sprintSpeed: 7.0,
+        yaw: 0,
+        pitch: 0.04,
+        velocity: new THREE.Vector3(),
+        isGrounded: true,
+        jumpForce: 4.8,
+        gravity: 14.0,
+        keys: { forward: false, backward: false, left: false, right: false, sprint: false, jump: false }
+      },
+      hdri: {
+        enabled: false,
+        preset: null,
+        intensity: 1.0,
+        showBackground: true,
+        blur: 0.02,
+        rotation: 0
+      },
       animatedCars: [],
       // 2D Floorplan Slice & Map Interaction
       planCutFraction: 0.22,
@@ -1240,6 +1353,8 @@
       uniqueMaterials: new Map(),
       meshRecords: [],
       selectedMesh: null,
+      materialLibraryCache: {},
+      activeMaterialPresetKey: null,
       edgeLinesGroup: new THREE.Group(),
       lumionEnvGroup: new THREE.Group(),
       bboxGroup: new THREE.Group(),
@@ -1337,7 +1452,7 @@
 
     let mixer = null;
     const clock = new THREE.Clock();
-    window.RENDRA = { THREE, scene, renderer, state, controls, canvas, sunLight, getCamera: () => activeCamera, modelRoot, envHooks: [], selectMesh: (m, f) => selectAndFocusMesh(m, f), focusMesh: (m) => focusCameraOnMesh(m), frameModel: (v) => frameCameraToModel(v), tick: [], post: [] };
+    window.RENDRA = { THREE, scene, renderer, state, controls, canvas, sunLight, getCamera: () => activeCamera, modelRoot, envHooks: [], selectMesh: (m, f) => selectAndFocusMesh(m, f), focusMesh: (m) => focusCameraOnMesh(m), frameModel: (v) => frameCameraToModel(v), tick: [], post: [], setHdriPreset: (p) => setHdriPreset(p), toggleHdri: () => toggleHdri(), updateHdriUI: () => updateHdriUI(), disableHdri: () => disableHdri(), applyHdriRotation: (deg) => applyHdriRotation(deg), toggleWalkMode: () => toggleWalkMode(), enableWalkMode: () => enableWalkMode(), disableWalkMode: () => disableWalkMode(), applyMaterialPreset: (id, m) => applyMaterialPreset(id, m), resetMeshMaterial: (m) => resetMeshMaterial(m), resetAllMaterials: () => resetAllMaterials(), getMaterialPresets: () => AEC_MATERIAL_PRESETS, activateTab: (t) => activateTab(t) };
 
     // ==========================================================================
     // 3. SPINNER HELPER
@@ -1700,6 +1815,36 @@
           head.position.set(0, 3.75, 0.6);
           lampGrp.add(head);
 
+          // Volumetric Street Luminaire Light Cone
+          const coneH = 3.65;
+          const coneGeo = new THREE.ConeGeometry(2.1, coneH, 18, 1, true);
+          coneGeo.translate(0, -coneH * 0.5, 0);
+          const coneMat = new THREE.MeshBasicMaterial({
+            color: 0xFFE29A,
+            transparent: true,
+            opacity: isLowSun ? 0.20 : 0.07,
+            blending: THREE.AdditiveBlending,
+            side: THREE.DoubleSide,
+            depthWrite: false
+          });
+          const cone = new THREE.Mesh(coneGeo, coneMat);
+          cone.position.set(0, 3.72, 0.6);
+          lampGrp.add(cone);
+
+          // Pavement Illumination Pool
+          const groundPoolMat = new THREE.MeshBasicMaterial({
+            color: 0xFFE29A,
+            transparent: true,
+            opacity: isLowSun ? 0.24 : 0.09,
+            blending: THREE.AdditiveBlending,
+            side: THREE.DoubleSide,
+            depthWrite: false
+          });
+          const groundPool = new THREE.Mesh(new THREE.CircleGeometry(2.1, 18), groundPoolMat);
+          groundPool.rotation.x = -Math.PI / 2;
+          groundPool.position.set(0, 0.02, 0.6);
+          lampGrp.add(groundPool);
+
           state.lumionEnvGroup.add(lampGrp);
         }
       }
@@ -1895,9 +2040,17 @@
         skyColor.lerpColors(cGoldenSky, cDaySky, (sunFactor - 0.35) / 0.65);
       }
 
-      scene.background = skyColor;
-      scene.fog = new THREE.FogExp2(skyColor.getHex(), 0.0011 / Math.max(maxDim / 20, 0.5));
-      scene.environmentIntensity = 0.4 + sunFactor * 0.45;
+      if (!state.hdri || !state.hdri.enabled) {
+        scene.background = skyColor;
+        scene.fog = new THREE.FogExp2(skyColor.getHex(), 0.0011 / Math.max(maxDim / 20, 0.5));
+        scene.environmentIntensity = 0.4 + sunFactor * 0.45;
+      } else {
+        if (!state.hdri.showBackground) {
+          scene.background = skyColor;
+        }
+        scene.fog = new THREE.FogExp2(skyColor.getHex(), 0.0006 / Math.max(maxDim / 20, 0.5));
+        scene.environmentIntensity = state.hdri.intensity;
+      }
 
       const cGoldenSun = new THREE.Color(0xFFA048);
       const cNoonSun = new THREE.Color(0xFFFDF8);
@@ -1907,6 +2060,234 @@
       hemiLight.color.copy(skyColor).lerp(new THREE.Color(0xFFFFFF), 0.35);
       hemiLight.groundColor.setHex(0x8C857B);
       hemiLight.intensity = 0.85 + sunFactor * 0.55;
+    }
+
+    // ==========================================================================
+    // 4C. HDRI ENVIRONMENT & SKY DOME ARCHITECTURE (V-RAY / LUMION REALISM)
+    // ==========================================================================
+    const HDRI_PRESETS = {
+      daylight: {
+        id: 'daylight',
+        name: 'Daylight (Clear)',
+        local: './assets/hdri/daylight.hdr',
+        cdn: 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r170/examples/textures/equirectangular/royal_esplanade_1k.hdr',
+        sunElevation: 14.5,
+        azimuth: 25,
+        exposure: 1.05
+      },
+      overcast: {
+        id: 'overcast',
+        name: 'Overcast (Studio)',
+        local: './assets/hdri/overcast.hdr',
+        cdn: 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r170/examples/textures/equirectangular/pedestrian_overpass_1k.hdr',
+        sunElevation: 12.0,
+        azimuth: 45,
+        exposure: 0.95
+      },
+      sunset: {
+        id: 'sunset',
+        name: 'Sunset (Golden)',
+        local: './assets/hdri/sunset.hdr',
+        cdn: 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r170/examples/textures/equirectangular/venice_sunset_1k.hdr',
+        sunElevation: 17.2,
+        azimuth: 240,
+        exposure: 1.2
+      }
+    };
+
+    const hdriTextureCache = new Map();
+    let currentHdriTexture = null;
+
+    async function loadHdriPreset(presetKey, customUrl = null) {
+      const preset = HDRI_PRESETS[presetKey];
+      if (!preset && !customUrl) return;
+
+      const cacheKey = customUrl || presetKey;
+      if (hdriTextureCache.has(cacheKey)) {
+        applyHdriTexture(hdriTextureCache.get(cacheKey), presetKey);
+        return;
+      }
+
+      await showSpinner('LOADING HDRI ENVIRONMENT...', preset ? preset.name : 'Custom HDRI Map', 45);
+
+      try {
+        const { RGBELoader } = await import('three/addons/loaders/RGBELoader.js');
+        const rgbeLoader = new RGBELoader();
+
+        const onLoaded = (tex) => {
+          tex.mapping = THREE.EquirectangularReflectionMapping;
+          hdriTextureCache.set(cacheKey, tex);
+          hideSpinner();
+          applyHdriTexture(tex, presetKey);
+        };
+
+        const targetUrl = customUrl || preset.local;
+        rgbeLoader.load(targetUrl, onLoaded, undefined, (err) => {
+          if (preset && preset.cdn && targetUrl !== preset.cdn) {
+            console.warn(`Local HDRI failed (${targetUrl}), falling back to CDN (${preset.cdn})`);
+            rgbeLoader.load(preset.cdn, onLoaded, undefined, (cdnErr) => {
+              hideSpinner();
+              console.error('All HDRI sources failed:', cdnErr);
+            });
+          } else {
+            hideSpinner();
+            console.error('HDRI load failed:', err);
+          }
+        });
+      } catch (err) {
+        hideSpinner();
+        console.error('Failed to import RGBELoader:', err);
+      }
+    }
+
+    function applyHdriTexture(tex, presetKey) {
+      state.hdri.enabled = true;
+      state.hdri.preset = presetKey;
+      currentHdriTexture = tex;
+
+      // IBL reflections and ambient lighting on all physical materials
+      scene.environment = currentHdriTexture;
+      scene.environmentIntensity = state.hdri.intensity;
+
+      // 360-degree background dome
+      if (state.hdri.showBackground) {
+        scene.background = currentHdriTexture;
+        if ('backgroundBlurriness' in scene) {
+          scene.backgroundBlurriness = state.hdri.blur;
+        }
+        if ('backgroundIntensity' in scene) {
+          scene.backgroundIntensity = state.hdri.intensity;
+        }
+      } else {
+        if (state.todEnabled) {
+          updateLumionAtmosphereAndSun();
+        } else {
+          scene.background = new THREE.Color(state.darkMode ? 0x141519 : 0xECECE6);
+        }
+      }
+
+      // Sync Sky Rotation
+      applyHdriRotation(state.hdri.rotation);
+
+      // Adjust solar arc time if preset has recommended sun position
+      if (presetKey && HDRI_PRESETS[presetKey] && state.todEnabled) {
+        state.todTime = HDRI_PRESETS[presetKey].sunElevation;
+        const timeSlider = document.getElementById('todTimeSlider');
+        if (timeSlider) {
+          timeSlider.value = state.todTime;
+          document.getElementById('todTimeLabel').textContent = formatSolarTime(state.todTime);
+        }
+        state.todAzimuth = HDRI_PRESETS[presetKey].azimuth;
+        const azSlider = document.getElementById('todAzimuthSlider');
+        if (azSlider) {
+          azSlider.value = state.todAzimuth;
+          document.getElementById('todAzimuthLabel').textContent = `${Math.round(state.todAzimuth)}°`;
+        }
+        updateLumionAtmosphereAndSun();
+      }
+
+      updateHdriUI();
+    }
+
+    function applyHdriRotation(deg) {
+      state.hdri.rotation = deg;
+      const rad = THREE.MathUtils.degToRad(deg);
+      if ('backgroundRotation' in scene && scene.backgroundRotation) {
+        scene.backgroundRotation.set(0, rad, 0);
+      }
+      if ('environmentRotation' in scene && scene.environmentRotation) {
+        scene.environmentRotation.set(0, rad, 0);
+      }
+      const lbl = document.getElementById('hdriRotationLabel');
+      if (lbl) lbl.textContent = `${Math.round(deg)}°`;
+      const slider = document.getElementById('hdriRotationSlider');
+      if (slider) slider.value = Math.round(deg);
+    }
+
+    function setHdriPreset(presetKey) {
+      if (state.hdri.enabled && state.hdri.preset === presetKey) {
+        disableHdri();
+      } else {
+        loadHdriPreset(presetKey);
+      }
+    }
+
+    function toggleHdri() {
+      if (state.hdri.enabled) {
+        disableHdri();
+      } else {
+        setHdriPreset(state.hdri.preset || 'daylight');
+      }
+    }
+
+    function disableHdri() {
+      state.hdri.enabled = false;
+      currentHdriTexture = null;
+
+      // Revert to RoomEnvironment PMREM
+      scene.environment = vrayEnvTexture;
+      scene.environmentIntensity = 0.55;
+      if ('backgroundBlurriness' in scene) {
+        scene.backgroundBlurriness = 0;
+      }
+      if ('backgroundRotation' in scene && scene.backgroundRotation) {
+        scene.backgroundRotation.set(0, 0, 0);
+      }
+      if ('environmentRotation' in scene && scene.environmentRotation) {
+        scene.environmentRotation.set(0, 0, 0);
+      }
+
+      if (state.todEnabled) {
+        updateLumionAtmosphereAndSun();
+      } else {
+        scene.background = new THREE.Color(state.darkMode ? 0x141519 : 0xECECE6);
+      }
+
+      updateHdriUI();
+    }
+
+    function updateHdriUI() {
+      const badge = document.getElementById('hdriStatusBadge');
+      if (badge) {
+        badge.textContent = state.hdri.enabled
+          ? (state.hdri.preset ? state.hdri.preset.toUpperCase() : 'ACTIVE')
+          : 'RAYLEIGH SKY';
+      }
+
+      document.querySelectorAll('.hdri-preset-btn').forEach((btn) => {
+        const p = btn.getAttribute('data-hdri');
+        btn.classList.toggle('active', state.hdri.enabled && state.hdri.preset === p);
+      });
+
+      const toggleBgBtn = document.getElementById('hdriToggleBgBtn');
+      if (toggleBgBtn) {
+        toggleBgBtn.classList.toggle('active', state.hdri.showBackground);
+        toggleBgBtn.textContent = `Sky Dome: ${state.hdri.showBackground ? 'ON' : 'OFF'}`;
+      }
+
+      const expSlider = document.getElementById('hdriExposureSlider');
+      if (expSlider) {
+        expSlider.value = Math.round(state.hdri.intensity * 10);
+        document.getElementById('hdriExposureLabel').textContent = `${state.hdri.intensity.toFixed(1)}x`;
+      }
+
+      const blurSlider = document.getElementById('hdriBlurSlider');
+      if (blurSlider) {
+        blurSlider.value = Math.round(state.hdri.blur * 100);
+        document.getElementById('hdriBlurLabel').textContent = state.hdri.blur.toFixed(2);
+      }
+
+      const drawerHdriBtn = document.getElementById('drawerFxHdriBtn');
+      if (drawerHdriBtn) {
+        drawerHdriBtn.classList.toggle('active', state.hdri.enabled);
+        drawerHdriBtn.textContent = `HDRI: ${state.hdri.enabled ? 'ON' : 'OFF'}`;
+      }
+
+      const fxHdriBtn = document.getElementById('fxHdriBtn');
+      if (fxHdriBtn) {
+        fxHdriBtn.classList.toggle('active', state.hdri.enabled);
+        fxHdriBtn.textContent = `HDRI: ${state.hdri.enabled ? 'ON' : 'OFF'}`;
+      }
     }
 
     // ==========================================================================
@@ -2144,7 +2525,14 @@
       resetAnimationTimeline();
       clearMeasurements();
       state.selectedMesh = null;
+      state.activeMaterialPresetKey = null;
       state.isolatedMaterialUuid = null;
+      const targetBadge = document.getElementById('pbrTargetBadge');
+      if (targetBadge) {
+        targetBadge.textContent = 'NO SELECTION';
+        targetBadge.style.background = 'var(--surface-mute)';
+        targetBadge.style.color = 'var(--fg)';
+      }
       document.getElementById('selectedObjHud').classList.add('hidden');
 
       while (modelRoot.children.length > 0) modelRoot.remove(modelRoot.children[0]);
@@ -2469,7 +2857,8 @@
       sharedClayMaterial.side = state.doubleSided ? THREE.DoubleSide : THREE.FrontSide;
 
       state.meshRecords.forEach((rec) => {
-        rec.mesh.material = state.clayMode ? sharedClayMaterial : rec.origMaterial;
+        const activeMat = rec.customMaterial || rec.origMaterial;
+        rec.mesh.material = state.clayMode ? sharedClayMaterial : activeMat;
         const mats = Array.isArray(rec.mesh.material) ? rec.mesh.material : [rec.mesh.material];
         mats.forEach((m) => {
           if (!m) return;
@@ -2607,6 +2996,536 @@
         row.appendChild(left);
         row.appendChild(isoBtn);
         listEl.appendChild(row);
+      });
+    }
+
+    // ==========================================================================
+    // AEC CURATED PBR MATERIAL PRE-LIBRARY (LAZY LOADED PROCEDURAL TEXTURES)
+    // ==========================================================================
+    const AEC_MATERIAL_PRESETS = [
+      {
+        id: 'travertine',
+        name: 'Brushed Travertine',
+        subtitle: 'Roman Ivory',
+        category: 'Stone',
+        swatchHex: '#E8E4DA',
+        create: () => {
+          const c = document.createElement('canvas'); c.width = 512; c.height = 512;
+          const ctx = c.getContext('2d');
+          ctx.fillStyle = '#E8E4DA'; ctx.fillRect(0, 0, 512, 512);
+          for (let y = 0; y < 512; y += 2) {
+            const alpha = 0.05 + 0.08 * Math.sin(y * 0.04 + Math.sin(y * 0.12));
+            ctx.fillStyle = y % 8 < 4 ? `rgba(188, 180, 161, ${alpha})` : `rgba(212, 206, 191, ${alpha})`;
+            ctx.fillRect(0, y, 512, 2);
+          }
+          for (let i = 0; i < 900; i++) {
+            const px = Math.random() * 512, py = Math.random() * 512, pw = 1 + Math.random() * 4, ph = 1 + Math.random() * 2;
+            ctx.fillStyle = 'rgba(160, 150, 130, 0.18)';
+            ctx.fillRect(px, py, pw, ph);
+          }
+          const tex = new THREE.CanvasTexture(c);
+          tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+          tex.repeat.set(2, 2);
+          return new THREE.MeshPhysicalMaterial({
+            name: 'PBR_Brushed_Travertine',
+            color: 0xF4F2EB,
+            map: tex,
+            bumpMap: tex,
+            bumpScale: 0.025,
+            roughness: 0.38,
+            metalness: 0.0,
+            clearcoat: 0.08,
+            clearcoatRoughness: 0.3
+          });
+        }
+      },
+      {
+        id: 'nero_marquina',
+        name: 'Nero Marquina',
+        subtitle: 'Spanish Marble',
+        category: 'Marble',
+        swatchHex: '#1A1B1E',
+        create: () => {
+          const c = document.createElement('canvas'); c.width = 512; c.height = 512;
+          const ctx = c.getContext('2d');
+          ctx.fillStyle = '#141518'; ctx.fillRect(0, 0, 512, 512);
+          for (let i = 0; i < 30; i++) {
+            ctx.fillStyle = `rgba(38, 40, 46, ${0.04 + Math.random() * 0.06})`;
+            ctx.beginPath();
+            ctx.arc(Math.random() * 512, Math.random() * 512, 40 + Math.random() * 90, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          const drawVein = (x, y, len, angle, w) => {
+            ctx.strokeStyle = `rgba(240, 243, 246, ${0.45 + Math.random() * 0.45})`;
+            ctx.lineWidth = w;
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            let curX = x, curY = y;
+            for (let s = 0; s < len; s += 8) {
+              angle += (Math.random() - 0.5) * 0.45;
+              curX += Math.cos(angle) * 8;
+              curY += Math.sin(angle) * 8;
+              ctx.lineTo(curX, curY);
+              if (Math.random() < 0.12 && w > 0.8) {
+                drawVein(curX, curY, len * 0.45, angle + (Math.random() > 0.5 ? 0.6 : -0.6), w * 0.5);
+              }
+            }
+            ctx.stroke();
+          };
+          drawVein(20, 40, 480, 0.65, 2.2);
+          drawVein(420, 10, 420, 2.3, 1.6);
+          drawVein(10, 360, 320, -0.4, 1.2);
+          const tex = new THREE.CanvasTexture(c);
+          tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+          tex.repeat.set(1.5, 1.5);
+          return new THREE.MeshPhysicalMaterial({
+            name: 'PBR_Nero_Marquina',
+            color: 0x1F2124,
+            map: tex,
+            roughness: 0.12,
+            metalness: 0.04,
+            clearcoat: 0.88,
+            clearcoatRoughness: 0.08
+          });
+        }
+      },
+      {
+        id: 'board_concrete',
+        name: 'Board Concrete',
+        subtitle: 'Wood Grain Imprint',
+        category: 'Concrete',
+        swatchHex: '#9B9C97',
+        create: () => {
+          const c = document.createElement('canvas'); c.width = 512; c.height = 512;
+          const ctx = c.getContext('2d');
+          ctx.fillStyle = '#9C9D98'; ctx.fillRect(0, 0, 512, 512);
+          for (let p = 0; p < 512; p += 64) {
+            const shade = (Math.random() - 0.5) * 14;
+            ctx.fillStyle = `rgba(${shade > 0 ? 255 : 0}, ${shade > 0 ? 255 : 0}, ${shade > 0 ? 255 : 0}, ${Math.abs(shade) / 180})`;
+            ctx.fillRect(0, p, 512, 64);
+            for (let g = 0; g < 18; g++) {
+              const gy = p + Math.random() * 64;
+              ctx.fillStyle = `rgba(0, 0, 0, ${0.03 + Math.random() * 0.05})`;
+              ctx.fillRect(0, gy, 512, 1);
+            }
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.28)'; ctx.fillRect(0, p + 62, 512, 2);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.18)'; ctx.fillRect(0, p, 512, 1);
+            [120, 392].forEach((tx) => {
+              const ty = p + 32;
+              ctx.fillStyle = 'rgba(40, 42, 40, 0.55)';
+              ctx.beginPath(); ctx.arc(tx, ty, 6.5, 0, Math.PI * 2); ctx.fill();
+              ctx.fillStyle = 'rgba(20, 22, 20, 0.85)';
+              ctx.beginPath(); ctx.arc(tx, ty, 3.5, 0, Math.PI * 2); ctx.fill();
+            });
+          }
+          const tex = new THREE.CanvasTexture(c);
+          tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+          tex.repeat.set(2, 2);
+          return new THREE.MeshStandardMaterial({
+            name: 'PBR_Board_Concrete',
+            color: 0xAEB0AB,
+            map: tex,
+            bumpMap: tex,
+            bumpScale: 0.045,
+            roughness: 0.76,
+            metalness: 0.02
+          });
+        }
+      },
+      {
+        id: 'teak_timber',
+        name: 'Teak Timber',
+        subtitle: 'Natural Slat Grain',
+        category: 'Wood',
+        swatchHex: '#8F5831',
+        create: () => {
+          const c = document.createElement('canvas'); c.width = 512; c.height = 512;
+          const ctx = c.getContext('2d');
+          ctx.fillStyle = '#965E36'; ctx.fillRect(0, 0, 512, 512);
+          for (let y = 0; y < 512; y += 2) {
+            const wave = Math.sin(y * 0.035) * 18 + Math.sin(y * 0.11) * 6;
+            const dark = (y + Math.floor(wave)) % 22 < 3;
+            ctx.fillStyle = dark ? 'rgba(78, 44, 22, 0.28)' : 'rgba(182, 124, 76, 0.18)';
+            ctx.fillRect(0, y, 512, 2);
+          }
+          for (let i = 0; i < 450; i++) {
+            const rx = Math.random() * 512, ry = Math.random() * 512;
+            ctx.fillStyle = Math.random() > 0.5 ? 'rgba(50, 25, 10, 0.22)' : 'rgba(210, 150, 95, 0.18)';
+            ctx.fillRect(rx, ry, 1 + Math.random() * 8, 1);
+          }
+          const tex = new THREE.CanvasTexture(c);
+          tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+          tex.repeat.set(2, 2);
+          return new THREE.MeshPhysicalMaterial({
+            name: 'PBR_Teak_Timber',
+            color: 0xA06B3E,
+            map: tex,
+            bumpMap: tex,
+            bumpScale: 0.03,
+            roughness: 0.32,
+            metalness: 0.0,
+            clearcoat: 0.22,
+            clearcoatRoughness: 0.25
+          });
+        }
+      },
+      {
+        id: 'fluted_glass',
+        name: 'Fluted Glass',
+        subtitle: 'Architectural Reeded',
+        category: 'Glass',
+        swatchHex: '#BCE0E5',
+        create: () => {
+          const c = document.createElement('canvas'); c.width = 512; c.height = 512;
+          const ctx = c.getContext('2d');
+          ctx.fillStyle = '#D6EBEE'; ctx.fillRect(0, 0, 512, 512);
+          for (let x = 0; x < 512; x += 16) {
+            const grad = ctx.createLinearGradient(x, 0, x + 16, 0);
+            grad.addColorStop(0.0, 'rgba(255, 255, 255, 0.45)');
+            grad.addColorStop(0.4, 'rgba(255, 255, 255, 0.15)');
+            grad.addColorStop(0.7, 'rgba(140, 185, 195, 0.25)');
+            grad.addColorStop(1.0, 'rgba(100, 150, 165, 0.45)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(x, 0, 16, 512);
+          }
+          const tex = new THREE.CanvasTexture(c);
+          tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+          tex.repeat.set(4, 1);
+          return new THREE.MeshPhysicalMaterial({
+            name: 'PBR_Fluted_Glass',
+            color: 0xE8F2F4,
+            map: tex,
+            roughness: 0.18,
+            transmission: 0.88,
+            transparent: true,
+            opacity: 0.95,
+            ior: 1.52,
+            thickness: 0.6
+          });
+        }
+      },
+      {
+        id: 'corten_steel',
+        name: 'Corten Steel',
+        subtitle: 'Weathered Rust Patina',
+        category: 'Metal',
+        swatchHex: '#7E391B',
+        create: () => {
+          const c = document.createElement('canvas'); c.width = 512; c.height = 512;
+          const ctx = c.getContext('2d');
+          ctx.fillStyle = '#6E3218'; ctx.fillRect(0, 0, 512, 512);
+          for (let i = 0; i < 45; i++) {
+            ctx.fillStyle = `rgba(156, 73, 32, ${0.12 + Math.random() * 0.18})`;
+            ctx.beginPath();
+            ctx.arc(Math.random() * 512, Math.random() * 512, 30 + Math.random() * 80, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          for (let i = 0; i < 1800; i++) {
+            ctx.fillStyle = Math.random() > 0.4 ? 'rgba(50, 20, 10, 0.35)' : 'rgba(195, 100, 45, 0.28)';
+            ctx.fillRect(Math.random() * 512, Math.random() * 512, 1 + Math.random() * 3, 1 + Math.random() * 3);
+          }
+          const tex = new THREE.CanvasTexture(c);
+          tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+          tex.repeat.set(2, 2);
+          return new THREE.MeshStandardMaterial({
+            name: 'PBR_Corten_Steel',
+            color: 0x823D1F,
+            map: tex,
+            bumpMap: tex,
+            bumpScale: 0.035,
+            roughness: 0.78,
+            metalness: 0.42
+          });
+        }
+      },
+      {
+        id: 'brushed_titanium',
+        name: 'Brushed Titanium',
+        subtitle: 'Satin Architectural',
+        category: 'Metal',
+        swatchHex: '#7B7F86',
+        create: () => {
+          const c = document.createElement('canvas'); c.width = 512; c.height = 512;
+          const ctx = c.getContext('2d');
+          ctx.fillStyle = '#7A7D82'; ctx.fillRect(0, 0, 512, 512);
+          for (let y = 0; y < 512; y++) {
+            const br = (Math.random() - 0.5) * 35;
+            ctx.fillStyle = `rgba(${br > 0 ? 255 : 0}, ${br > 0 ? 255 : 0}, ${br > 0 ? 255 : 0}, ${Math.abs(br) / 255})`;
+            ctx.fillRect(0, y, 512, 1);
+          }
+          const tex = new THREE.CanvasTexture(c);
+          tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+          tex.repeat.set(1, 4);
+          return new THREE.MeshStandardMaterial({
+            name: 'PBR_Brushed_Titanium',
+            color: 0x84888F,
+            map: tex,
+            bumpMap: tex,
+            bumpScale: 0.015,
+            roughness: 0.26,
+            metalness: 0.92
+          });
+        }
+      },
+      {
+        id: 'terrazzo_bianco',
+        name: 'Terrazzo Bianco',
+        subtitle: 'Polished Aggregate',
+        category: 'Stone',
+        swatchHex: '#EAE7E0',
+        create: () => {
+          const c = document.createElement('canvas'); c.width = 512; c.height = 512;
+          const ctx = c.getContext('2d');
+          ctx.fillStyle = '#EFECE6'; ctx.fillRect(0, 0, 512, 512);
+          const chipColors = [
+            'rgba(30, 32, 35, 0.85)',
+            'rgba(160, 85, 55, 0.80)',
+            'rgba(120, 135, 120, 0.75)',
+            'rgba(195, 175, 140, 0.70)',
+            'rgba(245, 245, 250, 0.90)'
+          ];
+          for (let i = 0; i < 650; i++) {
+            const cx = Math.random() * 512, cy = Math.random() * 512;
+            const sz = 2 + Math.random() * 7;
+            ctx.fillStyle = chipColors[Math.floor(Math.random() * chipColors.length)];
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(cx + sz * (0.8 + Math.random() * 0.5), cy + sz * (Math.random() - 0.5));
+            ctx.lineTo(cx + sz * (Math.random() - 0.5), cy + sz * (0.8 + Math.random() * 0.5));
+            ctx.closePath();
+            ctx.fill();
+          }
+          const tex = new THREE.CanvasTexture(c);
+          tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+          tex.repeat.set(2, 2);
+          return new THREE.MeshPhysicalMaterial({
+            name: 'PBR_Terrazzo_Bianco',
+            color: 0xF4F2EE,
+            map: tex,
+            roughness: 0.20,
+            metalness: 0.0,
+            clearcoat: 0.65,
+            clearcoatRoughness: 0.12
+          });
+        }
+      },
+      {
+        id: 'ceramic_mosaic',
+        name: 'Ceramic Mosaic',
+        subtitle: 'Cobalt Pool Tesserae',
+        category: 'Tiles',
+        swatchHex: '#1E4275',
+        create: () => {
+          const c = document.createElement('canvas'); c.width = 512; c.height = 512;
+          const ctx = c.getContext('2d');
+          ctx.fillStyle = '#C8CCD0'; ctx.fillRect(0, 0, 512, 512);
+          const tileSize = 32, pad = 2.5;
+          for (let y = 0; y < 512; y += tileSize) {
+            for (let x = 0; x < 512; x += tileSize) {
+              const b = 0.85 + Math.random() * 0.3;
+              ctx.fillStyle = `rgb(${Math.floor(25 * b)}, ${Math.floor(65 * b)}, ${Math.floor(125 * b)})`;
+              ctx.fillRect(x + pad, y + pad, tileSize - pad * 2, tileSize - pad * 2);
+              ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+              ctx.fillRect(x + pad, y + pad, (tileSize - pad * 2) * 0.5, 2);
+            }
+          }
+          const tex = new THREE.CanvasTexture(c);
+          tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+          tex.repeat.set(3, 3);
+          return new THREE.MeshPhysicalMaterial({
+            name: 'PBR_Ceramic_Mosaic',
+            color: 0x22487A,
+            map: tex,
+            bumpMap: tex,
+            bumpScale: 0.03,
+            roughness: 0.16,
+            metalness: 0.0,
+            clearcoat: 0.75,
+            clearcoatRoughness: 0.08
+          });
+        }
+      },
+      {
+        id: 'acoustic_felt',
+        name: 'Acoustic Felt',
+        subtitle: 'Studio Charcoal Wool',
+        category: 'Acoustic',
+        swatchHex: '#2B2D33',
+        create: () => {
+          const c = document.createElement('canvas'); c.width = 512; c.height = 512;
+          const ctx = c.getContext('2d');
+          ctx.fillStyle = '#222428'; ctx.fillRect(0, 0, 512, 512);
+          for (let i = 0; i < 2200; i++) {
+            ctx.fillStyle = Math.random() > 0.5 ? 'rgba(55, 58, 65, 0.35)' : 'rgba(15, 16, 18, 0.4)';
+            ctx.fillRect(Math.random() * 512, Math.random() * 512, 1 + Math.random() * 2, 1 + Math.random() * 2);
+          }
+          const tex = new THREE.CanvasTexture(c);
+          tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+          tex.repeat.set(3, 3);
+          return new THREE.MeshStandardMaterial({
+            name: 'PBR_Acoustic_Felt',
+            color: 0x2B2D33,
+            map: tex,
+            roughness: 0.96,
+            metalness: 0.0
+          });
+        }
+      }
+    ];
+
+    function getOrCreatePresetMaterial(presetId) {
+      if (!state.materialLibraryCache[presetId]) {
+        const def = AEC_MATERIAL_PRESETS.find((p) => p.id === presetId);
+        if (!def) return null;
+        state.materialLibraryCache[presetId] = def.create();
+      }
+      return state.materialLibraryCache[presetId];
+    }
+
+    function applyMaterialPreset(presetId, targetMesh = state.selectedMesh) {
+      if (!targetMesh) {
+        document.getElementById('statusText').textContent = 'SELECT A MESH PART FIRST';
+        const badge = document.getElementById('pbrTargetBadge');
+        if (badge) {
+          badge.textContent = 'SELECT PART FIRST';
+          badge.style.background = '#EF4444';
+          badge.style.color = '#FFFFFF';
+          setTimeout(() => {
+            if (badge) {
+              badge.textContent = state.selectedMesh ? (state.selectedMesh.name || 'PART').toUpperCase().slice(0, 15) : 'NO SELECTION';
+              badge.style.background = 'var(--surface-mute)';
+              badge.style.color = 'var(--fg)';
+            }
+          }, 1800);
+        }
+        return false;
+      }
+
+      const pbrMat = getOrCreatePresetMaterial(presetId);
+      if (!pbrMat) return false;
+
+      if (!targetMesh.userData.pristineMaterial) {
+        targetMesh.userData.pristineMaterial = targetMesh.material;
+      }
+
+      const rec = state.meshRecords.find((r) => r.mesh === targetMesh);
+      if (rec) {
+        if (!rec.pristineMaterial) rec.pristineMaterial = rec.origMaterial;
+        rec.customMaterial = pbrMat;
+      }
+      targetMesh.material = pbrMat;
+      targetMesh.userData.customMaterial = pbrMat;
+
+      state.activeMaterialPresetKey = presetId;
+      applyMaterialModes();
+
+      const presetDef = AEC_MATERIAL_PRESETS.find((p) => p.id === presetId);
+      const name = presetDef ? presetDef.name : presetId;
+      document.getElementById('selObjMat').textContent = name;
+      document.getElementById('statusText').textContent = `APPLIED FINISH: ${name.toUpperCase()}`;
+
+      document.querySelectorAll('.pbr-preset-card').forEach((card) => {
+        const isActive = card.dataset.preset === presetId;
+        card.classList.toggle('active', isActive);
+        card.style.borderColor = isActive ? 'var(--fg)' : 'var(--border)';
+      });
+
+      return true;
+    }
+
+    function resetMeshMaterial(targetMesh = state.selectedMesh) {
+      if (!targetMesh) return false;
+      const rec = state.meshRecords.find((r) => r.mesh === targetMesh);
+      const orig = rec ? (rec.pristineMaterial || rec.origMaterial) : targetMesh.userData.pristineMaterial;
+      if (!orig) return false;
+
+      if (rec) rec.customMaterial = null;
+      targetMesh.material = orig;
+      targetMesh.userData.customMaterial = null;
+      state.activeMaterialPresetKey = null;
+
+      applyMaterialModes();
+
+      const origName = Array.isArray(orig) ? orig.map((m) => m?.name).join(', ') : (orig.name || 'Original SKP');
+      document.getElementById('selObjMat').textContent = origName;
+      document.getElementById('statusText').textContent = 'RESTORED ORIGINAL MATERIAL';
+
+      document.querySelectorAll('.pbr-preset-card').forEach((card) => {
+        card.classList.remove('active');
+        card.style.borderColor = 'var(--border)';
+      });
+
+      return true;
+    }
+
+    function resetAllMaterials() {
+      let count = 0;
+      state.meshRecords.forEach((rec) => {
+        const orig = rec.pristineMaterial || rec.origMaterial;
+        if (orig) {
+          rec.customMaterial = null;
+          rec.mesh.material = orig;
+          rec.mesh.userData.customMaterial = null;
+          count++;
+        }
+      });
+      state.activeMaterialPresetKey = null;
+      applyMaterialModes();
+
+      if (state.selectedMesh) {
+        const rec = state.meshRecords.find((r) => r.mesh === state.selectedMesh);
+        const orig = rec ? (rec.pristineMaterial || rec.origMaterial) : state.selectedMesh.material;
+        document.getElementById('selObjMat').textContent = orig?.name || 'Original SKP';
+      }
+
+      document.querySelectorAll('.pbr-preset-card').forEach((card) => {
+        card.classList.remove('active');
+        card.style.borderColor = 'var(--border)';
+      });
+
+      document.getElementById('statusText').textContent = `RESTORED ${count} PARTS TO ORIGINAL`;
+      return count;
+    }
+
+    function initPbrMaterialLibraryUI() {
+      const grid = document.getElementById('pbrLibraryGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      AEC_MATERIAL_PRESETS.forEach((preset) => {
+        const card = document.createElement('button');
+        card.className = 'pbr-preset-card flex items-center gap-2 p-1.5 rounded border text-left hover:border-[var(--fg)] transition-all';
+        card.dataset.preset = preset.id;
+        card.style.borderColor = 'var(--border)';
+        card.style.background = 'var(--surface-mute)';
+        card.title = `${preset.name} (${preset.category}) — Click to apply finish to selected part`;
+
+        const swatch = document.createElement('span');
+        swatch.className = 'w-5 h-5 rounded shrink-0 border';
+        swatch.style.backgroundColor = preset.swatchHex;
+        swatch.style.borderColor = 'var(--border-strong)';
+
+        const textDiv = document.createElement('div');
+        textDiv.className = 'truncate leading-tight';
+
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'mono text-[9px] font-bold truncate';
+        nameDiv.textContent = preset.name;
+
+        const subDiv = document.createElement('div');
+        subDiv.className = 'text-[8px] opacity-65 truncate';
+        subDiv.textContent = preset.subtitle;
+
+        textDiv.appendChild(nameDiv);
+        textDiv.appendChild(subDiv);
+        card.appendChild(swatch);
+        card.appendChild(textDiv);
+
+        card.addEventListener('click', () => {
+          applyMaterialPreset(preset.id);
+        });
+
+        grid.appendChild(card);
       });
     }
 
@@ -2925,16 +3844,23 @@
       );
 
       const rec = state.meshRecords.find((r) => r.mesh === mesh);
-      const origMat = rec ? rec.origMaterial : mesh.material;
-      const matName = Array.isArray(origMat)
-        ? origMat.map((m) => m?.name).join(', ')
-        : origMat?.name || 'Default';
+      const activeMat = rec?.customMaterial || rec?.origMaterial || mesh.material;
+      const matName = Array.isArray(activeMat)
+        ? activeMat.map((m) => m?.name).join(', ')
+        : activeMat?.name || 'Default';
 
       document.getElementById('selObjName').textContent = mesh.name || 'Mesh_Part';
       document.getElementById('selObjMat').textContent = matName;
       document.getElementById('selObjDims').textContent = `${formatLength(size.x)}×${formatLength(size.z)}×${formatLength(size.y)}`;
       document.getElementById('selObjElev').textContent = formatLength(box.min.y - state.modelBounds.min.y);
       document.getElementById('selectedObjHud').classList.remove('hidden');
+
+      const targetBadge = document.getElementById('pbrTargetBadge');
+      if (targetBadge) {
+        targetBadge.textContent = (mesh.name || 'PART').toUpperCase().slice(0, 15);
+        targetBadge.style.background = 'var(--fg)';
+        targetBadge.style.color = 'var(--bg)';
+      }
 
       if (shouldFocusCamera) {
         focusCameraOnMesh(mesh);
@@ -3063,6 +3989,199 @@
       document.getElementById('lastMeasureReadout').textContent = '--';
       document.getElementById('tapeStepBadge').textContent = 'Click two points on model';
     }
+
+    // ==========================================================================
+    // 5B. FIRST-PERSON WASD WALK MODE & ARCHITECTURAL FLOOR COLLISION
+    // ==========================================================================
+    const walkRaycaster = new THREE.Raycaster();
+    walkRaycaster.far = 30;
+
+    function enableWalkMode() {
+      if (state.projection !== 'perspective') {
+        state.projection = 'perspective';
+        activeCamera = perspCamera;
+        controls.object = activeCamera;
+        document.querySelectorAll('.proj-toggle-btn').forEach((b) => b.classList.toggle('active', b.dataset.proj === 'perspective'));
+      }
+
+      state.walkMode.active = true;
+      controls.enabled = false;
+
+      // Position player at entrance walkway facing north into villa
+      activeCamera.position.set(2.0, 1.70, 9.5);
+      state.walkMode.yaw = 0;
+      state.walkMode.pitch = 0.04;
+      state.walkMode.velocity.set(0, 0, 0);
+      state.walkMode.isGrounded = true;
+      activeCamera.rotation.set(state.walkMode.pitch, state.walkMode.yaw, 0, 'YXZ');
+
+      const hud = document.getElementById('walkHud');
+      if (hud) {
+        hud.classList.remove('hidden');
+        hud.classList.add('flex');
+      }
+
+      const btn = document.getElementById('dWalk');
+      if (btn) btn.classList.add('active');
+    }
+
+    function disableWalkMode() {
+      state.walkMode.active = false;
+      state.walkMode.keys = { forward: false, backward: false, left: false, right: false, sprint: false, jump: false };
+
+      if (document.pointerLockElement === canvas) {
+        document.exitPointerLock?.();
+      }
+
+      controls.enabled = true;
+      const fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(activeCamera.quaternion);
+      controls.target.copy(activeCamera.position).addScaledVector(fwd, 6.0);
+      controls.update();
+
+      const hud = document.getElementById('walkHud');
+      if (hud) {
+        hud.classList.add('hidden');
+        hud.classList.remove('flex');
+      }
+
+      const btn = document.getElementById('dWalk');
+      if (btn) btn.classList.remove('active');
+    }
+
+    function toggleWalkMode() {
+      if (state.walkMode && state.walkMode.active) {
+        disableWalkMode();
+      } else {
+        enableWalkMode();
+      }
+    }
+
+    function updateWalkMode(dt) {
+      const wm = state.walkMode;
+      if (!wm || !wm.active) return;
+
+      // 1. Horizontal movement relative to camera yaw
+      const yaw = wm.yaw;
+      const fwd = new THREE.Vector3(-Math.sin(yaw), 0, -Math.cos(yaw)).normalize();
+      const right = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw)).normalize();
+
+      const move = new THREE.Vector3();
+      const k = wm.keys;
+      if (k.forward) move.add(fwd);
+      if (k.backward) move.sub(fwd);
+      if (k.right) move.add(right);
+      if (k.left) move.sub(right);
+
+      if (move.lengthSq() > 0) move.normalize();
+      const spd = k.sprint ? wm.sprintSpeed : wm.moveSpeed;
+      activeCamera.position.addScaledVector(move, spd * dt);
+
+      // 2. Downward Floor Collision & Step Detection
+      const origin = new THREE.Vector3(activeCamera.position.x, activeCamera.position.y + 0.5, activeCamera.position.z);
+      walkRaycaster.set(origin, new THREE.Vector3(0, -1, 0));
+
+      const queryTargets = [];
+      if (modelRoot) queryTargets.push(modelRoot);
+      if (state.lumionEnvGroup) queryTargets.push(state.lumionEnvGroup);
+
+      const hits = walkRaycaster.intersectObjects(queryTargets, true);
+      let floorY = 0.0;
+      for (let i = 0; i < hits.length; i++) {
+        const h = hits[i];
+        if (h.face && h.face.normal.y > 0.35 && h.point.y <= origin.y - 0.15) {
+          floorY = Math.max(floorY, h.point.y);
+          break;
+        }
+      }
+
+      const targetEyeY = floorY + wm.eyeHeight;
+
+      if (!wm.isGrounded) {
+        // Airborne (jumping or dropping off a step/ledge)
+        wm.velocity.y -= wm.gravity * dt;
+        activeCamera.position.y += wm.velocity.y * dt;
+        if (activeCamera.position.y <= targetEyeY) {
+          activeCamera.position.y = targetEyeY;
+          wm.velocity.y = 0;
+          wm.isGrounded = true;
+        }
+      } else {
+        // Grounded: smoothly step onto pavers, curbs, and stair treads
+        const diff = targetEyeY - activeCamera.position.y;
+        if (Math.abs(diff) < 0.55) {
+          activeCamera.position.y = THREE.MathUtils.lerp(activeCamera.position.y, targetEyeY, Math.min(1, dt * 18));
+        } else if (diff < -0.55) {
+          wm.isGrounded = false;
+          wm.velocity.y = 0;
+        } else {
+          activeCamera.position.y = targetEyeY;
+        }
+      }
+
+      // Sync camera rotation with pitch & yaw
+      activeCamera.rotation.set(wm.pitch, wm.yaw, 0, 'YXZ');
+    }
+
+    // First-Person Walk Controls Listeners
+    canvas.addEventListener('click', () => {
+      if (state.walkMode && state.walkMode.active) {
+        if (document.pointerLockElement !== canvas) {
+          try {
+            const p = canvas.requestPointerLock?.();
+            if (p && p.catch) p.catch(() => {});
+          } catch (e) {}
+        }
+      }
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (state.walkMode && state.walkMode.active) {
+        if (document.pointerLockElement === canvas || e.buttons === 1) {
+          const sens = 0.0024;
+          state.walkMode.yaw -= e.movementX * sens;
+          state.walkMode.pitch -= e.movementY * sens;
+          state.walkMode.pitch = Math.max(-1.45, Math.min(1.45, state.walkMode.pitch));
+          activeCamera.rotation.set(state.walkMode.pitch, state.walkMode.yaw, 0, 'YXZ');
+        }
+      }
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
+      if (e.code === 'KeyV' && !e.shiftKey && !e.ctrlKey) {
+        toggleWalkMode();
+        return;
+      }
+      if (state.walkMode && state.walkMode.active) {
+        if (e.code === 'KeyW' || e.code === 'ArrowUp') state.walkMode.keys.forward = true;
+        if (e.code === 'KeyS' || e.code === 'ArrowDown') state.walkMode.keys.backward = true;
+        if (e.code === 'KeyA' || e.code === 'ArrowLeft') state.walkMode.keys.left = true;
+        if (e.code === 'KeyD' || e.code === 'ArrowRight') state.walkMode.keys.right = true;
+        if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') state.walkMode.keys.sprint = true;
+        if (e.code === 'Space') {
+          e.preventDefault();
+          if (state.walkMode.isGrounded) {
+            state.walkMode.velocity.y = state.walkMode.jumpForce;
+            state.walkMode.isGrounded = false;
+          }
+        }
+        if (e.code === 'Escape') {
+          disableWalkMode();
+        }
+      }
+    });
+
+    window.addEventListener('keyup', (e) => {
+      if (state.walkMode && state.walkMode.active) {
+        if (e.code === 'KeyW' || e.code === 'ArrowUp') state.walkMode.keys.forward = false;
+        if (e.code === 'KeyS' || e.code === 'ArrowDown') state.walkMode.keys.backward = false;
+        if (e.code === 'KeyA' || e.code === 'ArrowLeft') state.walkMode.keys.left = false;
+        if (e.code === 'KeyD' || e.code === 'ArrowRight') state.walkMode.keys.right = false;
+        if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') state.walkMode.keys.sprint = false;
+      }
+    });
+
+    document.getElementById('exitWalkBtn')?.addEventListener('click', disableWalkMode);
 
     async function buildDemoArchitecturalVilla() {
       await showSpinner('BUILDING ARCHITECTURAL VILLA...', 'Constructing perimeter estate, interior rooms & cantilever slabs', 35);
@@ -3469,6 +4588,10 @@
       document.getElementById('fileBadge').textContent = state.currentFileName;
       await showSpinner('FINALIZING SCENE...', 'Computing bounds, edges & 2D floor plan', 85);
       finalizeLoadedModel();
+      if (state.todEnabled) {
+        buildProceduralLumionEnvironment();
+        updateLumionAtmosphereAndSun();
+      }
       hideSpinner();
       document.getElementById('statusText').textContent = 'DEMO VILLA READY';
     }
@@ -3669,6 +4792,18 @@
         if (item.category === 'select') { item.el.remove(); return false; }
         return true;
       });
+      const targetBadge = document.getElementById('pbrTargetBadge');
+      if (targetBadge) {
+        targetBadge.textContent = 'NO SELECTION';
+        targetBadge.style.background = 'var(--surface-mute)';
+        targetBadge.style.color = 'var(--fg)';
+      }
+    });
+    document.getElementById('selHudOpenMatsBtn')?.addEventListener('click', () => {
+      activateTab('materials');
+    });
+    document.getElementById('selHudResetMatBtn')?.addEventListener('click', () => {
+      if (state.selectedMesh) resetMeshMaterial(state.selectedMesh);
     });
 
     // Outliner Tab
@@ -3789,6 +4924,9 @@
     document.getElementById('todAzimuthSlider').addEventListener('input', (e) => {
       state.todAzimuth = parseFloat(e.target.value);
       document.getElementById('todAzimuthLabel').textContent = `${Math.round(state.todAzimuth)}°`;
+      if (state.hdri && state.hdri.enabled) {
+        applyHdriRotation(state.todAzimuth);
+      }
       updateLumionAtmosphereAndSun();
     });
 
@@ -3812,6 +4950,70 @@
         }
         updateLumionAtmosphereAndSun();
       });
+    });
+
+    // HDRI Sky & IBL Event Listeners
+    document.querySelectorAll('.hdri-preset-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const preset = btn.getAttribute('data-hdri');
+        setHdriPreset(preset);
+      });
+    });
+
+    document.getElementById('hdriToggleBgBtn').addEventListener('click', (e) => {
+      state.hdri.showBackground = !state.hdri.showBackground;
+      e.currentTarget.classList.toggle('active', state.hdri.showBackground);
+      e.currentTarget.textContent = `Sky Dome: ${state.hdri.showBackground ? 'ON' : 'OFF'}`;
+      if (state.hdri.enabled && currentHdriTexture) {
+        if (state.hdri.showBackground) {
+          scene.background = currentHdriTexture;
+          if ('backgroundBlurriness' in scene) scene.backgroundBlurriness = state.hdri.blur;
+          if ('backgroundIntensity' in scene) scene.backgroundIntensity = state.hdri.intensity;
+        } else {
+          if (state.todEnabled) {
+            updateLumionAtmosphereAndSun();
+          } else {
+            scene.background = new THREE.Color(state.darkMode ? 0x141519 : 0xECECE6);
+          }
+        }
+      }
+    });
+
+    document.getElementById('hdriExposureSlider').addEventListener('input', (e) => {
+      state.hdri.intensity = parseFloat(e.target.value) / 10;
+      document.getElementById('hdriExposureLabel').textContent = `${state.hdri.intensity.toFixed(1)}x`;
+      if (state.hdri.enabled) {
+        scene.environmentIntensity = state.hdri.intensity;
+        if ('backgroundIntensity' in scene && state.hdri.showBackground) {
+          scene.backgroundIntensity = state.hdri.intensity;
+        }
+      }
+    });
+
+    document.getElementById('hdriBlurSlider').addEventListener('input', (e) => {
+      state.hdri.blur = parseFloat(e.target.value) / 100;
+      document.getElementById('hdriBlurLabel').textContent = state.hdri.blur.toFixed(2);
+      if (state.hdri.enabled && state.hdri.showBackground && 'backgroundBlurriness' in scene) {
+        scene.backgroundBlurriness = state.hdri.blur;
+      }
+    });
+
+    document.getElementById('hdriRotationSlider').addEventListener('input', (e) => {
+      const deg = parseFloat(e.target.value);
+      applyHdriRotation(deg);
+    });
+
+    document.getElementById('hdriResetProceduralBtn').addEventListener('click', () => {
+      disableHdri();
+    });
+
+    document.getElementById('customHdriInput').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const objectUrl = URL.createObjectURL(file);
+      await loadHdriPreset('custom', objectUrl);
+      const b = document.getElementById('hdriStatusBadge');
+      if (b) b.textContent = file.name.substring(0, 12).toUpperCase();
     });
 
     // Measure Tab Controls
@@ -3884,6 +5086,12 @@
     });
 
     // Materials Tab
+    document.getElementById('resetSelectedMatBtn')?.addEventListener('click', () => {
+      if (state.selectedMesh) resetMeshMaterial(state.selectedMesh);
+    });
+    document.getElementById('resetAllMatsBtn')?.addEventListener('click', () => {
+      resetAllMaterials();
+    });
     document.getElementById('healOrangeMatBtn').addEventListener('click', neutralizeOrangeAndBackfaceMaterials);
     document.getElementById('flipNormalsBtn').addEventListener('click', recomputeAllNormals);
     document.getElementById('toggleDoubleSideBtn').addEventListener('click', (e) => {
@@ -4111,7 +5319,11 @@
       }
 
       for (const fn of window.RENDRA.tick) fn(dt, clock.elapsedTime);
-      controls.update();
+      if (state.walkMode && state.walkMode.active) {
+        updateWalkMode(dt);
+      } else {
+        controls.update();
+      }
       updateFloatingLabelsScreenPos();
       renderAxisGizmo();
       if (window.RENDRA.render) window.RENDRA.render(scene, activeCamera); else renderer.render(scene, activeCamera);
@@ -4119,6 +5331,7 @@
     }
 
     window.onload = async () => {
+      initPbrMaterialLibraryUI();
       onWindowResize();
       // Auto-collapse inspector on small mobile screens so 3D viewport is unobstructed
       if (window.innerWidth < 640) {
@@ -4128,6 +5341,10 @@
       animate();
       scanHardwareCapabilities();
       await buildDemoArchitecturalVilla();
+      if (state.todEnabled) {
+        buildProceduralLumionEnvironment();
+        updateLumionAtmosphereAndSun();
+      }
     };
   </script>
   <script type="module">
@@ -4159,7 +5376,7 @@ body.clean .glass-card,body.clean .glass-pill,body.clean nav,body.clean #dir{opa
  <button class="tool-btn" data-wx="rain">Rain</button><button class="tool-btn" data-wx="snow">Snow</button><span class="sep"></span>
  <label class="mono" style="font-size:9px;opacity:.7">EXP</label><input id="dExp" type="range" min="3" max="20" value="11" class="studio-slider" style="width:64px">
  <button class="tool-btn" id="dVig">Vignette</button><button class="tool-btn" id="dGrain">Grain</button><span class="sep"></span>
- <button class="tool-btn" id="dTour">Tour</button><button class="tool-btn" id="dShot">Photo</button>
+ <button class="tool-btn" id="dWalk" title="V — Walk mode (WASD + mouse look + floor collision)">Walk</button><button class="tool-btn" id="dTour">Tour</button><button class="tool-btn" id="dShot">Photo</button>
  <button class="tool-btn" id="dRec"><i id="recDot"></i><span id="recTxt">Record</span></button>
  <button class="tool-btn" id="dClean" title="Shift+H">Clean</button><button class="tool-btn tool-btn-primary" id="dInstall" style="display:none">Install</button></div>`);
 
@@ -4280,6 +5497,7 @@ body.clean .glass-card,body.clean .glass-pill,body.clean nav,body.clean #dir{opa
       $('dTour').insertAdjacentHTML('beforebegin', '<button class="tool-btn tool-btn-solid" id="dFocus" title="F — focus selection / frame all">Focus</button><button class="tool-btn" id="dFrame" title="Home — frame everything">Frame</button>');
       const focus = () => state.selectedMesh ? R.focusMesh(state.selectedMesh) : R.frameModel('iso');
       $('dFocus').onclick = focus; $('dFrame').onclick = () => R.frameModel('iso');
+      $('dWalk').onclick = () => R.toggleWalkMode();
       $('showUi').onclick = () => document.body.classList.remove('clean');
       addEventListener('keydown', (e) => {
         if (/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
@@ -4292,6 +5510,7 @@ body.clean .glass-card,body.clean .glass-pill,body.clean nav,body.clean #dir{opa
       canvas.addEventListener('pointerdown', (e) => { down = [e.clientX, e.clientY]; });
       canvas.addEventListener('pointerup', (e) => {
         if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 5) return;
+        if (state.walkMode && state.walkMode.active) return;
         if (state.tapeActive && state.activeTab === 'dimensions') return;
         const r = canvas.getBoundingClientRect(); pv.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
         rc.setFromCamera(pv, R.getCamera()); const h = rc.intersectObjects(R.modelRoot.children, true).find((x) => x.object.isMesh && x.object.visible);
@@ -4339,12 +5558,20 @@ void main() {
       function buildWorld() {
         while (env.children.length) { const o = env.children.pop(); o.traverse((m) => { m.geometry?.dispose?.(); }); }
         clouds = []; env.visible = dome.visible = !!state.todEnabled; if (!state.todEnabled) return;
-        const B = state.modelBounds, C = state.modelCenter, S = state.modelSize; span = Math.max(S.x, S.z, 12);
-        const floorY = B.min.y - 0.02, rw = Math.max(span * .42, 7.2), padW = S.x * state.sitePadScale, padD = S.z * state.sitePadScale;
-        const roadZ = B.max.z + Math.max(padD * .32, 5) + rw * .5, crossX = C.x + padW * .65 + rw * .75;
+        const B = state.modelBounds, C = state.modelCenter, S = state.modelSize;
+        span = Math.max(isFinite(S.x) ? S.x : 15, isFinite(S.z) ? S.z : 15, 12);
+        const spanVal = span;
+        const floorY = isFinite(B.min.y) ? B.min.y - 0.02 : -0.02;
+        const rw = Math.max(spanVal * .42, 7.2);
+        const padW = (isFinite(S.x) ? S.x : 20) * state.sitePadScale;
+        const padD = (isFinite(S.z) ? S.z : 20) * state.sitePadScale;
+        const centerX = isFinite(C.x) ? C.x : 0;
+        const centerZ = isFinite(C.z) ? C.z : 0;
+        const roadZ = (isFinite(B.max.z) ? B.max.z : 10) + Math.max(padD * .32, 5) + rw * .5;
+        const crossX = centerX + padW * .65 + rw * .75;
 
         // 1. remove prop collisions with the loaded model (cars, lamps, trees) + old blob hills
-        const keep = B.clone().expandByScalar(Math.max(.8, span * .03)), bx = new THREE.Box3(), grp = state.lumionEnvGroup;
+        const keep = B.clone().expandByScalar(Math.max(.8, spanVal * .03)), bx = new THREE.Box3(), grp = state.lumionEnvGroup;
         for (const o of [...grp.children]) {
           if (o.isMesh && o.geometry.type === 'SphereGeometry') { grp.remove(o); continue; }
           if (o.isGroup && bx.setFromObject(o).intersectsBox(keep)) grp.remove(o);
@@ -4352,18 +5579,31 @@ void main() {
         state.animatedCars = state.animatedCars.filter((c) => { const p = c.mesh.position, ok = c.axis === 'x' ? (p.z < keep.min.z || p.z > keep.max.z) : (p.x < keep.min.x || p.x > keep.max.x); if (!ok) grp.remove(c.mesh); return ok; });
 
         // 2. sculpted mountain ring with road valleys + altitude colouring (grass → forest → rock → snow)
-        const inner = span * 6.5, outer = span * 26, amp = span * 8, g = new THREE.RingGeometry(inner, outer, 180, 56); g.rotateX(-Math.PI / 2);
+        const inner = spanVal * 6.5, outer = spanVal * 26, amp = spanVal * 8, g = new THREE.RingGeometry(inner, outer, 180, 56); g.rotateX(-Math.PI / 2);
         const p = g.attributes.position, col = new Float32Array(p.count * 3), cc = [0x9CBB84, 0x5F8A4C, 0x3F6A3A, 0x8B8C86, 0xF1F3F6].map((x) => new THREE.Color(x)), tmp = new THREE.Color();
         const sm = THREE.MathUtils.smoothstep;
         for (let i = 0; i < p.count; i++) {
-          const x = p.getX(i), z = p.getZ(i), t = (Math.hypot(x, z) - inner) / (outer - inner), wx = x + C.x, wz = z + C.z;
-          const valley = sm(Math.min(Math.abs(wz - roadZ), Math.abs(wx - crossX)), rw * 1.3, rw * 4 + span * 1.8);
-          const h = Math.pow(t, 1.25) * amp * (.2 + 1.0 * noise(wx / span * .35, wz / span * .35)) * valley;
-          p.setY(i, floorY - .05 + h); const k = Math.min(Math.max(h / (amp * .8), 0), .999) * 4, a = Math.min(Math.max(Math.floor(k), 0), cc.length - 2);
-          tmp.copy(cc[a]).lerp(cc[a + 1], k - a); col.set([tmp.r, tmp.g, tmp.b], i * 3);
+          const x = p.getX(i), z = p.getZ(i);
+          const dist = Math.hypot(x, z);
+          const t = Math.max(0, (dist - inner) / Math.max(1, outer - inner));
+          const wx = x + centerX, wz = z + centerZ;
+          const valley = sm(Math.min(Math.abs(wz - roadZ), Math.abs(wx - crossX)), rw * 1.3, rw * 4 + spanVal * 1.8);
+          const h = Math.pow(Math.max(0, t), 1.25) * amp * (.2 + 1.0 * noise(wx / spanVal * .35, wz / spanVal * .35)) * valley;
+          const safeH = isFinite(h) ? Math.max(0, h) : 0;
+          const finalY = isFinite(floorY - 0.05 + safeH) ? (floorY - 0.05 + safeH) : 0;
+          p.setY(i, finalY);
+          const k = Math.min(Math.max(safeH / (amp * .8), 0), .999) * 4;
+          const a = Math.min(Math.max(Math.floor(k), 0), cc.length - 2);
+          if (cc[a] && cc[a + 1]) {
+            tmp.copy(cc[a]).lerp(cc[a + 1], k - a);
+            col.set([tmp.r, tmp.g, tmp.b], i * 3);
+          }
         }
-        g.setAttribute('color', new THREE.BufferAttribute(col, 3)); g.computeVertexNormals();
-        const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 1 })); m.position.set(C.x, 0, C.z); m.receiveShadow = true; env.add(m);
+        g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+        g.computeVertexNormals();
+        g.computeBoundingBox();
+        g.computeBoundingSphere();
+        const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 1 })); m.position.set(centerX, 0, centerZ); m.receiveShadow = true; env.add(m);
 
         // 3. drifting cloud banks
         for (let i = 0; i < 16; i++) {
@@ -4716,40 +5956,16 @@ void main() {
         e.currentTarget.textContent = `Still: ${F.scale}x`;
       };
 
-      // HDRI Sky Toggle (Phase 2)
-      let hdriTexture = null;
-      let origEnv = scene.environment;
-      $('fxHdriBtn').onclick = async (e) => {
-        F.hdri = !F.hdri;
-        e.currentTarget.classList.toggle('active', F.hdri);
-        e.currentTarget.textContent = `HDRI: ${F.hdri ? 'ON' : 'OFF'}`;
-        if (F.hdri) {
-          if (!hdriTexture) {
-            try {
-              const { RGBELoader } = await import('three/addons/loaders/RGBELoader.js');
-              const loader = new RGBELoader();
-              loader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js@r170/examples/textures/equirectangular/royal_esplanade_1k.hdr', (tex) => {
-                tex.mapping = THREE.EquirectangularReflectionMapping;
-                hdriTexture = tex;
-                if (F.hdri) {
-                  scene.environment = hdriTexture;
-                  scene.background = hdriTexture;
-                }
-              });
-            } catch (err) {
-              console.warn('HDRI load failed:', err);
-            }
-          } else {
-            scene.environment = hdriTexture;
-            scene.background = hdriTexture;
-          }
-        } else {
-          scene.environment = origEnv || scene.environment;
-          if (state.todEnabled) {
-            const s = $('todTimeSlider');
-            if (s) s.dispatchEvent(new Event('input'));
-          } else {
-            scene.background = new THREE.Color(state.darkMode ? 0x141519 : 0xECECE6);
+      // Centralized HDRI Sky Integration
+      $('fxHdriBtn').onclick = () => {
+        if (R.toggleHdri) {
+          R.toggleHdri();
+          F.hdri = state.hdri ? state.hdri.enabled : !F.hdri;
+          $('fxHdriBtn').classList.toggle('active', F.hdri);
+          $('fxHdriBtn').textContent = `HDRI: ${F.hdri ? 'ON' : 'OFF'}`;
+          if ($('drawerFxHdriBtn')) {
+            $('drawerFxHdriBtn').classList.toggle('active', F.hdri);
+            $('drawerFxHdriBtn').textContent = `HDRI: ${F.hdri ? 'ON' : 'OFF'}`;
           }
         }
       };

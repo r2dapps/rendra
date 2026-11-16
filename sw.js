@@ -1,4 +1,4 @@
-const V='rendra-v9',CORE=['./','./index.html','./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png'];
+const V='rendra-v11',CORE=['./','./index.html','./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png','./assets/hdri/daylight.hdr','./assets/hdri/overcast.hdr','./assets/hdri/sunset.hdr'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(V).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==V).map(x=>caches.delete(x)))).then(()=>clients.claim()))});
 // stale-while-revalidate for app shell + CDN libs (three, openskp, fonts, tailwind) => works offline after first visit

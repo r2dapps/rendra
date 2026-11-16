@@ -85,7 +85,19 @@ The existing engine is untouched: SKP→GLB conversion, 180° solar arc, procedu
 | **Engine Bugfixes** | Fixed sky dome shader directive newline parsing, wireframe blackscreen defect, altitude color array clamp, and drawer FX slider bindings |
 | **2D CAD Plan Slicing** | Planimetric slicing at 1.76m elevation dynamically renders the estate boundary, gate openings, interior walls, and furniture layouts |
 
-Not yet done: HDRI sky, billboard vegetation, geo sun study, first-person walk, self-hosting libraries and instancing.
+## ✦ v7 — True HDRI Sky & Image-Based Lighting (IBL)
+
+| Area | What changed |
+|---|---|
+| **HDRI Presets** | Instant switching between **Daylight** (Clear sky, 14.5° elev), **Overcast** (Soft architectural studio, 12.0° elev), and **Sunset** (Golden hour rim lighting, 17.2° elev) |
+| **Offline & CDN Fallback** | Local HDR assets precached in `assets/hdri/*.hdr` via Service Worker `rendra-v10` for 100% offline access, with automatic CDN fallback |
+| **Custom HDR Import** | Load any `.hdr` or `.exr` file directly from local disk via the studio file picker |
+| **Lighting & Optics Controls** | Real-time sliders for **IBL Exposure** (0.2x to 3.0x), **Sky Blur / Defocus** (0.00 to 0.60), and **Sky Azimuth** (0° to 360°) |
+| **Sky Dome Isolation** | Toggle **Sky Dome** on/off to retain accurate physical reflections on glass, marble, and automotive paint while presenting a clean neutral or Rayleigh background |
+| **Sun & Compass Sync** | Dragging the Lumion compass slider dynamically synchronizes the 360° HDR environment dome and reflections with directional sun casting |
+| **Single Source of Truth** | Fully coordinated state between the Lumion World drawer, Post-Processing FX panel, and bottom Director dock |
+
+Not yet done: PBR texture sets (external maps), billboard vegetation, geo sun study, first-person walk, self-hosting libraries and instancing.
 
 ## ✦ Quick start
 
@@ -100,10 +112,27 @@ Open `http://localhost:8080`, then use your browser's **Install** option (or the
 
 ---
 
+## ✦ v8 — Studio HDRI IBL, WASD First-Person Walk, Volumetric Lighting & AEC PBR Library
+
+| Capability | Implementation |
+|---|---|
+| **Studio HDRI Sky & IBL** | True high dynamic range image-based lighting with Equirectangular HDR textures (`daylight`, `overcast`, `sunset`), live IBL exposure (`0.2x`–`3.0x`), sky defocus blur (`0.00`–`0.60`), 360° azimuth rotation, sky dome isolation toggle, and custom `.hdr`/`.exr` loading |
+| **First-Person WASD Walk** | Architectural eye-level (1.65m) navigation with WASD/arrow locomotion, `Shift` sprint (7.0 m/s), `Space` jump, and mouse look. Ground-penetrating raycaster dynamically climbs entrance pavers, plinth slabs, and staircase treads with gravitational free-fall |
+| **Volumetric Street Lighting** | Curbside luminaire poles equipped with physical volumetric light cones (`THREE.AdditiveBlending`) and ground illumination pools that dynamically brighten during dusk, sunset, and night |
+| **AEC PBR Pre-Library** | 10 curated architectural finishes (*Brushed Travertine, Nero Marquina, Board-Formed Concrete, Teak Timber, Fluted Glass, Corten Steel, Brushed Titanium, Terrazzo Bianco, Ceramic Mosaic, Acoustic Felt*) with procedural PBR maps |
+| **Zero-Overhead Lazy Loading** | Material textures are generated strictly on demand when clicked, keeping initial page load memory overhead at absolute zero |
+| **Atomic Material Reset** | Single-click "Reset Part" and "Reset All Parts" restore individual elements or all 240 estate meshes to their pristine SketchUp materials |
+
+---
+
 ## ✦ Director cheat sheet
 
 | Key | Action |
 |---|---|
+| `V` | Toggle First-Person WASD Walk mode |
+| `W` / `A` / `S` / `D` | Walk / strafe / backward (in Walk mode) |
+| `Shift` | Sprint (in Walk mode) |
+| `Space` | Jump (in Walk mode) |
 | `Shift` + `P` | 📷 Photo (PNG) |
 | `Shift` + `T` | Start / stop cinematic tour |
 | `Shift` + `R` | Start / stop film recording |
